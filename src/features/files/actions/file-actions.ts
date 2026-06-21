@@ -20,7 +20,7 @@ export async function getFileDownloadUrlAction(id: string, workspaceId: string) 
   }
 }
 
-export async function deleteFileAction(id: string, workspaceId: string, projectId: string) {
+export async function deleteFileAction(id: string, workspaceId: string, projectId?: string) {
   try {
     const session = await auth();
     if (!session?.user?.id) {
@@ -28,7 +28,10 @@ export async function deleteFileAction(id: string, workspaceId: string, projectI
     }
 
     await fileService.deleteFile(id, workspaceId, session.user.id);
-    revalidatePath(`/[workspaceSlug]/projects/${projectId}`);
+    if (projectId) {
+      revalidatePath(`/[workspaceSlug]/projects/${projectId}`);
+    }
+    revalidatePath(`/[workspaceSlug]/files`);
     return { success: true };
   } catch (error: any) {
     return { success: false, error: error.message || 'Failed to delete file' };

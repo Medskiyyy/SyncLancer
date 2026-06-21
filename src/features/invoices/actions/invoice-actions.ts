@@ -18,6 +18,7 @@ export async function createInvoiceAction(workspaceId: string, input: CreateInvo
     if (input.projectId) {
       revalidatePath(`/[workspaceSlug]/projects/${input.projectId}`);
     }
+    revalidatePath(`/[workspaceSlug]/invoices`);
     return { success: true, data: invoice };
   } catch (error: any) {
     return { success: false, error: error.message || 'Failed to create invoice' };
@@ -35,6 +36,7 @@ export async function updateInvoiceAction(id: string, workspaceId: string, proje
     if (projectId) {
       revalidatePath(`/[workspaceSlug]/projects/${projectId}`);
     }
+    revalidatePath(`/[workspaceSlug]/invoices`);
     return { success: true, data: invoice };
   } catch (error: any) {
     return { success: false, error: error.message || 'Failed to update invoice' };
@@ -52,6 +54,7 @@ export async function deleteInvoiceAction(id: string, workspaceId: string, proje
     if (projectId) {
       revalidatePath(`/[workspaceSlug]/projects/${projectId}`);
     }
+    revalidatePath(`/[workspaceSlug]/invoices`);
     return { success: true };
   } catch (error: any) {
     return { success: false, error: error.message || 'Failed to delete invoice' };
@@ -69,6 +72,7 @@ export async function sendInvoiceAction(id: string, workspaceId: string, project
     if (projectId) {
       revalidatePath(`/[workspaceSlug]/projects/${projectId}`);
     }
+    revalidatePath(`/[workspaceSlug]/invoices`);
     return { success: true, data: invoice };
   } catch (error: any) {
     return { success: false, error: error.message || 'Failed to send invoice' };
@@ -86,6 +90,7 @@ export async function markAsPaidAction(id: string, workspaceId: string, projectI
     if (projectId) {
       revalidatePath(`/[workspaceSlug]/projects/${projectId}`);
     }
+    revalidatePath(`/[workspaceSlug]/invoices`);
     return { success: true, data: invoice };
   } catch (error: any) {
     return { success: false, error: error.message || 'Failed to mark invoice as paid' };

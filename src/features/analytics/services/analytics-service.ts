@@ -33,19 +33,171 @@ export class AnalyticsService {
     const startOfCurrentMonth = startOfMonth(now);
     const startOfLastMonth = startOfMonth(subMonths(now, 1));
     const endOfLastMonth = endOfMonth(subMonths(now, 1));
+    const startOfWeekDate = startOfWeek(now, { weekStartsOn: 1 });
 
-    // 2. Query Paid Invoices for Workspace
-    const paidInvoices = await prisma.invoice.findMany({
-      where: {
-        workspaceId,
-        status: InvoiceStatus.PAID,
-        deletedAt: null,
-      },
-      select: {
-        totalAmount: true,
-        createdAt: true,
-      },
-    });
+    const [
+      paidInvoices,
+      pendingInvoices,
+      activeProjectsCount,
+      lastMonthActiveProjectsCount,
+      activeClientsCount,
+      lastMonthClientsCount,
+      projectsByStatus,
+      timeEntries,
+      activeTasksCount,
+      upcomingMilestone,
+      dbInvoices,
+      dbProposals,
+      dbLeads,
+      dbMilestones
+    ] = await Promise.all([
+      // 2. Query Paid Invoices for Workspace
+      prisma.invoice.findMany({
+        where: {
+          workspaceId,
+          status: InvoiceStatus.PAID,
+          deletedAt: null,
+        },
+        select: {
+          totalAmount: true,
+          createdAt: true,
+        },
+      }),
+      // 3. Query Pending Invoices
+      prisma.invoice.findMany({
+        where: {
+          workspaceId,
+          status: { in: [InvoiceStatus.SENT, InvoiceStatus.OVERDUE] },
+          deletedAt: null,
+        },
+        select: {
+          totalAmount: true,
+        },
+      }),
+      // 4. Query Active Projects
+      prisma.project.count({
+        where: {
+          workspaceId,
+          status: ProjectStatus.ACTIVE,
+          deletedAt: null,
+        },
+      }),
+      prisma.project.count({
+        where: {
+          workspaceId,
+          status: ProjectStatus.ACTIVE,
+          createdAt: { lt: startOfCurrentMonth },
+          deletedAt: null,
+        },
+      }),
+      // 5. Query Active Clients
+      prisma.client.count({
+        where: {
+          workspaceId,
+          archived: false,
+          deletedAt: null,
+        },
+      }),
+      prisma.client.count({
+        where: {
+          workspaceId,
+          archived: false,
+          createdAt: { lt: startOfCurrentMonth },
+          deletedAt: null,
+        },
+      }),
+      // 6. Project Status Distribution (for Status Chart)
+      prisma.project.groupBy({
+        by: ['status'],
+        where: {
+          workspaceId,
+          deletedAt: null,
+        },
+        _count: {
+          _all: true,
+        },
+      }),
+      // 8. Workload & Progress: time entries
+      prisma.timeEntry.findMany({
+        where: {
+          project: {
+            workspaceId,
+            deletedAt: null,
+          },
+          startTime: {
+            gte: startOfWeekDate,
+          },
+        },
+        select: {
+          durationMinutes: true,
+        },
+      }),
+      // 8. Workload & Progress: active tasks count
+      prisma.task.count({
+        where: {
+          project: {
+            workspaceId,
+            deletedAt: null,
+          },
+          status: {
+            in: [TaskStatus.IN_PROGRESS, TaskStatus.REVIEW],
+          },
+        },
+      }),
+      // 8. Workload & Progress: upcoming milestone
+      prisma.milestone.findFirst({
+        where: {
+          project: {
+            workspaceId,
+            deletedAt: null,
+          },
+          status: {
+            in: [MilestoneStatus.NOT_STARTED, MilestoneStatus.IN_PROGRESS],
+          },
+          dueDate: {
+            gte: now,
+          },
+        },
+        orderBy: {
+          dueDate: 'asc',
+        },
+        include: {
+          project: true,
+        },
+      }),
+      // 9. Recent Activity Feed: invoices
+      prisma.invoice.findMany({
+        where: { workspaceId, deletedAt: null },
+        orderBy: { updatedAt: 'desc' },
+        take: 5,
+        include: { client: true },
+      }),
+      // 9. Recent Activity Feed: proposals
+      prisma.proposal.findMany({
+        where: { workspaceId, deletedAt: null },
+        orderBy: { updatedAt: 'desc' },
+        take: 5,
+        include: { client: true },
+      }),
+      // 9. Recent Activity Feed: leads
+      prisma.lead.findMany({
+        where: { workspaceId, deletedAt: null },
+        orderBy: { updatedAt: 'desc' },
+        take: 5,
+      }),
+      // 9. Recent Activity Feed: completed milestones
+      prisma.milestone.findMany({
+        where: {
+          project: { workspaceId, deletedAt: null },
+          status: MilestoneStatus.COMPLETED,
+        },
+        orderBy: {
+          dueDate: 'desc',
+        },
+        take: 5,
+        include: { project: true },
+      })
+    ]);
 
     const totalRevenue = paidInvoices.reduce((sum, inv) => sum + Number(inv.totalAmount), 0);
 
@@ -65,72 +217,12 @@ export class AnalyticsService {
       revenueChangePercent = 100;
     }
 
-    // 3. Query Pending Invoices
-    const pendingInvoices = await prisma.invoice.findMany({
-      where: {
-        workspaceId,
-        status: { in: [InvoiceStatus.SENT, InvoiceStatus.OVERDUE] },
-        deletedAt: null,
-      },
-      select: {
-        totalAmount: true,
-      },
-    });
-
     const pendingAmount = pendingInvoices.reduce((sum, inv) => sum + Number(inv.totalAmount), 0);
     const pendingCount = pendingInvoices.length;
 
-    // 4. Query Active Projects
-    const activeProjectsCount = await prisma.project.count({
-      where: {
-        workspaceId,
-        status: ProjectStatus.ACTIVE,
-        deletedAt: null,
-      },
-    });
-
-    const lastMonthActiveProjectsCount = await prisma.project.count({
-      where: {
-        workspaceId,
-        status: ProjectStatus.ACTIVE,
-        createdAt: { lt: startOfCurrentMonth },
-        deletedAt: null,
-      },
-    });
-
     const projectsChangeCount = activeProjectsCount - lastMonthActiveProjectsCount;
 
-    // 5. Query Active Clients
-    const activeClientsCount = await prisma.client.count({
-      where: {
-        workspaceId,
-        archived: false,
-        deletedAt: null,
-      },
-    });
-
-    const lastMonthClientsCount = await prisma.client.count({
-      where: {
-        workspaceId,
-        archived: false,
-        createdAt: { lt: startOfCurrentMonth },
-        deletedAt: null,
-      },
-    });
-
     const clientsChangeCount = activeClientsCount - lastMonthClientsCount;
-
-    // 6. Project Status Distribution (for Status Chart)
-    const projectsByStatus = await prisma.project.groupBy({
-      by: ['status'],
-      where: {
-        workspaceId,
-        deletedAt: null,
-      },
-      _count: {
-        _all: true,
-      },
-    });
 
     const statusLabels: Record<ProjectStatus, string> = {
       [ProjectStatus.DRAFT]: 'Draft',
@@ -162,91 +254,8 @@ export class AnalyticsService {
       monthlyRevenueTrend.push({ name: monthName, revenue });
     }
 
-    // 8. Workload & Progress
-    const startOfWeekDate = startOfWeek(now, { weekStartsOn: 1 });
-    const timeEntries = await prisma.timeEntry.findMany({
-      where: {
-        project: {
-          workspaceId,
-          deletedAt: null,
-        },
-        startTime: {
-          gte: startOfWeekDate,
-        },
-      },
-      select: {
-        durationMinutes: true,
-      },
-    });
-
     const totalMinutes = timeEntries.reduce((sum, entry) => sum + entry.durationMinutes, 0);
     const hoursLogged = Math.round((totalMinutes / 60) * 10) / 10;
-
-    const activeTasksCount = await prisma.task.count({
-      where: {
-        project: {
-          workspaceId,
-          deletedAt: null,
-        },
-        status: {
-          in: [TaskStatus.IN_PROGRESS, TaskStatus.REVIEW],
-        },
-      },
-    });
-
-    const upcomingMilestone = await prisma.milestone.findFirst({
-      where: {
-        project: {
-          workspaceId,
-          deletedAt: null,
-        },
-        status: {
-          in: [MilestoneStatus.NOT_STARTED, MilestoneStatus.IN_PROGRESS],
-        },
-        dueDate: {
-          gte: now,
-        },
-      },
-      orderBy: {
-        dueDate: 'asc',
-      },
-      include: {
-        project: true,
-      },
-    });
-
-    // 9. Recent Activity Feed
-    const dbInvoices = await prisma.invoice.findMany({
-      where: { workspaceId, deletedAt: null },
-      orderBy: { updatedAt: 'desc' },
-      take: 5,
-      include: { client: true },
-    });
-
-    const dbProposals = await prisma.proposal.findMany({
-      where: { workspaceId, deletedAt: null },
-      orderBy: { updatedAt: 'desc' },
-      take: 5,
-      include: { client: true },
-    });
-
-    const dbLeads = await prisma.lead.findMany({
-      where: { workspaceId, deletedAt: null },
-      orderBy: { updatedAt: 'desc' },
-      take: 5,
-    });
-
-    const dbMilestones = await prisma.milestone.findMany({
-      where: {
-        project: { workspaceId, deletedAt: null },
-        status: MilestoneStatus.COMPLETED,
-      },
-      orderBy: {
-        dueDate: 'desc', // Milestones do not have a completed date, using dueDate as proxy
-      },
-      take: 5,
-      include: { project: true },
-    });
 
     const activitiesList: Array<{ text: string; time: string; date: Date; type: string }> = [];
 
