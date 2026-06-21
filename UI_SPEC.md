@@ -1,6 +1,6 @@
 # SyncLancer UI/UX Design System Specification
 
-This document specifies the premium design system applied to SyncLancer. The theme aligns with modern SaaS products like Attio, Stripe, Linear, Notion, and Framer, utilizing a warm, organic Stone gray foundation highlighted with vibrant Amber/Gold accents.
+This document specifies the premium SaaS design system applied to SyncLancer. The theme aligns with modern SaaS products like Attio, Stripe, Linear, and Vercel, utilizing a high-contrast, clean Slate/Blue light-mode-first aesthetic.
 
 ---
 
@@ -8,90 +8,81 @@ This document specifies the premium design system applied to SyncLancer. The the
 
 SyncLancer employs a unified color system defined in `globals.css` using CSS custom properties.
 
-### Foundation Palette (Stone)
-- **Background (Light)**: `#fafaf9` (Stone 50) - Warm, soft background avoiding sterile white.
-- **Background (Dark)**: `#0c0a09` (Stone 950) - Rich deep obsidian black.
-- **Foreground (Light)**: `#1c1917` (Stone 900) - Premium high-contrast charcoal.
-- **Foreground (Dark)**: `#fafaf9` (Stone 50) - Warm chalk white.
-- **Cards (Light)**: `#ffffff` (White)
-- **Cards (Dark)**: `#1c1917` (Stone 900) - Sleek elevated container block.
-- **Borders (Light)**: `#e7e5e4` (Stone 200) - Crisp thin boundaries.
-- **Borders (Dark)**: `#292524` (Stone 800) - Subtle dark-mode lines.
+### Foundation Palette (Slate)
+- **Background**: `#F8FAFC` (Slate 50) - Soft light-mode page canvas.
+- **Card Background**: `#FFFFFF` (White) - Elevated surface container blocks.
+- **Borders**: `#E2E8F0` (Slate 200) - Clean, thin boundaries.
+- **Body Text**: `#64748B` (Slate 500 / Slate 600) - High-legibility charcoal gray.
+- **Headings**: `#0F172A` (Slate 900) - Pure dark slate for premium emphasis.
 
-### Accent Palette (Gold/Amber)
-- **Primary / Ring**: `#ca8a04` (Amber 600) - Gold accent signifying professional status.
-- **Muted Accents**: `rgba(202, 138, 4, 0.1)` (Amber 600 at 10% opacity) - Translucent highlights.
-- **Selection Highlight**: `selection:bg-amber-100 selection:text-amber-900` - Warm context select color.
+### Accent & Chart Colors
+- **Primary Blue**: `#2563EB` (Blue 600) - Signature branding color.
+- **Secondary Blue**: `#3B82F6` (Blue 500) - Alternative highlights.
+- **Accent Cyan**: `#06B6D4` (Cyan 500) - Informational/highlight accent.
+- **Success (Green)**: `#10B981` - Positive status indicators (PAID, COMPLETED).
+- **Warning (Amber)**: `#F59E0B` - Attention indicators (ON_HOLD, SENT).
+- **Danger (Red)**: `#EF4444` - Critical indicators (OVERDUE, CANCELLED).
+- **Grid Lines**: `#E2E8F0` - Soft lines for chart grids.
 
 ---
 
 ## 2. Typography & Hierarchy
 
-Clean, readable sans-serif typography with strict scaling for SaaS readability.
+Clean, readable typography using the Inter font family with strict font-size hierarchy for high-density SaaS views.
 
-- **Main Header (H1)**: `text-2xl md:text-3xl font-extrabold tracking-tight`
-- **Section Title (H2)**: `text-lg md:text-xl font-bold tracking-tight`
-- **Card Titles (H3)**: `text-sm font-bold tracking-wider uppercase text-zinc-450`
-- **Body Text**: `text-xs md:text-sm font-medium text-zinc-650 dark:text-zinc-450`
-- **Subtext / Meta info**: `text-[10px] md:text-xs font-semibold text-zinc-400`
-- **Monospace (Numbers / Codes)**: `font-mono` - Enforces uniform spacing for pricing, IDs, and dates.
-
----
-
-## 3. Borders & Shadows
-
-Crisp boundaries define the Linear/Stripe design language.
-
-- **Standard Border**: `border border-zinc-200/60 dark:border-zinc-800/80` (thin, semi-translucent crisp lines).
-- **Elevated Border**: `border-zinc-250 dark:border-zinc-800` (for high priority highlights).
-- **Border Radius**: `rounded-xl` (12px) for cards, `rounded-lg` (8px) for buttons/inputs, `rounded` (4px) for badges.
-- **Glassmorphic blur**: `.glass-card` (backdrop filter with white/obsidian translucent blends) for headers.
-- **Shadows**: Thin, soft elevations avoiding heavy blur:
-  - Standard Card: `shadow-xs`
-  - Hover Card Elevation (`.hover-lift`): Translates `translateY(-2px)` with shadow expansion `box-shadow: 0 12px 24px -10px rgba(9, 9, 11, 0.08)`.
+- **Page Title**: `32px` (`text-3xl font-bold tracking-tight text-slate-900`)
+- **Section Title**: `24px` (`text-2xl font-semibold tracking-tight text-slate-900`)
+- **Card Title / Table Title**: `16px` (`text-base font-bold text-slate-900`)
+- **Body / Content text**: `14px` (`text-sm font-medium text-slate-600`)
+- **Subtext / Meta info**: `12px` (`text-xs text-slate-500`)
 
 ---
 
-## 4. Components & Interactive States
+## 3. Layout Specifications
 
-Interactive components must feel tactile and responsive.
+Standardized layout dimensions ensure visual alignment across all pages.
 
-### Click Targets Enforcements
-- All clickable buttons, sidebar items, and tab buttons must explicitly feature the class `cursor-pointer`.
-- Active buttons implement a focus outline: `focus-visible:ring-1 focus-visible:ring-primary/40`.
-
-### Active / Selected States
-- **Sidebar Nav Links**: Active items receive a left border highlight `border-l-2 border-primary rounded-l-none` and background tint `bg-zinc-150 dark:bg-zinc-800`.
-- **Notion Tabs**: Tabs display a bordered pill design `bg-zinc-100 dark:bg-zinc-850 text-zinc-950 dark:text-zinc-50 border-zinc-200/40 dark:border-zinc-800`.
-- **Hover Transitions**: Transitions apply `transition-all duration-150` or `duration-250` for smooth animations.
+- **Desktop Sidebar**: Fixed `260px` width. Sidebar navigation menu items have a list height of `44px` (`h-11`). Active state transition is background-only with a left blue border.
+- **Workspace Switcher**: Switcher card height is `72px` (`h-[72px]`), displaying a `40x40` (`h-10 w-10`) avatar.
+- **Top Header**: Height of `64px` (`h-16`).
+- **Workspace Settings**: Maximum content width is set to exactly `900px` (`max-w-[900px]`), displaying exactly 6 settings tabs: General, Workspace, Branding, Billing, Notifications, and Security.
 
 ---
 
-## 5. Layout Specifications
+## 4. Spacing & Grid Metrics
 
-Responsive scaffolding for both desktop workspaces and mobile views.
+Specific component structures define the spacing system.
 
-- **Desktop Sidebar**: Fixed `w-64` left-side navigation with scrollable contents.
-- **Desktop Main Area**: Placed at `pl-64` on viewports `>= md`.
-- **Mobile Header**: Dynamic topbar `h-14` featuring absolute overlay backdrop-blur (`bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md`).
-- **Mobile Sidebar Drawer**: Hamburger-triggered sliding left panel (`animate-in slide-in-from-left duration-250`) with overlay dismiss target.
+- **Kanban Board columns**: Exactly `280px` wide, separated by a `16px` gap. Column header text uses Title casing and the label "Lead" instead of generic names.
+- **List Tables**: Table header height is `48px` (`h-[48px]`), and row height is `60px` (`h-[60px]`). Headers are aligned px-6. Row click targets are mapped directly on client/project names.
+- **Files Grid View**: Google Drive-style layout showing folder categories (Documents, Images, Archives, Others) at the top, and files in a 4-column card grid below. Card height is exactly `120px` (`h-[120px]`).
+- **Dashboard KPIs**: Card heights are exactly `120px` (`h-[120px]`). Greeting card is exactly `160px` (`h-[160px]`). Quick Actions card is exactly `88px` (`h-[88px]`).
 
 ---
 
-## 6. Feature Layout Standards
+## 5. Transitions & Micro-Interactions
 
-Specific UI patterns used across SyncLancer features.
+Interactive states are optimized for high perceived performance.
 
-### CRM Lead Kanban Board
-- Columns are container boxes styled with faint theme borders. Tapping cards enables full drag-and-drop triggers.
-- Active card items stack details (email, phone, company name) in high-density blocks.
-- **Won** columns expose a premium gold button: "Convert to Client".
+- **Page Transition (Enter)**: Custom layout animation wrapping App Router pages.
+  - Duration: `180ms`
+  - Opacity: `0 → 1`
+  - TranslateY: `8px → 0`
+- **Card Hover**: Cards scale slightly with a soft lift effect.
+  - Scale: `1 → 1.02`
+  - Duration: `150ms`
+- **Button Hover**:
+  - Duration: `150ms`
+- **Sidebar Navigation**:
+  - Background transition only (no sliding overlay).
+  - Duration: `150ms`
 
-### Attio-style Clients Directory
-- Client directories employ a dense row table instead of card grids.
-- Company logos display dynamic letter initials inside warm background badges (`bg-amber-500/10 text-amber-600 border border-amber-500/15`).
-- Active scopes display custom progress bar widgets with a gold gradient overlay.
+---
 
-### Document-like Proposal Views
-- Proposals display as a physical sheet document centered on the screen, highlighted by a gold gradient border.
-- Pricing tables render with translucent stone backgrounds (`bg-zinc-50/50 dark:bg-zinc-900/30`) and bold monospace totals.
+## 6. Charts & Empty States
+
+Standards for analytical dashboards to ensure usefulness and styling consistency.
+
+- **Revenue Chart**: Height is `360px`. Filled area uses a blue gradient (`#2563EB` to Transparent).
+- **Projects Status Chart**: Height is `360px`. Bars mapped to individual status colors.
+- **Empty States**: Never render empty charts or lists. If data is absent, show an icon, helpful descriptive message, and a contextual call-to-action button (e.g. "Create Invoice").

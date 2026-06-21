@@ -4,6 +4,7 @@ import { WorkspaceService } from '@/features/workspace/services/workspace-servic
 import { SidebarNav } from '@/features/workspace/components/sidebar-nav';
 import { ClientPortalRedirect } from '@/components/client-portal-redirect';
 import { NotificationCenter } from '@/features/notifications/components/notification-center';
+import { PageTransitionProvider } from '@/app/providers/page-transition-provider';
 import { Button } from '@/components/ui/button';
 import { LogOut } from 'lucide-react';
 
@@ -29,7 +30,6 @@ export default async function DashboardLayout({
 
   let membership;
   try {
-    // Validate if the logged-in user is a member of this workspace
     membership = await workspaceService.validateWorkspaceAccess(currentWorkspace.id, session.user.id);
   } catch (error) {
     redirect('/');
@@ -58,7 +58,7 @@ export default async function DashboardLayout({
   );
 
   return (
-    <div className="flex min-h-screen bg-zinc-50 dark:bg-zinc-950">
+    <div className="flex min-h-screen bg-zinc-50 dark:bg-zinc-950 font-sans">
       {isClient && (
         <ClientPortalRedirect
           workspaceSlug={workspaceSlug}
@@ -66,7 +66,6 @@ export default async function DashboardLayout({
         />
       )}
       
-      {/* Sidebar & Header Component */}
       <SidebarNav
         currentWorkspace={currentWorkspace}
         workspaces={workspaces}
@@ -76,14 +75,11 @@ export default async function DashboardLayout({
         userName={session.user.name || ''}
         logoutButton={logoutButton}
         notificationCenter={<NotificationCenter />}
-      />
-
-      {/* Main Content Area */}
-      <div className="flex flex-1 flex-col md:pl-64">
-        {/* Page Content */}
-        <main className="flex-1 p-4 md:p-6">{children}</main>
-      </div>
+      >
+        <PageTransitionProvider>
+          {children}
+        </PageTransitionProvider>
+      </SidebarNav>
     </div>
   );
 }
-

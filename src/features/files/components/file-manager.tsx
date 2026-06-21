@@ -10,13 +10,18 @@ import {
   AlertCircle, 
   Loader2, 
   HardDrive,
-  ExternalLink
+  ExternalLink,
+  Folder,
+  FileImage,
+  FileCode,
+  FileArchive,
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 import {
   Dialog,
   DialogContent,
@@ -49,6 +54,7 @@ export function FileManager({ projectId, workspaceId, initialFiles, workspaceSlu
   const [files, setFiles] = useState<ExtendedFile[]>(initialFiles);
   const [isUploading, setIsUploading] = useState(false);
   const [isDragOver, setIsDragOver] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState<'Documents' | 'Images' | 'Archives' | 'Others' | null>(null);
 
   // Storage usage state
   const [storageUsage, setStorageUsage] = useState<{
@@ -204,6 +210,48 @@ export function FileManager({ projectId, workspaceId, initialFiles, workspaceSlu
     ? Math.min(100, (storageUsage.usedBytes / storageUsage.limitBytes) * 100)
     : 0;
 
+  const getFileCategory = (fileName: string): 'Documents' | 'Images' | 'Archives' | 'Others' => {
+    const ext = fileName.split('.').pop()?.toLowerCase() || '';
+    if (['pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'txt', 'rtf', 'csv'].includes(ext)) {
+      return 'Documents';
+    }
+    if (['png', 'jpg', 'jpeg', 'gif', 'svg', 'webp', 'ico'].includes(ext)) {
+      return 'Images';
+    }
+    if (['zip', 'rar', 'tar', 'gz', '7z', 'pkg'].includes(ext)) {
+      return 'Archives';
+    }
+    return 'Others';
+  };
+
+  const getFileIconInfo = (fileName: string) => {
+    const ext = fileName.split('.').pop()?.toLowerCase() || '';
+    if (ext === 'pdf') {
+      return { icon: FileText, color: 'text-rose-600 bg-rose-50 border-rose-100' };
+    }
+    if (['xls', 'xlsx', 'csv'].includes(ext)) {
+      return { icon: FileText, color: 'text-emerald-650 bg-emerald-50 border-emerald-100' };
+    }
+    if (['png', 'jpg', 'jpeg', 'gif', 'svg', 'webp'].includes(ext)) {
+      return { icon: FileImage, color: 'text-violet-600 bg-violet-50 border-violet-100' };
+    }
+    if (['zip', 'rar', '7z', 'tar', 'gz'].includes(ext)) {
+      return { icon: FileArchive, color: 'text-amber-600 bg-amber-50 border-amber-100' };
+    }
+    return { icon: FileText, color: 'text-blue-600 bg-blue-50 border-blue-100' };
+  };
+
+  const folderCategories = [
+    { name: 'Documents', count: files.filter(f => getFileCategory(f.fileName) === 'Documents').length, color: 'text-blue-600 bg-blue-50 border-blue-100' },
+    { name: 'Images', count: files.filter(f => getFileCategory(f.fileName) === 'Images').length, color: 'text-violet-650 bg-violet-50 border-violet-100' },
+    { name: 'Archives', count: files.filter(f => getFileCategory(f.fileName) === 'Archives').length, color: 'text-amber-600 bg-amber-50 border-amber-100' },
+    { name: 'Others', count: files.filter(f => getFileCategory(f.fileName) === 'Others').length, color: 'text-slate-650 bg-slate-50 border-slate-100' },
+  ];
+
+  const filteredCategoryFiles = selectedCategory
+    ? files.filter(f => getFileCategory(f.fileName) === selectedCategory)
+    : files;
+
   return (
     <div className="space-y-6">
       {/* Storage Progress bar (Free plan limits) */}
@@ -286,88 +334,115 @@ export function FileManager({ projectId, workspaceId, initialFiles, workspaceSlu
         )}
       </div>
 
+      {/* Folders Section */}
+      {files.length > 0 && (
+        <div className="space-y-3">
+          <h2 className="text-sm font-semibold text-slate-500 uppercase tracking-wider">Folders</h2>
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            {folderCategories.map((cat) => (
+              <button
+                key={cat.name}
+                onClick={() => setSelectedCategory(selectedCategory === cat.name ? null : cat.name as any)}
+                className={cn(
+                  "flex items-center gap-3 p-4 border rounded-xl bg-white shadow-xs transition-all hover:scale-[1.01] cursor-pointer text-left",
+                  selectedCategory === cat.name ? "border-blue-550 ring-2 ring-blue-550/5 bg-slate-50/50" : "border-slate-200"
+                )}
+              >
+                <div className={cn("p-2 rounded-lg border shrink-0", cat.color)}>
+                  <Folder className="h-5 w-5 fill-current" />
+                </div>
+                <div className="flex flex-col min-w-0">
+                  <span className="text-sm font-semibold text-slate-900 truncate">{cat.name}</span>
+                  <span className="text-xs text-slate-505">{cat.count} {cat.count === 1 ? 'file' : 'files'}</span>
+                </div>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Files List Card */}
-      <Card className="border-zinc-200/60 dark:border-zinc-800/80 bg-white dark:bg-slate-900 rounded-xl shadow-sm overflow-hidden">
-        <CardHeader className="border-b border-zinc-150 dark:border-zinc-800/50 pb-4">
-          <CardTitle className="text-base font-bold text-zinc-950 dark:text-zinc-50 flex items-center gap-2">
-            <FileText className="h-5 w-5 text-amber-550" /> Uploaded Files
-          </CardTitle>
-          <CardDescription className="text-xs">
-            Documents, mockups, and client handovers linked to this project.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="p-0">
-          {files.length === 0 ? (
-            <div className="text-center py-12 text-slate-550 dark:text-zinc-400 space-y-2">
-              <FileText className="h-10 w-10 mx-auto text-slate-300 dark:text-zinc-700" />
-              <p className="text-sm font-semibold">No files uploaded yet</p>
-              <p className="text-xs text-slate-450 max-w-xs mx-auto">
-                Drag a document or image into the upload area above to share it with your workspace.
-              </p>
-            </div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse">
-                <thead>
-                  <tr className="border-b border-zinc-150 dark:border-slate-805 bg-zinc-50/50/50 dark:bg-zinc-950/20/20 text-xs font-bold text-zinc-500 dark:text-zinc-400">
-                    <th className="py-3 px-4 font-bold">File Name</th>
-                    <th className="py-3 px-4 font-bold">Size</th>
-                    <th className="py-3 px-4 font-bold">Uploaded By</th>
-                    <th className="py-3 px-4 font-bold">Upload Date</th>
-                    <th className="py-3 px-4 font-bold text-right">Actions</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-100 dark:divide-slate-850 text-xs">
-                  {files.map((file) => (
-                    <tr key={file.id} className="hover:bg-zinc-50/50/40 dark:hover:bg-slate-950/10 transition-colors">
-                      <td className="py-3.5 px-4 font-medium text-zinc-800 dark:text-zinc-200">
-                        <div className="flex items-center gap-2 max-w-[250px] sm:max-w-md truncate">
-                          <FileText className="h-4 w-4 text-amber-550 shrink-0" />
-                          <span className="truncate" title={file.fileName}>{file.fileName}</span>
-                        </div>
-                      </td>
-                      <td className="py-3.5 px-4 text-slate-600 dark:text-zinc-400">
-                        {formatBytes(file.fileSize)}
-                      </td>
-                      <td className="py-3.5 px-4 text-slate-600 dark:text-zinc-400">
-                        {file.uploader?.fullName || 'Workspace member'}
-                      </td>
-                      <td className="py-3.5 px-4 text-slate-600 dark:text-zinc-400">
-                        {formatDate(file.createdAt)}
-                      </td>
-                      <td className="py-3.5 px-4 text-right">
-                        <div className="flex items-center justify-end gap-1.5">
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="cursor-pointer h-7 w-7 text-slate-450 hover:text-zinc-650 dark:hover:text-slate-250"
-                            onClick={() => handleDownload(file)}
-                            title="Download file"
-                          >
-                            <Download className="h-3.5 w-3.5" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="cursor-pointer h-7 w-7 text-red-400 hover:text-red-650 dark:hover:text-red-450"
-                            onClick={() => {
-                              setFileToDelete(file);
-                              setIsDeleteOpen(true);
-                            }}
-                            title="Delete file"
-                          >
-                            <Trash2 className="h-3.5 w-3.5" />
-                          </Button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+      <div className="space-y-3">
+        <div className="flex items-center justify-between">
+          <h2 className="text-sm font-semibold text-slate-500 uppercase tracking-wider">
+            {selectedCategory ? `${selectedCategory} Files` : 'All Files'}
+          </h2>
+          {selectedCategory && (
+            <button 
+              onClick={() => setSelectedCategory(null)} 
+              className="text-xs text-blue-600 hover:underline font-medium"
+            >
+              Clear Filter
+            </button>
           )}
-        </CardContent>
-      </Card>
+        </div>
+
+        {filteredCategoryFiles.length === 0 ? (
+          <Card className="border-slate-200 bg-white rounded-xl shadow-sm p-12 text-center">
+            <FileText className="h-10 w-10 mx-auto text-slate-300 mb-3" />
+            <p className="text-sm font-semibold text-slate-900">No files found</p>
+            <p className="text-xs text-slate-450 mt-1 max-w-xs mx-auto">
+              There are no files uploaded in this category.
+            </p>
+          </Card>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            {filteredCategoryFiles.map((file) => {
+              const fileInfo = getFileIconInfo(file.fileName);
+              const FileIconComponent = fileInfo.icon;
+              return (
+                <Card 
+                  key={file.id} 
+                  className="bg-white border-slate-200 p-4 h-[120px] flex flex-col justify-between shadow-xs hover:scale-[1.01] transition-all rounded-xl relative group overflow-hidden"
+                >
+                  <div className="flex items-start justify-between min-w-0">
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <div className={cn("p-1.5 rounded-lg border shrink-0", fileInfo.color)}>
+                        <FileIconComponent className="h-4 w-4" />
+                      </div>
+                      <div className="flex flex-col min-w-0">
+                        <span className="text-sm font-semibold text-slate-900 truncate block pr-2" title={file.fileName}>
+                          {file.fileName}
+                        </span>
+                        <span className="text-[10px] text-slate-500 mt-0.5">{formatBytes(file.fileSize)}</span>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center justify-between mt-auto">
+                    <span className="text-[9px] font-medium text-slate-450 truncate max-w-[120px]" title={`Uploaded by ${file.uploader?.fullName || 'Workspace member'}`}>
+                      By {file.uploader?.fullName?.split(' ')[0] || 'Member'}
+                    </span>
+                    <div className="flex items-center gap-0.5">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-7 w-7 text-slate-400 hover:text-slate-900 rounded-md shrink-0 cursor-pointer"
+                        onClick={() => handleDownload(file)}
+                        title="Download file"
+                      >
+                        <Download className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-7 w-7 text-slate-405 hover:text-red-650 hover:bg-red-50 rounded-md shrink-0 cursor-pointer"
+                        onClick={() => {
+                          setFileToDelete(file);
+                          setIsDeleteOpen(true);
+                        }}
+                        title="Delete file"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+                </Card>
+              );
+            })}
+          </div>
+        )}
+      </div>
 
       {/* Delete Confirmation Dialog */}
       <Dialog open={isDeleteOpen} onOpenChange={setIsDeleteOpen}>

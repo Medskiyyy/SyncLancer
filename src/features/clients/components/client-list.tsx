@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Client, Project } from '@prisma/client';
+import { Client, Project, Invoice } from '@prisma/client';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'sonner';
@@ -19,6 +19,8 @@ import {
   Users,
   Building,
   Sparkles,
+  DollarSign,
+  Calendar,
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -48,6 +50,7 @@ import { cn } from '@/lib/utils';
 
 interface ExtendedClient extends Client {
   projects?: Project[];
+  invoices?: Invoice[];
 }
 
 interface ClientListProps {
@@ -185,29 +188,52 @@ export function ClientList({ initialClients, workspaceId, workspaceSlug }: Clien
     );
   });
 
+  const getClientRevenue = (client: ExtendedClient) => {
+    if (!client.invoices) return 0;
+    return client.invoices
+      .filter((invoice) => invoice.status === 'PAID')
+      .reduce((sum, invoice) => sum + Number(invoice.totalAmount), 0);
+  };
+
+  const getClientLastActivity = (client: ExtendedClient) => {
+    const dates = [new Date(client.updatedAt)];
+    if (client.projects) {
+      client.projects.forEach((p) => dates.push(new Date(p.updatedAt)));
+    }
+    if (client.invoices) {
+      client.invoices.forEach((i) => dates.push(new Date(i.updatedAt)));
+    }
+    const maxDate = new Date(Math.max(...dates.map((d) => d.getTime())));
+    return maxDate.toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+    });
+  };
+
   return (
     <div className="space-y-6 animate-in fade-in-50 duration-300">
       {/* Page Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-zinc-200/60 dark:border-zinc-800/80 pb-5">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-6 border-b border-slate-100">
         <div>
-          <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight text-zinc-900 dark:text-zinc-55">Clients Directory</h1>
-          <p className="text-sm text-zinc-500 dark:text-zinc-400">View and manage workspace customer relations, scope history, and portal keys.</p>
+          <h1 className="text-3xl font-bold tracking-tight text-slate-900">Clients</h1>
+          <p className="text-sm text-slate-500 mt-1">Manage client profiles, projects, billing records, and access keys.</p>
         </div>
-        <Button onClick={() => setIsAddOpen(true)} className="cursor-pointer font-semibold text-xs h-9">
-          <Plus className="mr-1.5 h-4 w-4" /> Add Client
+        <Button onClick={() => setIsAddOpen(true)} className="cursor-pointer font-medium text-sm h-10 px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow-sm">
+          <Plus className="mr-2 h-4 w-4" /> Add Client
         </Button>
       </div>
 
       {/* Tabs and Search Bar */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex bg-zinc-100 dark:bg-zinc-800 p-0.5 rounded-lg border border-zinc-200/50 dark:border-zinc-700/50 self-start">
+        <div className="flex bg-slate-100 p-1 rounded-lg border border-slate-200/50 self-start">
           <button
             onClick={() => setActiveTab('active')}
             className={cn(
               "px-4 py-1.5 text-xs font-semibold rounded-md transition-all cursor-pointer",
               activeTab === 'active'
-                ? "bg-white dark:bg-zinc-900 text-zinc-950 dark:text-zinc-50 shadow-xs"
-                : "text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-200"
+                ? "bg-white text-blue-700 shadow-xs"
+                : "text-slate-500 hover:text-slate-900"
             )}
           >
             Active Clients
@@ -217,8 +243,8 @@ export function ClientList({ initialClients, workspaceId, workspaceSlug }: Clien
             className={cn(
               "px-4 py-1.5 text-xs font-semibold rounded-md transition-all cursor-pointer",
               activeTab === 'archived'
-                ? "bg-white dark:bg-zinc-900 text-zinc-950 dark:text-zinc-50 shadow-xs"
-                : "text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-200"
+                ? "bg-white text-blue-700 shadow-xs"
+                : "text-slate-500 hover:text-slate-900"
             )}
           >
             Archived
@@ -226,115 +252,108 @@ export function ClientList({ initialClients, workspaceId, workspaceSlug }: Clien
         </div>
 
         <div className="relative w-full max-w-sm">
-          <Search className="absolute left-3 top-2.5 h-4 w-4 text-zinc-400 dark:text-zinc-500" />
+          <Search className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
           <Input
-            placeholder="Search company, contact, notes..."
+            placeholder="Search clients..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-9 bg-white dark:bg-zinc-900 text-xs h-9 rounded-lg"
+            className="pl-9 bg-white text-sm h-10 rounded-lg border-slate-250"
           />
         </div>
       </div>
 
       {/* Clients List */}
       {filteredClients.length === 0 ? (
-        <Card className="flex flex-col items-center justify-center p-12 text-center border-dashed border-zinc-200/60 dark:border-zinc-800">
-          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-zinc-50 dark:bg-zinc-950 text-zinc-400 mb-4 border border-zinc-200/50 dark:border-zinc-800/80">
-            <Users className="h-6 w-6 text-zinc-400" />
+        <Card className="flex flex-col items-center justify-center p-12 text-center border-dashed border-slate-200">
+          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-slate-50 text-slate-450 mb-4 border border-slate-100">
+            <Users className="h-6 w-6 text-slate-500" />
           </div>
-          <CardTitle className="text-sm font-bold text-zinc-900 dark:text-zinc-50">
+          <CardTitle className="text-base font-bold text-slate-900">
             {searchQuery ? 'No matching clients found' : `No ${activeTab} clients yet`}
           </CardTitle>
-          <CardDescription className="max-w-sm mt-1 text-xs text-zinc-500 dark:text-zinc-400">
+          <CardDescription className="max-w-sm mt-2 text-sm text-slate-500">
             {searchQuery 
               ? 'Try refining your search terms or filters.'
               : activeTab === 'active' 
-                ? 'Add your first client to start sending proposals, managing projects, and billing.' 
+                ? 'Create a client profile to start tracking proposals, active projects, and billing.' 
                 : 'You have no archived clients.'
             }
           </CardDescription>
           {!searchQuery && activeTab === 'active' && (
-            <Button onClick={() => setIsAddOpen(true)} className="mt-4 flex items-center gap-2 cursor-pointer font-semibold text-xs h-9">
+            <Button onClick={() => setIsAddOpen(true)} className="mt-5 flex items-center gap-2 cursor-pointer font-medium text-sm h-10 bg-blue-600 hover:bg-blue-700 text-white px-4 rounded-lg shadow-sm">
               <Plus className="h-4 w-4" />
               <span>Add Client</span>
             </Button>
           )}
         </Card>
       ) : (
-        <Card className="overflow-hidden border border-zinc-200/60 dark:border-zinc-800/80 rounded-xl shadow-xs">
+        <Card className="overflow-hidden border border-slate-200 rounded-xl shadow-sm bg-white">
           <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse text-xs">
+            <table className="w-full text-left border-collapse text-sm">
               <thead>
-                <tr className="border-b border-zinc-200 dark:border-zinc-800 text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider bg-zinc-50/50 dark:bg-zinc-900/30">
-                  <th className="px-5 py-3">Client & Company</th>
-                  <th className="px-5 py-3">Primary Contact</th>
-                  <th className="px-5 py-3">Active Projects</th>
-                  <th className="px-5 py-3">Status</th>
-                  <th className="px-5 py-3 text-right">Actions</th>
+                <tr className="border-b border-slate-200 text-xs font-semibold text-slate-500 bg-slate-50/50 h-[48px]">
+                  <th className="px-6 align-middle font-medium">Client</th>
+                  <th className="px-6 align-middle font-medium">Email</th>
+                  <th className="px-6 align-middle font-medium">Projects</th>
+                  <th className="px-6 align-middle font-medium">Revenue</th>
+                  <th className="px-6 align-middle font-medium">Status</th>
+                  <th className="px-6 align-middle font-medium">Last Activity</th>
+                  <th className="px-6 align-middle font-medium text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-zinc-200/60 dark:divide-zinc-800/60 bg-white dark:bg-zinc-900">
+              <tbody className="divide-y divide-slate-100 bg-white">
                 {filteredClients.map((client) => {
                   const projectCount = client.projects?.length || 0;
+                  const revenue = getClientRevenue(client);
+                  const lastActivity = getClientLastActivity(client);
                   return (
-                    <tr key={client.id} className="hover:bg-zinc-50/40 dark:hover:bg-zinc-900/40 transition-colors">
-                      <td className="px-5 py-3.5">
+                    <tr key={client.id} className="hover:bg-slate-50/50 transition-colors h-[60px]">
+                      <td className="px-6 align-middle">
                         <div className="flex items-center gap-3">
-                          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-amber-500/10 text-amber-600 dark:text-amber-400 font-bold border border-amber-500/15 shadow-xs">
+                          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-blue-600 font-bold border border-blue-100 text-xs">
                             {client.companyName.substring(0, 2).toUpperCase()}
                           </div>
-                          <div>
-                            <Link href={`/${workspaceSlug}/clients/${client.id}`} className="font-semibold text-zinc-900 dark:text-zinc-100 hover:text-primary transition-colors hover:underline">
+                          <div className="flex flex-col min-w-0">
+                            <Link href={`/${workspaceSlug}/clients/${client.id}`} className="font-semibold text-slate-900 hover:text-blue-600 hover:underline truncate">
                               {client.companyName}
                             </Link>
-                            {client.notes && (
-                              <p className="text-[10px] text-zinc-400 dark:text-zinc-500 truncate max-w-[200px] mt-0.5 font-medium">
-                                {client.notes}
-                              </p>
-                            )}
                           </div>
                         </div>
                       </td>
-                      <td className="px-5 py-3.5">
-                        <div className="space-y-1">
-                          <div className="flex items-center gap-1.5 text-zinc-700 dark:text-zinc-300 font-medium">
-                            <Mail className="h-3.5 w-3.5 text-zinc-400" />
-                            <span>{client.primaryEmail}</span>
-                          </div>
-                          {client.phone && (
-                            <div className="flex items-center gap-1.5 text-zinc-400 dark:text-zinc-500 text-[10px]">
-                              <Phone className="h-3 w-3" />
-                              <span>{client.phone}</span>
-                            </div>
-                          )}
-                        </div>
+                      <td className="px-6 align-middle text-slate-600">
+                        <a href={`mailto:${client.primaryEmail}`} className="hover:underline hover:text-blue-600">
+                          {client.primaryEmail}
+                        </a>
                       </td>
-                      <td className="px-5 py-3.5">
-                        <div className="flex items-center gap-1.5">
-                          <Badge variant="secondary" className="font-mono font-semibold text-[10px] border border-zinc-200/50 dark:border-zinc-800/80">
-                            <FolderKanban className="h-3 w-3 mr-1 text-zinc-400" />
-                            {projectCount} {projectCount === 1 ? 'Project' : 'Projects'}
-                          </Badge>
-                        </div>
+                      <td className="px-6 align-middle">
+                        <span className="font-medium text-slate-700">
+                          {projectCount} {projectCount === 1 ? 'project' : 'projects'}
+                        </span>
                       </td>
-                      <td className="px-5 py-3.5">
+                      <td className="px-6 align-middle font-mono font-medium text-slate-900">
+                        ${revenue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      </td>
+                      <td className="px-6 align-middle">
                         <Badge 
                           className={cn(
-                            "text-[9px] font-bold px-1.5 py-0.5",
+                            "text-[10px] font-medium px-2 py-0.5 rounded-full border shadow-none",
                             client.archived 
-                              ? "bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 border border-zinc-200/30"
-                              : "bg-green-500/10 text-green-600 dark:text-green-400 border border-green-550/15"
+                              ? "bg-slate-105 text-slate-600 border-slate-200"
+                              : "bg-emerald-50 text-emerald-700 border-emerald-150"
                           )}
                           variant="secondary"
                         >
                           {client.archived ? 'Archived' : 'Active'}
                         </Badge>
                       </td>
-                      <td className="px-5 py-3.5 text-right">
+                      <td className="px-6 align-middle text-slate-500 text-xs">
+                        {lastActivity}
+                      </td>
+                      <td className="px-6 align-middle text-right">
                         <div className="flex items-center justify-end gap-1">
                           <Link href={`/${workspaceSlug}/clients/${client.id}`}>
-                            <Button variant="ghost" size="icon" title="View Profile" className="h-7 w-7 text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 cursor-pointer">
-                              <Eye className="h-3.5 w-3.5" />
+                            <Button variant="ghost" size="icon" title="View Profile" className="h-8 w-8 text-slate-400 hover:text-slate-900 rounded-md cursor-pointer">
+                              <Eye className="h-4 w-4" />
                             </Button>
                           </Link>
                           <Button 
@@ -345,27 +364,27 @@ export function ClientList({ initialClients, workspaceId, workspaceSlug }: Clien
                               setEditingClient(client);
                               setIsEditOpen(true);
                             }}
-                            className="h-7 w-7 text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 cursor-pointer"
+                            className="h-8 w-8 text-slate-400 hover:text-slate-900 rounded-md cursor-pointer"
                           >
-                            <Edit className="h-3.5 w-3.5" />
+                            <Edit className="h-4 w-4" />
                           </Button>
                           <Button 
                             variant="ghost" 
                             size="icon" 
                             title={client.archived ? 'Restore Client' : 'Archive Client'} 
                             onClick={() => handleArchiveClient(client)}
-                            className="h-7 w-7 text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 cursor-pointer"
+                            className="h-8 w-8 text-slate-400 hover:text-slate-900 rounded-md cursor-pointer"
                           >
-                            {client.archived ? <RotateCcw className="h-3.5 w-3.5 text-amber-500" /> : <Archive className="h-3.5 w-3.5" />}
+                            {client.archived ? <RotateCcw className="h-4 w-4 text-amber-500" /> : <Archive className="h-4 w-4" />}
                           </Button>
                           <Button 
                             variant="ghost" 
                             size="icon" 
                             title="Delete Client" 
                             onClick={() => handleDeleteClient(client.id)}
-                            className="h-7 w-7 text-zinc-400 hover:bg-destructive/5 hover:text-destructive cursor-pointer"
+                            className="h-8 w-8 text-slate-400 hover:bg-red-50 hover:text-red-650 rounded-md cursor-pointer"
                           >
-                            <Trash2 className="h-3.5 w-3.5" />
+                            <Trash2 className="h-4 w-4" />
                           </Button>
                         </div>
                       </td>

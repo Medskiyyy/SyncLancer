@@ -39,6 +39,9 @@ export class ClientRepository {
       },
       include: {
         projects: true,
+        invoices: {
+          where: { deletedAt: null },
+        },
       },
       orderBy: {
         createdAt: 'desc',

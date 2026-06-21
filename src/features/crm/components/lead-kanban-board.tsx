@@ -48,7 +48,7 @@ interface LeadKanbanBoardProps {
 }
 
 const COLUMNS = [
-  { label: 'New Lead', status: LeadStatus.NEW, theme: 'border-zinc-200/60 dark:border-zinc-800/60 bg-zinc-50/40 dark:bg-zinc-900/10' },
+  { label: 'Lead', status: LeadStatus.NEW, theme: 'border-zinc-200/60 dark:border-zinc-800/60 bg-zinc-50/40 dark:bg-zinc-900/10' },
   { label: 'Contacted', status: LeadStatus.CONTACTED, theme: 'border-blue-200/50 dark:border-blue-900/30 bg-blue-50/20 dark:bg-blue-900/5' },
   { label: 'Proposal Sent', status: LeadStatus.PROPOSAL_SENT, theme: 'border-violet-200/50 dark:border-violet-900/30 bg-violet-50/20 dark:bg-violet-900/5' },
   { label: 'Negotiation', status: LeadStatus.NEGOTIATION, theme: 'border-amber-200/50 dark:border-amber-900/30 bg-amber-50/20 dark:bg-amber-900/5' },
@@ -64,7 +64,7 @@ function KanbanColumn({ id, title, leadsCount, children, theme }: any) {
     <div
       ref={setNodeRef}
       className={cn(
-        "flex flex-col rounded-xl border p-3 min-h-[550px] w-full transition-all duration-200",
+        "flex flex-col rounded-xl border p-3 min-h-[550px] w-[280px] shrink-0 transition-all duration-200",
         theme,
         isOver ? "ring-2 ring-primary/20 border-primary/40 bg-zinc-100/50 dark:bg-zinc-800/20" : ""
       )}
@@ -384,7 +384,7 @@ export function LeadKanbanBoard({ initialLeads, workspaceId }: LeadKanbanBoardPr
 
       {/* Kanban Pipeline */}
       <DndContext sensors={sensors} collisionDetection={closestCorners} onDragEnd={onDragEnd}>
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-6 overflow-x-auto pb-4">
+        <div className="flex gap-4 overflow-x-auto pb-4 w-full">
           {COLUMNS.map((col) => {
             const columnLeads = filteredLeads.filter((l) => l.status === col.status);
             return (

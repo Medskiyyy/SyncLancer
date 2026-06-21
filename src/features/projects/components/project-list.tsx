@@ -53,12 +53,12 @@ interface ProjectListProps {
 }
 
 const STATUS_THEMES: Record<string, string> = {
-  DRAFT: 'bg-zinc-50 dark:bg-zinc-950 text-zinc-400 dark:text-zinc-505 border-zinc-200/60 dark:border-zinc-850',
-  ACTIVE: 'bg-green-550/10 text-green-600 dark:text-green-400 border-green-550/15',
-  ON_HOLD: 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/15',
-  REVIEW: 'bg-stone-500/10 text-stone-650 dark:text-stone-400 border-stone-550/15',
-  COMPLETED: 'bg-amber-550/10 text-amber-600 dark:text-amber-400 border-amber-500/20',
-  CANCELLED: 'bg-red-500/10 text-red-655 dark:text-red-400 border-red-550/15',
+  DRAFT: 'bg-slate-100 text-slate-600 border-slate-200 shadow-none',
+  ACTIVE: 'bg-emerald-50 text-emerald-700 border-emerald-150 shadow-none',
+  ON_HOLD: 'bg-amber-50 text-amber-700 border-amber-150 shadow-none',
+  REVIEW: 'bg-cyan-50 text-cyan-700 border-cyan-150 shadow-none',
+  COMPLETED: 'bg-blue-50 text-blue-700 border-blue-150 shadow-none',
+  CANCELLED: 'bg-red-50 text-red-700 border-red-150 shadow-none',
 };
 
 export function ProjectList({ initialProjects, workspaceId, workspaceSlug }: ProjectListProps) {
@@ -119,16 +119,16 @@ export function ProjectList({ initialProjects, workspaceId, workspaceSlug }: Pro
   return (
     <div className="space-y-6 animate-in fade-in-50 duration-300">
       {/* Header Banner */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-zinc-200/60 dark:border-zinc-800/80 pb-5">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-6 border-b border-slate-100">
         <div>
-          <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight text-zinc-900 dark:text-zinc-55">Projects Directory</h1>
-          <p className="text-sm text-zinc-500 dark:text-zinc-400">
-            Manage your active client engagements, budgets, milestones, and deliverables.
+          <h1 className="text-3xl font-bold tracking-tight text-slate-900">Projects</h1>
+          <p className="text-sm text-slate-500 mt-1">
+            Manage active client engagements, budgets, milestones, and deliverables.
           </p>
         </div>
         <Link href={`/${workspaceSlug}/projects/new`}>
-          <Button className="cursor-pointer font-semibold text-xs h-9">
-            <Plus className="mr-1.5 h-4 w-4" /> New Project
+          <Button className="cursor-pointer font-medium text-sm h-10 px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow-sm">
+            <Plus className="mr-2 h-4 w-4" /> New Project
           </Button>
         </Link>
       </div>
@@ -136,24 +136,24 @@ export function ProjectList({ initialProjects, workspaceId, workspaceSlug }: Pro
       {/* Search & Filters */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="relative w-full max-w-sm">
-          <Search className="absolute left-3 top-2.5 h-4 w-4 text-zinc-400 dark:text-zinc-505" />
+          <Search className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
           <Input
-            placeholder="Search projects or clients..."
+            placeholder="Search projects..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-9 bg-white dark:bg-zinc-900 text-xs h-9 rounded-lg"
+            className="pl-9 bg-white text-sm h-10 rounded-lg border-slate-250"
           />
         </div>
-        <div className="flex flex-wrap bg-zinc-100 dark:bg-zinc-800 p-0.5 rounded-lg border border-zinc-200/50 dark:border-zinc-700/50 self-start max-w-full overflow-x-auto">
+        <div className="flex bg-slate-100 p-1 rounded-lg border border-slate-200/50 self-start max-w-full overflow-x-auto">
           {['ALL', 'ACTIVE', 'ON_HOLD', 'REVIEW', 'COMPLETED'].map((status) => (
             <button
               key={status}
               onClick={() => setStatusFilter(status)}
               className={cn(
-                "px-3 py-1 text-xs font-semibold rounded-md transition-all cursor-pointer whitespace-nowrap",
+                "px-3 py-1.5 text-xs font-semibold rounded-md transition-all cursor-pointer whitespace-nowrap",
                 statusFilter === status
-                  ? "bg-white dark:bg-zinc-900 text-zinc-950 dark:text-zinc-50 shadow-xs"
-                  : "text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-200"
+                  ? "bg-white text-blue-700 shadow-xs"
+                  : "text-slate-500 hover:text-slate-900"
               )}
             >
               {status}
@@ -164,128 +164,106 @@ export function ProjectList({ initialProjects, workspaceId, workspaceSlug }: Pro
 
       {/* Grid List */}
       {filteredProjects.length === 0 ? (
-        <Card className="flex flex-col items-center justify-center p-12 text-center border-dashed border-zinc-200/60 dark:border-zinc-800">
-          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-zinc-50 dark:bg-zinc-950 text-zinc-400 mb-4 border border-zinc-200/50 dark:border-zinc-800/80">
-            <Briefcase className="h-6 w-6 text-zinc-400" />
+        <Card className="flex flex-col items-center justify-center p-12 text-center border-dashed border-slate-200">
+          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-slate-50 text-slate-450 mb-4 border border-slate-100">
+            <Briefcase className="h-6 w-6 text-slate-550" />
           </div>
-          <CardTitle className="text-sm font-bold text-zinc-900 dark:text-zinc-55">No projects found</CardTitle>
-          <CardDescription className="max-w-sm mt-1 text-xs text-zinc-500 dark:text-zinc-400">
+          <CardTitle className="text-base font-bold text-slate-900">No projects found</CardTitle>
+          <CardDescription className="max-w-sm mt-2 text-sm text-slate-500">
             {searchQuery || statusFilter !== 'ALL'
               ? 'Try adjusting your search query or filters.'
               : 'Create a project scope to track milestones, tasks, files and log billable times.'}
           </CardDescription>
           {!searchQuery && statusFilter === 'ALL' && (
             <Link href={`/${workspaceSlug}/projects/new`}>
-              <Button className="mt-4 flex items-center gap-2 cursor-pointer font-semibold text-xs h-9">
+              <Button className="mt-5 flex items-center gap-2 cursor-pointer font-medium text-sm h-10 bg-blue-600 hover:bg-blue-700 text-white px-4 rounded-lg shadow-sm">
                 <Plus className="h-4 w-4" /> Create Project
               </Button>
             </Link>
           )}
         </Card>
       ) : (
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {filteredProjects.map((project) => (
-            <Card 
-              key={project.id} 
-              className="group relative flex flex-col justify-between overflow-hidden border-zinc-200/70 dark:border-zinc-850 bg-white dark:bg-zinc-900 hover-lift rounded-xl"
-            >
-              <CardHeader className="pb-4">
-                <div className="flex items-start justify-between">
-                  <Badge className={cn("text-[9px] font-bold px-1.5 py-0.5 border shadow-xs", STATUS_THEMES[project.status] || 'bg-zinc-100 text-zinc-800')}>
-                    {project.status}
-                  </Badge>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger className="h-7 w-7 text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 flex items-center justify-center cursor-pointer outline-none transition-colors">
-                      <MoreVertical className="h-4 w-4" />
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-40 p-1 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg shadow-lg">
-                      <DropdownMenuItem 
-                        onClick={() => router.push(`/${workspaceSlug}/projects/${project.id}`)}
-                        className="flex items-center gap-2 px-2.5 py-2 text-xs font-semibold rounded-md hover:bg-zinc-50 dark:hover:bg-zinc-800/50 cursor-pointer text-zinc-700 dark:text-zinc-300"
-                      >
-                        <ExternalLink className="h-3.5 w-3.5" /> View Details
-                      </DropdownMenuItem>
-                      <DropdownMenuItem 
-                        onClick={() => router.push(`/${workspaceSlug}/projects/${project.id}/edit`)}
-                        className="flex items-center gap-2 px-2.5 py-2 text-xs font-semibold rounded-md hover:bg-zinc-50 dark:hover:bg-zinc-800/50 cursor-pointer text-zinc-700 dark:text-zinc-300"
-                      >
-                        <Edit className="h-3.5 w-3.5" /> Edit Project
-                      </DropdownMenuItem>
-                      <DropdownMenuItem 
-                        onClick={() => {
-                          setDeletingProject(project);
-                          setIsDeleteOpen(true);
-                        }}
-                        className="flex items-center gap-2 px-2.5 py-2 text-xs font-semibold rounded-md hover:bg-red-50 dark:hover:bg-red-950/20 cursor-pointer text-destructive"
-                      >
-                        <Trash2 className="h-3.5 w-3.5" /> Delete Project
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </div>
-                
-                <div className="mt-3 space-y-1">
-                  <Link href={`/${workspaceSlug}/projects/${project.id}`} className="font-extrabold text-sm text-zinc-900 dark:text-zinc-50 group-hover:text-primary transition-colors inline-block leading-snug">
-                    {project.name}
-                  </Link>
-                  <CardDescription className="text-[10px] font-bold text-zinc-400">
-                    Client: <span className="text-zinc-750 dark:text-zinc-350">{project.client?.companyName || 'None'}</span>
-                  </CardDescription>
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-4 pt-0">
-                {project.description && (
-                  <p className="text-xs text-zinc-500 dark:text-zinc-450 line-clamp-2 min-h-[32px] font-medium leading-relaxed">
-                    {project.description}
-                  </p>
-                )}
-
-                <div className="grid grid-cols-2 gap-4 border-t border-zinc-100 dark:border-zinc-800/60 pt-4 text-xs font-semibold">
-                  <div className="space-y-1">
-                    <span className="flex items-center text-[9px] font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">
-                      <DollarSign className="mr-1 h-3.5 w-3.5" /> Budget
-                    </span>
-                    <span className="text-xs font-bold text-zinc-800 dark:text-zinc-200 font-mono">
-                      {formatCurrency(project.budget, project.currency)}
-                    </span>
-                  </div>
-                  <div className="space-y-1">
-                    <span className="flex items-center text-[9px] font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">
-                      <Calendar className="mr-1 h-3.5 w-3.5" /> Deadline
-                    </span>
-                    <span className="text-xs font-bold text-zinc-800 dark:text-zinc-200">
-                      {formatDate(project.deadline)}
-                    </span>
-                  </div>
-                </div>
-
-                <div className="space-y-2 pt-2 border-t border-zinc-100 dark:border-zinc-800/65">
-                  <div className="flex items-center justify-between text-xs font-semibold">
-                    <span className="flex items-center text-zinc-500 dark:text-zinc-450">
-                      <TrendingUp className="mr-1 h-3.5 w-3.5 text-amber-500" /> Progress
-                    </span>
-                    <span className="font-bold text-zinc-800 dark:text-zinc-200 font-mono">{project.progress}%</span>
-                  </div>
-                  <div className="w-full bg-zinc-100 dark:bg-zinc-800 rounded-full h-1.5 overflow-hidden">
-                    <div 
-                      className="bg-gradient-to-r from-amber-500 to-amber-600 h-full rounded-full transition-all duration-500" 
-                      style={{ width: `${project.progress}%` }}
-                    />
-                  </div>
-                </div>
-
-                <div className="flex justify-end pt-1">
-                  <Link href={`/${workspaceSlug}/projects/${project.id}`}>
-                    <Button variant="ghost" size="sm" className="cursor-pointer text-[10px] text-zinc-550 dark:text-zinc-400 hover:text-primary dark:hover:text-primary hover:bg-transparent dark:hover:bg-transparent font-bold pr-0 h-7 flex items-center gap-0.5">
-                      <span>Explore details</span>
-                      <ChevronRight className="h-3.5 w-3.5" />
-                    </Button>
-                  </Link>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+        <Card className="overflow-hidden border border-slate-200 rounded-xl shadow-sm bg-white">
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse text-sm">
+              <thead>
+                <tr className="border-b border-slate-200 text-xs font-semibold text-slate-500 bg-slate-50/50 h-[48px]">
+                  <th className="px-6 align-middle font-medium">Project Name</th>
+                  <th className="px-6 align-middle font-medium">Client</th>
+                  <th className="px-6 align-middle font-medium">Status</th>
+                  <th className="px-6 align-middle font-medium">Budget</th>
+                  <th className="px-6 align-middle font-medium">Progress</th>
+                  <th className="px-6 align-middle font-medium">Due Date</th>
+                  <th className="px-6 align-middle font-medium text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100 bg-white">
+                {filteredProjects.map((project) => {
+                  return (
+                    <tr key={project.id} className="hover:bg-slate-50/50 transition-colors h-[60px]">
+                      <td className="px-6 align-middle">
+                        <Link href={`/${workspaceSlug}/projects/${project.id}`} className="font-semibold text-slate-900 hover:text-blue-650 hover:underline">
+                          {project.name}
+                        </Link>
+                      </td>
+                      <td className="px-6 align-middle text-slate-600 font-medium">
+                        {project.client?.companyName || '—'}
+                      </td>
+                      <td className="px-6 align-middle">
+                        <Badge className={cn("text-[10px] font-medium px-2 py-0.5 rounded-full border shadow-none", STATUS_THEMES[project.status] || 'bg-slate-100 text-slate-800')}>
+                          {project.status}
+                        </Badge>
+                      </td>
+                      <td className="px-6 align-middle font-mono font-medium text-slate-900">
+                        {formatCurrency(project.budget, project.currency)}
+                      </td>
+                      <td className="px-6 align-middle min-w-[140px]">
+                        <div className="flex items-center gap-2 max-w-[150px]">
+                          <div className="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
+                            <div 
+                              className="bg-blue-600 h-full rounded-full transition-all duration-300" 
+                              style={{ width: `${project.progress}%` }}
+                            />
+                          </div>
+                          <span className="font-mono text-xs font-semibold text-slate-700">{project.progress}%</span>
+                        </div>
+                      </td>
+                      <td className="px-6 align-middle text-slate-500 text-xs">
+                        {formatDate(project.deadline)}
+                      </td>
+                      <td className="px-6 align-middle text-right">
+                        <div className="flex items-center justify-end gap-1">
+                          <Link href={`/${workspaceSlug}/projects/${project.id}`}>
+                            <Button variant="ghost" size="icon" title="View details" className="h-8 w-8 text-slate-400 hover:text-slate-900 rounded-md cursor-pointer">
+                              <ExternalLink className="h-4 w-4" />
+                            </Button>
+                          </Link>
+                          <Link href={`/${workspaceSlug}/projects/${project.id}/edit`}>
+                            <Button variant="ghost" size="icon" title="Edit project" className="h-8 w-8 text-slate-400 hover:text-slate-900 rounded-md cursor-pointer">
+                              <Edit className="h-4 w-4" />
+                            </Button>
+                          </Link>
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            title="Delete project" 
+                            onClick={() => {
+                              setDeletingProject(project);
+                              setIsDeleteOpen(true);
+                            }}
+                            className="h-8 w-8 text-slate-400 hover:bg-red-50 hover:text-red-650 rounded-md cursor-pointer"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </Card>
       )}
 
       {/* Delete Dialog */}

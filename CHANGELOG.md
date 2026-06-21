@@ -8,6 +8,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Slate/Blue SaaS Theme Redesign**:
+  - Rebuilt the color scheme from Stone/Amber to a light-mode-first Slate/Blue palette, mapping Tailwind variables to modern slate tones.
+  - Implemented high-density aligned table layouts for Clients directory (`client-list.tsx`) and Projects directory (`project-list.tsx`) with row height 60px and header height 48px.
+  - Added 4 KPI cards block (Total Invoiced, Paid, Outstanding, Drafts) at the top of the Invoices page (`workspace-invoice-manager.tsx`).
+  - Replaced the Files table with a Google Drive-style layout featuring dynamic folders (Documents, Images, Archives, Others) and a responsive 4-column card grid (height 120px).
+  - Redesigned the Analytics page to use the Slate theme, setting the Recharts height to 360px and removing the weekly productivity block.
+  - Updated the Workspace Settings page to support a maximum width of 900px and exactly 6 settings tabs (General, Workspace, Branding, Billing, Notifications, Security).
+  - Rewrote `UI_SPEC.md` to specify the new Slate/Blue SaaS style guidelines.
 - **Premium SaaS Redesign**:
   - Redesigned the entire application to follow a modern Stone/Amber SaaS aesthetic (inspired by Linear, Stripe, Attio, Notion, Framer).
   - Setup unified global styling system in `globals.css` with Stone gray shades (`#fafaf9` / `#0c0a09`), amber highlights, thin crisp borders, and backdrop-blur glassmorphic features.
