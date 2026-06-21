@@ -52,6 +52,8 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { createMilestoneSchema, updateMilestoneSchema } from '@/features/milestones/schemas/milestone';
 import { createMilestoneAction, updateMilestoneAction, deleteMilestoneAction } from '@/features/milestones/actions/milestone-actions';
 import { TaskKanbanBoard } from '@/features/tasks/components/task-kanban-board';
+import { TimeTracker } from '@/features/time-tracking/components/time-tracker';
+import { TimeEntry } from '@prisma/client';
 
 interface ExtendedMilestone extends Milestone {
   tasks?: Task[];
@@ -61,6 +63,7 @@ interface ExtendedProject extends Project {
   client?: Client;
   milestones?: ExtendedMilestone[];
   tasks?: Task[];
+  timeEntries?: (TimeEntry & { task?: Task | null })[];
 }
 
 interface ProjectDetailProps {
@@ -548,23 +551,11 @@ export function ProjectDetail({ project, workspaceSlug }: ProjectDetailProps) {
       )}
 
       {activeTab === 'Time Tracking' && (
-        <Card className="border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 rounded-xl shadow-sm">
-          <CardHeader className="border-b border-slate-100 dark:border-slate-850 pb-4">
-            <CardTitle className="text-base font-bold text-slate-900 dark:text-slate-50 flex items-center gap-2">
-              <Clock className="h-5 w-5 text-indigo-500" /> Time Logging
-            </CardTitle>
-            <CardDescription className="text-xs">
-              Workspace timers and billable hour invoices will go live in Phase 10.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="py-12 text-center text-slate-500 dark:text-slate-400">
-            <Clock className="h-10 w-10 mx-auto text-slate-300 dark:text-slate-600 mb-3" />
-            <h3 className="text-sm font-bold text-slate-800 dark:text-slate-350">Time Tracking Offline</h3>
-            <p className="text-xs max-w-sm mx-auto mt-1.5">
-              Interactive timer dashboards and manual time entries will be integrated in Phase 10.
-            </p>
-          </CardContent>
-        </Card>
+        <TimeTracker
+          project={project}
+          initialTimeEntries={project.timeEntries || []}
+          workspaceSlug={workspaceSlug}
+        />
       )}
 
       {activeTab === 'Invoices' && (

@@ -32,6 +32,14 @@ export class ProjectRepository {
             milestone: true,
           },
         },
+        timeEntries: {
+          orderBy: {
+            startTime: 'desc',
+          },
+          include: {
+            task: true,
+          },
+        },
       },
     });
   }
