@@ -2,22 +2,11 @@
 
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
-const data = [
-  { name: 'Jan', revenue: 2400 },
-  { name: 'Feb', revenue: 1398 },
-  { name: 'Mar', revenue: 9800 },
-  { name: 'Apr', revenue: 3908 },
-  { name: 'May', revenue: 4800 },
-  { name: 'Jun', revenue: 3800 },
-  { name: 'Jul', revenue: 4300 },
-  { name: 'Aug', revenue: 6800 },
-  { name: 'Sep', revenue: 7900 },
-  { name: 'Oct', revenue: 9200 },
-  { name: 'Nov', revenue: 11000 },
-  { name: 'Dec', revenue: 14500 },
-];
+interface RevenueChartProps {
+  data: Array<{ name: string; revenue: number }>;
+}
 
-export function RevenueChart() {
+export function RevenueChart({ data }: RevenueChartProps) {
   return (
     <div className="h-[300px] w-full">
       <ResponsiveContainer width="100%" height="100%">
