@@ -1,16 +1,369 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
 datasource db {
   provider  = "postgresql"
   url       = env("DATABASE_URL")
   directUrl = env("DIRECT_URL")
 }
 
-generator client {
-  provider = "prisma-client-js"
+model User {
+  id             String            @id @default(uuid()) @db.Uuid
+  email          String            @unique @db.VarChar(255)
+  passwordHash   String?           @map("password_hash")
+  fullName       String            @map("full_name") @db.VarChar(255)
+  avatarUrl      String?           @map("avatar_url")
+  emailVerified  Boolean           @default(false) @map("email_verified")
+  createdAt      DateTime          @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt      DateTime          @updatedAt @map("updated_at") @db.Timestamp(6)
+  clientUserHubs ClientUser[]
+  uploadedFiles  File[]            @relation("FileUploader")
+  notifications  Notification[]
+  memberships    WorkspaceMember[]
+  workspaces     Workspace[]       @relation("WorkspaceOwner")
+
+  @@index([email], map: "idx_users_email")
+  @@map("users")
 }
 
-// ==========================================
-// ENUMS
-// ==========================================
+model Workspace {
+  id                String             @id @default(uuid()) @db.Uuid
+  ownerId           String             @map("owner_id") @db.Uuid
+  name              String             @db.VarChar(255)
+  slug              String             @unique @db.VarChar(100)
+  logoUrl           String?            @map("logo_url")
+  plan              Plan               @default(FREE)
+  createdAt         DateTime           @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt         DateTime           @updatedAt @map("updated_at") @db.Timestamp(6)
+  clients           Client[]
+  files             File[]
+  invoices          Invoice[]
+  leads             Lead[]
+  projectTemplates  ProjectTemplate[]
+  projects          Project[]
+  proposals         Proposal[]
+  recurringInvoices RecurringInvoice[]
+  subscriptionUsage SubscriptionUsage?
+  members           WorkspaceMember[]
+  owner             User               @relation("WorkspaceOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+
+  @@index([ownerId], map: "idx_workspace_owner")
+  @@map("workspaces")
+}
+
+model WorkspaceMember {
+  id          String    @id @default(uuid()) @db.Uuid
+  workspaceId String    @map("workspace_id") @db.Uuid
+  userId      String    @map("user_id") @db.Uuid
+  role        Role
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamp(6)
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@unique([workspaceId, userId])
+  @@index([userId], map: "idx_workspace_members_user")
+  @@map("workspace_members")
+}
+
+model Lead {
+  id          String     @id @default(uuid()) @db.Uuid
+  workspaceId String     @map("workspace_id") @db.Uuid
+  name        String     @db.VarChar(255)
+  email       String     @db.VarChar(255)
+  company     String     @db.VarChar(255)
+  phone       String     @db.VarChar(50)
+  notes       String
+  status      LeadStatus @default(NEW)
+  createdAt   DateTime   @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt   DateTime   @updatedAt @map("updated_at") @db.Timestamp(6)
+  deletedAt   DateTime?  @map("deleted_at") @db.Timestamp(6)
+  workspace   Workspace  @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@index([workspaceId, status], map: "idx_leads_workspace_status")
+  @@map("leads")
+}
+
+model Client {
+  id                String             @id @default(uuid()) @db.Uuid
+  workspaceId       String             @map("workspace_id") @db.Uuid
+  companyName       String             @map("company_name") @db.VarChar(255)
+  primaryEmail      String             @map("primary_email") @db.VarChar(255)
+  phone             String             @db.VarChar(50)
+  notes             String
+  archived          Boolean            @default(false)
+  createdAt         DateTime           @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt         DateTime           @updatedAt @map("updated_at") @db.Timestamp(6)
+  deletedAt         DateTime?          @map("deleted_at") @db.Timestamp(6)
+  portalUsers       ClientUser[]
+  workspace         Workspace          @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  invoices          Invoice[]
+  projects          Project[]
+  proposals         Proposal[]
+  recurringInvoices RecurringInvoice[]
+
+  @@index([workspaceId], map: "idx_clients_workspace")
+  @@map("clients")
+}
+
+model ClientUser {
+  id        String   @id @default(uuid()) @db.Uuid
+  clientId  String   @map("client_id") @db.Uuid
+  userId    String   @map("user_id") @db.Uuid
+  title     String   @db.VarChar(255)
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamp(6)
+  client    Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([clientId, userId])
+  @@map("client_users")
+}
+
+model Proposal {
+  id             String         @id @default(uuid()) @db.Uuid
+  workspaceId    String         @map("workspace_id") @db.Uuid
+  clientId       String         @map("client_id") @db.Uuid
+  proposalNumber String         @map("proposal_number") @db.VarChar(100)
+  title          String         @db.VarChar(255)
+  description    String
+  currency       String         @default("USD") @db.VarChar(10)
+  subtotal       Decimal        @db.Decimal(18, 2)
+  taxAmount      Decimal        @map("tax_amount") @db.Decimal(18, 2)
+  totalAmount    Decimal        @map("total_amount") @db.Decimal(18, 2)
+  expiresAt      DateTime       @map("expires_at") @db.Date
+  status         ProposalStatus @default(DRAFT)
+  pdfUrl         String?        @map("pdf_url")
+  createdAt      DateTime       @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt      DateTime       @updatedAt @map("updated_at") @db.Timestamp(6)
+  deletedAt      DateTime?      @map("deleted_at") @db.Timestamp(6)
+  projects       Project[]
+  items          ProposalItem[]
+  client         Client         @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  workspace      Workspace      @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@map("proposals")
+}
+
+model ProposalItem {
+  id          String   @id @default(uuid()) @db.Uuid
+  proposalId  String   @map("proposal_id") @db.Uuid
+  name        String   @db.VarChar(255)
+  description String
+  quantity    Int
+  unitPrice   Decimal  @map("unit_price") @db.Decimal(18, 2)
+  totalPrice  Decimal  @map("total_price") @db.Decimal(18, 2)
+  proposal    Proposal @relation(fields: [proposalId], references: [id], onDelete: Cascade)
+
+  @@map("proposal_items")
+}
+
+model ProjectTemplate {
+  id          String              @id @default(uuid()) @db.Uuid
+  workspaceId String?             @map("workspace_id") @db.Uuid
+  name        String              @db.VarChar(255)
+  description String
+  isSystem    Boolean             @default(false) @map("is_system")
+  createdAt   DateTime            @default(now()) @map("created_at") @db.Timestamp(6)
+  workspace   Workspace?          @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  milestones  TemplateMilestone[]
+
+  @@map("project_templates")
+}
+
+model TemplateMilestone {
+  id         String          @id @default(uuid()) @db.Uuid
+  templateId String          @map("template_id") @db.Uuid
+  title      String          @db.VarChar(255)
+  sortOrder  Int             @map("sort_order")
+  template   ProjectTemplate @relation(fields: [templateId], references: [id], onDelete: Cascade)
+  tasks      TemplateTask[]
+
+  @@map("template_milestones")
+}
+
+model TemplateTask {
+  id                  String            @id @default(uuid()) @db.Uuid
+  templateMilestoneId String            @map("template_milestone_id") @db.Uuid
+  title               String            @db.VarChar(255)
+  sortOrder           Int               @map("sort_order")
+  milestone           TemplateMilestone @relation(fields: [templateMilestoneId], references: [id], onDelete: Cascade)
+
+  @@map("template_tasks")
+}
+
+model Project {
+  id          String        @id @default(uuid()) @db.Uuid
+  workspaceId String        @map("workspace_id") @db.Uuid
+  clientId    String        @map("client_id") @db.Uuid
+  proposalId  String?       @map("proposal_id") @db.Uuid
+  name        String        @db.VarChar(255)
+  description String
+  budget      Decimal       @db.Decimal(18, 2)
+  currency    String        @default("USD") @db.VarChar(10)
+  startDate   DateTime      @map("start_date") @db.Date
+  deadline    DateTime      @map("deadline") @db.Date
+  progress    Int           @default(0)
+  status      ProjectStatus @default(DRAFT)
+  createdAt   DateTime      @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt   DateTime      @updatedAt @map("updated_at") @db.Timestamp(6)
+  deletedAt   DateTime?     @map("deleted_at") @db.Timestamp(6)
+  files       File[]
+  invoices    Invoice[]
+  milestones  Milestone[]
+  client      Client        @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  proposal    Proposal?     @relation(fields: [proposalId], references: [id])
+  workspace   Workspace     @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  tasks       Task[]
+  timeEntries TimeEntry[]
+
+  @@index([workspaceId, status], map: "idx_projects_workspace_status")
+  @@map("projects")
+}
+
+model Milestone {
+  id          String          @id @default(uuid()) @db.Uuid
+  projectId   String          @map("project_id") @db.Uuid
+  title       String          @db.VarChar(255)
+  description String
+  dueDate     DateTime        @map("due_date") @db.Date
+  progress    Int             @default(0)
+  status      MilestoneStatus @default(NOT_STARTED)
+  sortOrder   Int             @map("sort_order")
+  project     Project         @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  tasks       Task[]
+
+  @@map("milestones")
+}
+
+model Task {
+  id          String      @id @default(uuid()) @db.Uuid
+  projectId   String      @map("project_id") @db.Uuid
+  milestoneId String?     @map("milestone_id") @db.Uuid
+  title       String      @db.VarChar(255)
+  description String
+  status      TaskStatus  @default(BACKLOG)
+  priority    Priority    @default(MEDIUM)
+  dueDate     DateTime    @map("due_date") @db.Date
+  createdAt   DateTime    @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt   DateTime    @updatedAt @map("updated_at") @db.Timestamp(6)
+  milestone   Milestone?  @relation(fields: [milestoneId], references: [id])
+  project     Project     @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  timeLogs    TimeEntry[]
+
+  @@index([projectId, status], map: "idx_tasks_project_status")
+  @@map("tasks")
+}
+
+model TimeEntry {
+  id              String   @id @default(uuid()) @db.Uuid
+  projectId       String   @map("project_id") @db.Uuid
+  taskId          String?  @map("task_id") @db.Uuid
+  startTime       DateTime @map("start_time") @db.Timestamp(6)
+  endTime         DateTime @map("end_time") @db.Timestamp(6)
+  durationMinutes Int      @map("duration_minutes")
+  billable        Boolean  @default(true)
+  notes           String
+  createdAt       DateTime @default(now()) @map("created_at") @db.Timestamp(6)
+  project         Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  task            Task?    @relation(fields: [taskId], references: [id])
+
+  @@map("time_entries")
+}
+
+model Invoice {
+  id            String        @id @default(uuid()) @db.Uuid
+  workspaceId   String        @map("workspace_id") @db.Uuid
+  clientId      String        @map("client_id") @db.Uuid
+  projectId     String?       @map("project_id") @db.Uuid
+  invoiceNumber String        @map("invoice_number") @db.VarChar(100)
+  currency      String        @default("USD") @db.VarChar(10)
+  subtotal      Decimal       @db.Decimal(18, 2)
+  taxAmount     Decimal       @map("tax_amount") @db.Decimal(18, 2)
+  totalAmount   Decimal       @map("total_amount") @db.Decimal(18, 2)
+  dueDate       DateTime      @map("due_date") @db.Date
+  status        InvoiceStatus @default(DRAFT)
+  pdfUrl        String?       @map("pdf_url")
+  createdAt     DateTime      @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt     DateTime      @updatedAt @map("updated_at") @db.Timestamp(6)
+  deletedAt     DateTime?     @map("deleted_at") @db.Timestamp(6)
+  items         InvoiceItem[]
+  client        Client        @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  project       Project?      @relation(fields: [projectId], references: [id])
+  workspace     Workspace     @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@index([workspaceId, status], map: "idx_invoices_workspace_status")
+  @@map("invoices")
+}
+
+model InvoiceItem {
+  id          String  @id @default(uuid()) @db.Uuid
+  invoiceId   String  @map("invoice_id") @db.Uuid
+  name        String  @db.VarChar(255)
+  description String
+  quantity    Int
+  unitPrice   Decimal @map("unit_price") @db.Decimal(18, 2)
+  totalPrice  Decimal @map("total_price") @db.Decimal(18, 2)
+  invoice     Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+
+  @@map("invoice_items")
+}
+
+model RecurringInvoice {
+  id          String    @id @default(uuid()) @db.Uuid
+  workspaceId String    @map("workspace_id") @db.Uuid
+  clientId    String    @map("client_id") @db.Uuid
+  frequency   Frequency
+  nextRunAt   DateTime  @map("next_run_at") @db.Date
+  active      Boolean   @default(true)
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamp(6)
+  client      Client    @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@map("recurring_invoices")
+}
+
+model File {
+  id          String    @id @default(uuid()) @db.Uuid
+  workspaceId String    @map("workspace_id") @db.Uuid
+  projectId   String?   @map("project_id") @db.Uuid
+  uploadedBy  String    @map("uploaded_by") @db.Uuid
+  fileName    String    @map("file_name") @db.VarChar(255)
+  fileType    String    @map("file_type") @db.VarChar(50)
+  fileSize    BigInt    @map("file_size")
+  storagePath String    @map("storage_path")
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamp(6)
+  deletedAt   DateTime? @map("deleted_at") @db.Timestamp(6)
+  project     Project?  @relation(fields: [projectId], references: [id])
+  uploader    User      @relation("FileUploader", fields: [uploadedBy], references: [id], onDelete: Cascade)
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@map("files")
+}
+
+model Notification {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @map("user_id") @db.Uuid
+  title     String   @db.VarChar(255)
+  message   String
+  isRead    Boolean  @default(false) @map("is_read")
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamp(6)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId], map: "idx_notifications_user")
+  @@map("notifications")
+}
+
+model SubscriptionUsage {
+  id                  String    @id @default(uuid()) @db.Uuid
+  workspaceId         String    @unique @map("workspace_id") @db.Uuid
+  activeProjectsCount Int       @default(0) @map("active_projects_count")
+  clientsCount        Int       @default(0) @map("clients_count")
+  storageUsedBytes    BigInt    @default(0) @map("storage_used_bytes")
+  updatedAt           DateTime  @updatedAt @map("updated_at") @db.Timestamp(6)
+  workspace           Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@map("subscription_usage")
+}
 
 enum Plan {
   FREE
@@ -82,407 +435,4 @@ enum Frequency {
   MONTHLY
   QUARTERLY
   YEARLY
-}
-
-// ==========================================
-// MODELS
-// ==========================================
-
-model User {
-  id           String    @id @default(uuid()) @db.Uuid
-  email        String    @unique @db.VarChar(255)
-  passwordHash String?   @map("password_hash") @db.Text
-  fullName     String    @map("full_name") @db.VarChar(255)
-  avatarUrl    String?   @map("avatar_url") @db.Text
-  emailVerified Boolean   @default(false) @map("email_verified")
-  createdAt    DateTime  @default(now()) @map("created_at") @db.Timestamp
-  updatedAt    DateTime  @updatedAt @map("updated_at") @db.Timestamp
-
-  // Relations
-  workspaces       Workspace[]       @relation("WorkspaceOwner")
-  memberships      WorkspaceMember[]
-  clientUserHubs   ClientUser[]
-  uploadedFiles    File[]            @relation("FileUploader")
-  notifications    Notification[]
-
-  @@map("users")
-  @@index([email], name: "idx_users_email")
-}
-
-model Workspace {
-  id        String   @id @default(uuid()) @db.Uuid
-  ownerId   String   @map("owner_id") @db.Uuid
-  name      String   @db.VarChar(255)
-  slug      String   @unique @db.VarChar(100)
-  logoUrl   String?  @map("logo_url") @db.Text
-  plan      Plan     @default(FREE)
-  createdAt DateTime @default(now()) @map("created_at") @db.Timestamp
-  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamp
-
-  // Relations
-  owner             User               @relation("WorkspaceOwner", fields: [ownerId], references: [id], onDelete: Cascade)
-  members           WorkspaceMember[]
-  leads             Lead[]
-  clients           Client[]
-  proposals         Proposal[]
-  projectTemplates  ProjectTemplate[]
-  projects          Project[]
-  invoices          Invoice[]
-  recurringInvoices RecurringInvoice[]
-  files             File[]
-  subscriptionUsage SubscriptionUsage?
-
-  @@map("workspaces")
-  @@index([ownerId], name: "idx_workspace_owner")
-}
-
-model WorkspaceMember {
-  id          String    @id @default(uuid()) @db.Uuid
-  workspaceId String    @map("workspace_id") @db.Uuid
-  userId      String    @map("user_id") @db.Uuid
-  role        Role
-  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamp
-
-  // Relations
-  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
-  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@unique([workspaceId, userId])
-  @@map("workspace_members")
-  @@index([userId], name: "idx_workspace_members_user")
-}
-
-model Lead {
-  id          String    @id @default(uuid()) @db.Uuid
-  workspaceId String    @map("workspace_id") @db.Uuid
-  name        String    @db.VarChar(255)
-  email       String    @db.VarChar(255)
-  company     String    @db.VarChar(255)
-  phone       String    @db.VarChar(50)
-  notes       String    @db.Text
-  status      LeadStatus @default(NEW)
-  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamp
-  updatedAt   DateTime  @updatedAt @map("updated_at") @db.Timestamp
-  deletedAt   DateTime? @map("deleted_at") @db.Timestamp
-
-  // Relations
-  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
-
-  @@map("leads")
-  @@index([workspaceId, status], name: "idx_leads_workspace_status")
-}
-
-model Client {
-  id           String    @id @default(uuid()) @db.Uuid
-  workspaceId  String    @map("workspace_id") @db.Uuid
-  companyName  String    @map("company_name") @db.VarChar(255)
-  primaryEmail String    @map("primary_email") @db.VarChar(255)
-  phone        String    @db.VarChar(50)
-  notes        String    @db.Text
-  archived     Boolean   @default(false)
-  createdAt    DateTime  @default(now()) @map("created_at") @db.Timestamp
-  updatedAt    DateTime  @updatedAt @map("updated_at") @db.Timestamp
-  deletedAt    DateTime? @map("deleted_at") @db.Timestamp
-
-  // Relations
-  workspace         Workspace          @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
-  portalUsers       ClientUser[]
-  proposals         Proposal[]
-  projects          Project[]
-  invoices          Invoice[]
-  recurringInvoices RecurringInvoice[]
-
-  @@map("clients")
-  @@index([workspaceId], name: "idx_clients_workspace")
-}
-
-model ClientUser {
-  id        String   @id @default(uuid()) @db.Uuid
-  clientId  String   @map("client_id") @db.Uuid
-  userId    String   @map("user_id") @db.Uuid
-  title     String   @db.VarChar(255)
-  createdAt DateTime @default(now()) @map("created_at") @db.Timestamp
-
-  // Relations
-  client Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@unique([clientId, userId])
-  @@map("client_users")
-}
-
-model Proposal {
-  id             String         @id @default(uuid()) @db.Uuid
-  workspaceId    String         @map("workspace_id") @db.Uuid
-  clientId       String         @map("client_id") @db.Uuid
-  proposalNumber String         @map("proposal_number") @db.VarChar(100)
-  title          String         @db.VarChar(255)
-  description    String         @db.Text
-  currency       String         @default("USD") @db.VarChar(10)
-  subtotal       Decimal        @db.Decimal(18, 2)
-  taxAmount      Decimal        @map("tax_amount") @db.Decimal(18, 2)
-  totalAmount    Decimal        @map("total_amount") @db.Decimal(18, 2)
-  expiresAt      DateTime       @map("expires_at") @db.Date
-  status         ProposalStatus @default(DRAFT)
-  pdfUrl         String?        @map("pdf_url") @db.Text
-  createdAt      DateTime       @default(now()) @map("created_at") @db.Timestamp
-  updatedAt      DateTime       @updatedAt @map("updated_at") @db.Timestamp
-  deletedAt      DateTime?      @map("deleted_at") @db.Timestamp
-
-  // Relations
-  workspace Workspace      @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
-  client    Client         @relation(fields: [clientId], references: [id], onDelete: Cascade)
-  items     ProposalItem[]
-  projects  Project[]
-
-  @@map("proposals")
-}
-
-model ProposalItem {
-  id          String   @id @default(uuid()) @db.Uuid
-  proposalId  String   @map("proposal_id") @db.Uuid
-  name        String   @db.VarChar(255)
-  description String   @db.Text
-  quantity    Int
-  unitPrice   Decimal  @map("unit_price") @db.Decimal(18, 2)
-  totalPrice  Decimal  @map("total_price") @db.Decimal(18, 2)
-
-  // Relations
-  proposal Proposal @relation(fields: [proposalId], references: [id], onDelete: Cascade)
-
-  @@map("proposal_items")
-}
-
-model ProjectTemplate {
-  id          String   @id @default(uuid()) @db.Uuid
-  workspaceId String?  @map("workspace_id") @db.Uuid // null for system templates
-  name        String   @db.VarChar(255)
-  description String   @db.Text
-  isSystem    Boolean  @default(false) @map("is_system")
-  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamp
-
-  // Relations
-  workspace  Workspace?          @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
-  milestones TemplateMilestone[]
-
-  @@map("project_templates")
-}
-
-model TemplateMilestone {
-  id         String   @id @default(uuid()) @db.Uuid
-  templateId String   @map("template_id") @db.Uuid
-  title      String   @db.VarChar(255)
-  sortOrder  Int      @map("sort_order")
-
-  // Relations
-  template ProjectTemplate @relation(fields: [templateId], references: [id], onDelete: Cascade)
-  tasks    TemplateTask[]
-
-  @@map("template_milestones")
-}
-
-model TemplateTask {
-  id                  String   @id @default(uuid()) @db.Uuid
-  templateMilestoneId String   @map("template_milestone_id") @db.Uuid
-  title               String   @db.VarChar(255)
-  sortOrder           Int      @map("sort_order")
-
-  // Relations
-  milestone TemplateMilestone @relation(fields: [templateMilestoneId], references: [id], onDelete: Cascade)
-
-  @@map("template_tasks")
-}
-
-model Project {
-  id          String        @id @default(uuid()) @db.Uuid
-  workspaceId String        @map("workspace_id") @db.Uuid
-  clientId    String        @map("client_id") @db.Uuid
-  proposalId  String?       @map("proposal_id") @db.Uuid
-  name        String        @db.VarChar(255)
-  description String        @db.Text
-  budget      Decimal       @db.Decimal(18, 2)
-  currency    String        @default("USD") @db.VarChar(10)
-  startDate   DateTime      @map("start_date") @db.Date
-  deadline    DateTime      @map("deadline") @db.Date
-  progress    Int           @default(0)
-  status      ProjectStatus @default(DRAFT)
-  createdAt   DateTime      @default(now()) @map("created_at") @db.Timestamp
-  updatedAt   DateTime      @updatedAt @map("updated_at") @db.Timestamp
-  deletedAt   DateTime?     @map("deleted_at") @db.Timestamp
-
-  // Relations
-  workspace   Workspace    @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
-  client      Client       @relation(fields: [clientId], references: [id], onDelete: Cascade)
-  proposal    Proposal?    @relation(fields: [proposalId], references: [id], onDelete: SetNull)
-  milestones  Milestone[]
-  tasks       Task[]
-  timeEntries TimeEntry[]
-  invoices    Invoice[]
-  files       File[]
-
-  @@map("projects")
-  @@index([workspaceId, status], name: "idx_projects_workspace_status")
-}
-
-model Milestone {
-  id          String          @id @default(uuid()) @db.Uuid
-  projectId   String          @map("project_id") @db.Uuid
-  title       String          @db.VarChar(255)
-  description String          @db.Text
-  dueDate     DateTime        @map("due_date") @db.Date
-  progress    Int             @default(0)
-  status      MilestoneStatus @default(NOT_STARTED)
-  sortOrder   Int             @map("sort_order")
-
-  // Relations
-  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  tasks   Task[]
-
-  @@map("milestones")
-}
-
-model Task {
-  id          String     @id @default(uuid()) @db.Uuid
-  projectId   String     @map("project_id") @db.Uuid
-  milestoneId String?    @map("milestone_id") @db.Uuid
-  title       String     @db.VarChar(255)
-  description String     @db.Text
-  status      TaskStatus @default(BACKLOG)
-  priority    Priority   @default(MEDIUM)
-  dueDate     DateTime   @map("due_date") @db.Date
-  createdAt   DateTime   @default(now()) @map("created_at") @db.Timestamp
-  updatedAt   DateTime   @updatedAt @map("updated_at") @db.Timestamp
-
-  // Relations
-  project   Project      @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  milestone Milestone?   @relation(fields: [milestoneId], references: [id], onDelete: SetNull)
-  timeLogs  TimeEntry[]
-
-  @@map("tasks")
-  @@index([projectId, status], name: "idx_tasks_project_status")
-}
-
-model TimeEntry {
-  id              String   @id @default(uuid()) @db.Uuid
-  projectId       String   @map("project_id") @db.Uuid
-  taskId          String?  @map("task_id") @db.Uuid
-  startTime       DateTime @map("start_time") @db.Timestamp
-  endTime         DateTime @map("end_time") @db.Timestamp
-  durationMinutes Int      @map("duration_minutes")
-  billable        Boolean  @default(true)
-  notes           String   @db.Text
-  createdAt       DateTime @default(now()) @map("created_at") @db.Timestamp
-
-  // Relations
-  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  task    Task?   @relation(fields: [taskId], references: [id], onDelete: SetNull)
-
-  @@map("time_entries")
-}
-
-model Invoice {
-  id            String        @id @default(uuid()) @db.Uuid
-  workspaceId   String        @map("workspace_id") @db.Uuid
-  clientId      String        @map("client_id") @db.Uuid
-  projectId     String?       @map("project_id") @db.Uuid
-  invoiceNumber String        @map("invoice_number") @db.VarChar(100)
-  currency      String        @default("USD") @db.VarChar(10)
-  subtotal      Decimal       @db.Decimal(18, 2)
-  taxAmount     Decimal       @map("tax_amount") @db.Decimal(18, 2)
-  totalAmount   Decimal       @map("total_amount") @db.Decimal(18, 2)
-  dueDate       DateTime      @map("due_date") @db.Date
-  status        InvoiceStatus @default(DRAFT)
-  pdfUrl        String?       @map("pdf_url") @db.Text
-  createdAt     DateTime      @default(now()) @map("created_at") @db.Timestamp
-  updatedAt     DateTime      @updatedAt @map("updated_at") @db.Timestamp
-  deletedAt     DateTime?     @map("deleted_at") @db.Timestamp
-
-  // Relations
-  workspace Workspace     @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
-  client    Client        @relation(fields: [clientId], references: [id], onDelete: Cascade)
-  project   Project?      @relation(fields: [projectId], references: [id], onDelete: SetNull)
-  items     InvoiceItem[]
-
-  @@map("invoices")
-  @@index([workspaceId, status], name: "idx_invoices_workspace_status")
-}
-
-model InvoiceItem {
-  id          String   @id @default(uuid()) @db.Uuid
-  invoiceId   String   @map("invoice_id") @db.Uuid
-  name        String   @db.VarChar(255)
-  description String   @db.Text
-  quantity    Int
-  unitPrice   Decimal  @map("unit_price") @db.Decimal(18, 2)
-  totalPrice  Decimal  @map("total_price") @db.Decimal(18, 2)
-
-  // Relations
-  invoice Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
-
-  @@map("invoice_items")
-}
-
-model RecurringInvoice {
-  id          String    @id @default(uuid()) @db.Uuid
-  workspaceId String    @map("workspace_id") @db.Uuid
-  clientId    String    @map("client_id") @db.Uuid
-  frequency   Frequency
-  nextRunAt   DateTime  @map("next_run_at") @db.Date
-  active      Boolean   @default(true)
-  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamp
-
-  // Relations
-  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
-  client    Client    @relation(fields: [clientId], references: [id], onDelete: Cascade)
-
-  @@map("recurring_invoices")
-}
-
-model File {
-  id          String    @id @default(uuid()) @db.Uuid
-  workspaceId String    @map("workspace_id") @db.Uuid
-  projectId   String?   @map("project_id") @db.Uuid
-  uploadedBy  String    @map("uploaded_by") @db.Uuid
-  fileName    String    @map("file_name") @db.VarChar(255)
-  fileType    String    @map("file_type") @db.VarChar(50)
-  fileSize    BigInt    @map("file_size")
-  storagePath String    @map("storage_path") @db.Text
-  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamp
-  deletedAt   DateTime? @map("deleted_at") @db.Timestamp
-
-  // Relations
-  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
-  project   Project?  @relation(fields: [projectId], references: [id], onDelete: SetNull)
-  uploader  User      @relation("FileUploader", fields: [uploadedBy], references: [id], onDelete: Cascade)
-
-  @@map("files")
-}
-
-model Notification {
-  id        String   @id @default(uuid()) @db.Uuid
-  userId    String   @map("user_id") @db.Uuid
-  title     String   @db.VarChar(255)
-  message   String   @db.Text
-  isRead    Boolean  @default(false) @map("is_read")
-  createdAt DateTime @default(now()) @map("created_at") @db.Timestamp
-
-  // Relations
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@map("notifications")
-  @@index([userId], name: "idx_notifications_user")
-}
-
-model SubscriptionUsage {
-  id                  String   @id @default(uuid()) @db.Uuid
-  workspaceId         String   @unique @map("workspace_id") @db.Uuid
-  activeProjectsCount Int      @default(0) @map("active_projects_count")
-  clientsCount        Int      @default(0) @map("clients_count")
-  storageUsedBytes    BigInt   @default(0) @map("storage_used_bytes")
-  updatedAt           DateTime @updatedAt @map("updated_at") @db.Timestamp
-
-  // Relations
-  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
-
-  @@map("subscription_usage")
 }
