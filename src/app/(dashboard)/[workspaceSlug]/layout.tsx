@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { WorkspaceService } from '@/features/workspace/services/workspace-service';
 import { WorkspaceSwitcher } from '@/features/workspace/components/workspace-switcher';
 import { ClientPortalRedirect } from '@/components/client-portal-redirect';
+import { NotificationCenter } from '@/features/notifications/components/notification-center';
 import {
   LayoutDashboard,
   Users,
@@ -149,10 +150,7 @@ export default async function DashboardLayout({
                 />
               </div>
 
-              <Button variant="ghost" size="icon" className="relative">
-                <Bell className="h-4 w-4" />
-                <span className="absolute right-2 top-2 h-1.5 w-1.5 rounded-full bg-primary" />
-              </Button>
+              <NotificationCenter />
 
               <div className="flex h-8 w-8 items-center justify-center rounded-full bg-zinc-200 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
                 <UserIcon className="h-4 w-4" />

@@ -1,5 +1,6 @@
 import { InvoiceRepository } from '../repositories/invoice-repository';
 import { WorkspaceService } from '@/features/workspace/services/workspace-service';
+import { NotificationService } from '@/features/notifications/services/notification-service';
 import { CreateInvoiceInput, UpdateInvoiceInput } from '../schemas/invoice';
 import { Role, InvoiceStatus } from '@prisma/client';
 import { sendEmail } from '@/lib/email';
@@ -8,10 +9,12 @@ import prisma from '@/lib/prisma';
 export class InvoiceService {
   private invoiceRepository: InvoiceRepository;
   private workspaceService: WorkspaceService;
+  private notificationService: NotificationService;
 
   constructor() {
     this.invoiceRepository = new InvoiceRepository();
     this.workspaceService = new WorkspaceService();
+    this.notificationService = new NotificationService();
   }
 
   async getInvoices(workspaceId: string, userId: string) {
@@ -162,6 +165,18 @@ export class InvoiceService {
       html: htmlContent,
     });
 
+    // Create in-app notifications for all client portal users of this client
+    const clientUsers = await prisma.clientUser.findMany({
+      where: { clientId: invoice.clientId },
+    });
+    for (const clientUser of clientUsers) {
+      await this.notificationService.createNotification(
+        clientUser.userId,
+        'New Invoice Received',
+        `You have received invoice #${invoice.invoiceNumber} for ${formattedAmount}.`
+      );
+    }
+
     return updatedInvoice;
   }
 
@@ -224,6 +239,13 @@ export class InvoiceService {
       subject: `Payment Received: Invoice ${invoice.invoiceNumber} - ${workspace.name}`,
       html: htmlContent,
     });
+
+    // Create in-app notification for workspace owner
+    await this.notificationService.createNotification(
+      workspace.ownerId,
+      'Invoice Paid',
+      `Invoice #${invoice.invoiceNumber} has been paid by ${client.companyName}.`
+    );
 
     return updatedInvoice;
   }
