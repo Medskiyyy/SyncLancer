@@ -15,10 +15,10 @@ import {
   Trash2, 
   Edit, 
   Eye, 
-  X, 
-  FileText, 
   RotateCcw,
-  Users
+  Users,
+  Building,
+  Sparkles,
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -37,13 +37,14 @@ import {
 } from '@/components/ui/dialog';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 
-import { createClientSchema, CreateClientInput, updateClientSchema, UpdateClientInput } from '../schemas/client';
+import { createClientSchema, CreateClientInput } from '../schemas/client';
 import { 
   createClientAction, 
   updateClientAction, 
   archiveClientAction, 
   deleteClientAction 
 } from '../actions/client-actions';
+import { cn } from '@/lib/utils';
 
 interface ExtendedClient extends Client {
   projects?: Project[];
@@ -105,16 +106,14 @@ export function ClientList({ initialClients, workspaceId, workspaceSlug }: Clien
     try {
       const result = await createClientAction(workspaceId, data);
       if (result.success && result.data) {
-        toast.success('Client created successfully');
+        toast.success('Client added successfully');
         setIsAddOpen(false);
         addForm.reset();
-        // Optimistically add to list
-        setClients(prev => [result.data as ExtendedClient, ...prev]);
       } else {
         toast.error(result.error || 'Failed to create client');
       }
-    } catch (err) {
-      toast.error('An error occurred');
+    } catch (error) {
+      toast.error('An unexpected error occurred');
     } finally {
       setIsLoading(false);
     }
@@ -126,129 +125,127 @@ export function ClientList({ initialClients, workspaceId, workspaceSlug }: Clien
     try {
       const result = await updateClientAction(editingClient.id, workspaceId, data);
       if (result.success && result.data) {
-        toast.success('Client updated successfully');
+        toast.success('Client details updated');
         setIsEditOpen(false);
         setEditingClient(null);
-        // Update item in list
-        setClients(prev => 
-          prev.map(c => c.id === editingClient.id ? { ...c, ...result.data } : c)
-        );
       } else {
         toast.error(result.error || 'Failed to update client');
       }
-    } catch (err) {
-      toast.error('An error occurred');
+    } catch (error) {
+      toast.error('An unexpected error occurred');
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleArchiveClient = async (client: ExtendedClient) => {
-    const nextArchivedState = !client.archived;
+    const actionText = client.archived ? 'restore' : 'archive';
+    if (!confirm(`Are you sure you want to ${actionText} this client?`)) return;
+
     try {
-      const result = await archiveClientAction(client.id, workspaceId, nextArchivedState);
+      const result = await archiveClientAction(client.id, workspaceId, !client.archived);
       if (result.success) {
-        toast.success(nextArchivedState ? 'Client archived' : 'Client restored');
-        setClients(prev =>
-          prev.map(c => c.id === client.id ? { ...c, archived: nextArchivedState } : c)
-        );
+        toast.success(`Client ${client.archived ? 'restored' : 'archived'} successfully`);
       } else {
-        toast.error(result.error || 'Failed to update archive status');
+        toast.error(result.error || `Failed to ${actionText} client`);
       }
-    } catch (err) {
-      toast.error('An error occurred');
+    } catch (error) {
+      toast.error('An unexpected error occurred');
     }
   };
 
   const handleDeleteClient = async (clientId: string) => {
-    if (!confirm('Are you sure you want to delete this client? All portal integrations will be revoked.')) return;
+    if (!confirm('Are you sure you want to permanently delete this client? All projects and invoices under this client will be affected.')) return;
+
     try {
       const result = await deleteClientAction(clientId, workspaceId);
       if (result.success) {
-        toast.success('Client deleted successfully');
-        setClients(prev => prev.filter(c => c.id !== clientId));
+        toast.success('Client permanently deleted');
       } else {
         toast.error(result.error || 'Failed to delete client');
       }
-    } catch (err) {
-      toast.error('An error occurred');
+    } catch (error) {
+      toast.error('An unexpected error occurred');
     }
   };
 
-  // Filter clients based on search query and active tab
-  const filteredClients = clients.filter(client => {
-    const matchesSearch = 
-      client.companyName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      client.primaryEmail.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      client.phone.toLowerCase().includes(searchQuery.toLowerCase());
+  const filteredClients = clients.filter((client) => {
+    const isArchivedMatch = activeTab === 'archived' ? client.archived : !client.archived;
     
-    const matchesTab = activeTab === 'active' ? !client.archived : client.archived;
-    
-    return matchesSearch && matchesTab;
+    if (!isArchivedMatch) return false;
+
+    if (!searchQuery) return true;
+
+    const query = searchQuery.toLowerCase();
+    return (
+      client.companyName.toLowerCase().includes(query) ||
+      client.primaryEmail.toLowerCase().includes(query) ||
+      (client.phone && client.phone.toLowerCase().includes(query)) ||
+      (client.notes && client.notes.toLowerCase().includes(query))
+    );
   });
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 animate-in fade-in-50 duration-300">
       {/* Page Header */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-zinc-200/60 dark:border-zinc-800/80 pb-5">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">Clients</h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            Manage your client relationships, project scopes, invoices, and client portals.
-          </p>
+          <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight text-zinc-900 dark:text-zinc-55">Clients Directory</h1>
+          <p className="text-sm text-zinc-500 dark:text-zinc-400">View and manage workspace customer relations, scope history, and portal keys.</p>
         </div>
-        <Button onClick={() => setIsAddOpen(true)} className="flex items-center gap-2 self-start sm:self-center">
-          <Plus className="h-4 w-4" />
-          <span>Add Client</span>
+        <Button onClick={() => setIsAddOpen(true)} className="cursor-pointer font-semibold text-xs h-9">
+          <Plus className="mr-1.5 h-4 w-4" /> Add Client
         </Button>
       </div>
 
       {/* Tabs and Search Bar */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex bg-zinc-100 p-1 rounded-lg dark:bg-zinc-800 self-start">
+        <div className="flex bg-zinc-100 dark:bg-zinc-800 p-0.5 rounded-lg border border-zinc-200/50 dark:border-zinc-700/50 self-start">
           <button
             onClick={() => setActiveTab('active')}
-            className={`px-4 py-1.5 text-xs font-medium rounded-md transition-colors ${
+            className={cn(
+              "px-4 py-1.5 text-xs font-semibold rounded-md transition-all cursor-pointer",
               activeTab === 'active'
-                ? 'bg-white shadow-sm text-zinc-950 dark:bg-zinc-900 dark:text-zinc-50'
-                : 'text-zinc-600 hover:text-zinc-950 dark:text-zinc-400 dark:hover:text-zinc-50'
-            }`}
+                ? "bg-white dark:bg-zinc-900 text-zinc-950 dark:text-zinc-50 shadow-xs"
+                : "text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-200"
+            )}
           >
             Active Clients
           </button>
           <button
             onClick={() => setActiveTab('archived')}
-            className={`px-4 py-1.5 text-xs font-medium rounded-md transition-colors ${
+            className={cn(
+              "px-4 py-1.5 text-xs font-semibold rounded-md transition-all cursor-pointer",
               activeTab === 'archived'
-                ? 'bg-white shadow-sm text-zinc-950 dark:bg-zinc-900 dark:text-zinc-50'
-                : 'text-zinc-600 hover:text-zinc-950 dark:text-zinc-400 dark:hover:text-zinc-50'
-            }`}
+                ? "bg-white dark:bg-zinc-900 text-zinc-950 dark:text-zinc-50 shadow-xs"
+                : "text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-200"
+            )}
           >
             Archived
           </button>
         </div>
 
         <div className="relative w-full max-w-sm">
-          <Search className="absolute left-3 top-2.5 h-4 w-4 text-zinc-400" />
+          <Search className="absolute left-3 top-2.5 h-4 w-4 text-zinc-400 dark:text-zinc-500" />
           <Input
-            placeholder="Search company, email, or phone..."
+            placeholder="Search company, contact, notes..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-9 bg-white dark:bg-zinc-900"
+            className="pl-9 bg-white dark:bg-zinc-900 text-xs h-9 rounded-lg"
           />
         </div>
       </div>
 
-      {/* Clients Card List or Table */}
+      {/* Clients List */}
       {filteredClients.length === 0 ? (
-        <Card className="flex flex-col items-center justify-center p-12 text-center border-dashed">
-          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-400 mb-4">
-            <Users className="h-6 w-6" />
+        <Card className="flex flex-col items-center justify-center p-12 text-center border-dashed border-zinc-200/60 dark:border-zinc-800">
+          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-zinc-50 dark:bg-zinc-950 text-zinc-400 mb-4 border border-zinc-200/50 dark:border-zinc-800/80">
+            <Users className="h-6 w-6 text-zinc-400" />
           </div>
-          <CardTitle className="text-lg font-semibold text-zinc-900 dark:text-zinc-50">
+          <CardTitle className="text-sm font-bold text-zinc-900 dark:text-zinc-50">
             {searchQuery ? 'No matching clients found' : `No ${activeTab} clients yet`}
           </CardTitle>
-          <CardDescription className="max-w-sm mt-2 text-zinc-500 dark:text-zinc-400">
+          <CardDescription className="max-w-sm mt-1 text-xs text-zinc-500 dark:text-zinc-400">
             {searchQuery 
               ? 'Try refining your search terms or filters.'
               : activeTab === 'active' 
@@ -257,170 +254,199 @@ export function ClientList({ initialClients, workspaceId, workspaceSlug }: Clien
             }
           </CardDescription>
           {!searchQuery && activeTab === 'active' && (
-            <Button onClick={() => setIsAddOpen(true)} className="mt-4 flex items-center gap-2">
+            <Button onClick={() => setIsAddOpen(true)} className="mt-4 flex items-center gap-2 cursor-pointer font-semibold text-xs h-9">
               <Plus className="h-4 w-4" />
               <span>Add Client</span>
             </Button>
           )}
         </Card>
       ) : (
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {filteredClients.map((client) => {
-            const projectCount = client.projects?.length || 0;
-            return (
-              <Card key={client.id} className="relative flex flex-col justify-between overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-                {client.archived && (
-                  <div className="absolute top-0 right-0 bg-amber-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-bl">
-                    ARCHIVED
-                  </div>
-                )}
-                <div>
-                  <CardHeader className="pb-3">
-                    <CardTitle className="text-lg font-bold text-zinc-900 dark:text-zinc-50 flex items-center gap-2">
-                      {client.companyName}
-                    </CardTitle>
-                    <CardDescription className="line-clamp-2 min-h-[32px] text-xs">
-                      {client.notes || 'No description or notes provided.'}
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-3 pb-4 border-b border-zinc-100 dark:border-zinc-800 text-sm">
-                    <div className="flex items-center gap-2 text-zinc-600 dark:text-zinc-400">
-                      <Mail className="h-4 w-4 text-zinc-400 shrink-0" />
-                      <span className="truncate">{client.primaryEmail}</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-zinc-600 dark:text-zinc-400">
-                      <Phone className="h-4 w-4 text-zinc-400 shrink-0" />
-                      <span>{client.phone}</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-zinc-600 dark:text-zinc-400">
-                      <FolderKanban className="h-4 w-4 text-zinc-400 shrink-0" />
-                      <span>{projectCount} {projectCount === 1 ? 'Project' : 'Projects'}</span>
-                    </div>
-                  </CardContent>
-                </div>
-                <div className="flex items-center justify-between p-3 bg-zinc-50 dark:bg-zinc-900/50">
-                  <div className="flex gap-1.5">
-                    <Link href={`/${workspaceSlug}/clients/${client.id}`}>
-                      <Button variant="ghost" size="icon" title="View Profile" className="h-8 w-8 hover:bg-zinc-200 dark:hover:bg-zinc-800 text-zinc-600 dark:text-zinc-400">
-                        <Eye className="h-4 w-4" />
-                      </Button>
-                    </Link>
-                    <Button 
-                      variant="ghost" 
-                      size="icon" 
-                      title="Edit Client" 
-                      onClick={() => {
-                        setEditingClient(client);
-                        setIsEditOpen(true);
-                      }}
-                      className="h-8 w-8 hover:bg-zinc-200 dark:hover:bg-zinc-800 text-zinc-600 dark:text-zinc-400"
-                    >
-                      <Edit className="h-4 w-4" />
-                    </Button>
-                    <Button 
-                      variant="ghost" 
-                      size="icon" 
-                      title={client.archived ? 'Restore Client' : 'Archive Client'} 
-                      onClick={() => handleArchiveClient(client)}
-                      className="h-8 w-8 hover:bg-zinc-200 dark:hover:bg-zinc-800 text-zinc-600 dark:text-zinc-400"
-                    >
-                      {client.archived ? <RotateCcw className="h-4 w-4 text-amber-500" /> : <Archive className="h-4 w-4" />}
-                    </Button>
-                  </div>
-                  <Button 
-                    variant="ghost" 
-                    size="icon" 
-                    title="Delete Client" 
-                    onClick={() => handleDeleteClient(client.id)}
-                    className="h-8 w-8 hover:bg-red-100 hover:text-red-600 dark:hover:bg-red-950/20 text-zinc-600 dark:text-zinc-400"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </div>
-              </Card>
-            );
-          })}
-        </div>
+        <Card className="overflow-hidden border border-zinc-200/60 dark:border-zinc-800/80 rounded-xl shadow-xs">
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse text-xs">
+              <thead>
+                <tr className="border-b border-zinc-200 dark:border-zinc-800 text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider bg-zinc-50/50 dark:bg-zinc-900/30">
+                  <th className="px-5 py-3">Client & Company</th>
+                  <th className="px-5 py-3">Primary Contact</th>
+                  <th className="px-5 py-3">Active Projects</th>
+                  <th className="px-5 py-3">Status</th>
+                  <th className="px-5 py-3 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-zinc-200/60 dark:divide-zinc-800/60 bg-white dark:bg-zinc-900">
+                {filteredClients.map((client) => {
+                  const projectCount = client.projects?.length || 0;
+                  return (
+                    <tr key={client.id} className="hover:bg-zinc-50/40 dark:hover:bg-zinc-900/40 transition-colors">
+                      <td className="px-5 py-3.5">
+                        <div className="flex items-center gap-3">
+                          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-amber-500/10 text-amber-600 dark:text-amber-400 font-bold border border-amber-500/15 shadow-xs">
+                            {client.companyName.substring(0, 2).toUpperCase()}
+                          </div>
+                          <div>
+                            <Link href={`/${workspaceSlug}/clients/${client.id}`} className="font-semibold text-zinc-900 dark:text-zinc-100 hover:text-primary transition-colors hover:underline">
+                              {client.companyName}
+                            </Link>
+                            {client.notes && (
+                              <p className="text-[10px] text-zinc-400 dark:text-zinc-500 truncate max-w-[200px] mt-0.5 font-medium">
+                                {client.notes}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-5 py-3.5">
+                        <div className="space-y-1">
+                          <div className="flex items-center gap-1.5 text-zinc-700 dark:text-zinc-300 font-medium">
+                            <Mail className="h-3.5 w-3.5 text-zinc-400" />
+                            <span>{client.primaryEmail}</span>
+                          </div>
+                          {client.phone && (
+                            <div className="flex items-center gap-1.5 text-zinc-400 dark:text-zinc-500 text-[10px]">
+                              <Phone className="h-3 w-3" />
+                              <span>{client.phone}</span>
+                            </div>
+                          )}
+                        </div>
+                      </td>
+                      <td className="px-5 py-3.5">
+                        <div className="flex items-center gap-1.5">
+                          <Badge variant="secondary" className="font-mono font-semibold text-[10px] border border-zinc-200/50 dark:border-zinc-800/80">
+                            <FolderKanban className="h-3 w-3 mr-1 text-zinc-400" />
+                            {projectCount} {projectCount === 1 ? 'Project' : 'Projects'}
+                          </Badge>
+                        </div>
+                      </td>
+                      <td className="px-5 py-3.5">
+                        <Badge 
+                          className={cn(
+                            "text-[9px] font-bold px-1.5 py-0.5",
+                            client.archived 
+                              ? "bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 border border-zinc-200/30"
+                              : "bg-green-500/10 text-green-600 dark:text-green-400 border border-green-550/15"
+                          )}
+                          variant="secondary"
+                        >
+                          {client.archived ? 'Archived' : 'Active'}
+                        </Badge>
+                      </td>
+                      <td className="px-5 py-3.5 text-right">
+                        <div className="flex items-center justify-end gap-1">
+                          <Link href={`/${workspaceSlug}/clients/${client.id}`}>
+                            <Button variant="ghost" size="icon" title="View Profile" className="h-7 w-7 text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 cursor-pointer">
+                              <Eye className="h-3.5 w-3.5" />
+                            </Button>
+                          </Link>
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            title="Edit Client" 
+                            onClick={() => {
+                              setEditingClient(client);
+                              setIsEditOpen(true);
+                            }}
+                            className="h-7 w-7 text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 cursor-pointer"
+                          >
+                            <Edit className="h-3.5 w-3.5" />
+                          </Button>
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            title={client.archived ? 'Restore Client' : 'Archive Client'} 
+                            onClick={() => handleArchiveClient(client)}
+                            className="h-7 w-7 text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 cursor-pointer"
+                          >
+                            {client.archived ? <RotateCcw className="h-3.5 w-3.5 text-amber-500" /> : <Archive className="h-3.5 w-3.5" />}
+                          </Button>
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            title="Delete Client" 
+                            onClick={() => handleDeleteClient(client.id)}
+                            className="h-7 w-7 text-zinc-400 hover:bg-destructive/5 hover:text-destructive cursor-pointer"
+                          >
+                            <Trash2 className="h-3.5 w-3.5" />
+                          </Button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </Card>
       )}
 
       {/* Add Client Dialog */}
       <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
-        <DialogContent className="sm:max-w-[425px]">
+        <DialogContent className="max-w-md p-6 bg-white dark:bg-zinc-900 border border-zinc-250 dark:border-zinc-800 rounded-xl">
           <DialogHeader>
-            <DialogTitle>Add Client</DialogTitle>
-            <DialogDescription>
-              Create a new client entity. You can link active projects, generate invoices, and invite client representatives to their secure portal from here.
+            <DialogTitle className="text-base font-bold text-zinc-900 dark:text-zinc-50 flex items-center gap-2">
+              <Sparkles className="h-4 w-4 text-amber-500" />
+              <span>Add Client</span>
+            </DialogTitle>
+            <DialogDescription className="text-zinc-400 dark:text-zinc-500 text-xs">
+              Introduce a new corporate entity or client contact to your workspace directory.
             </DialogDescription>
           </DialogHeader>
-
           <Form {...addForm}>
-            <form onSubmit={addForm.handleSubmit(handleCreateClient)} className="space-y-4">
+            <form onSubmit={addForm.handleSubmit(handleCreateClient)} className="space-y-4 pt-2">
               <FormField
-                control={addForm.control as any}
+                control={addForm.control}
                 name="companyName"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Company Name</FormLabel>
+                    <FormLabel className="text-xs font-semibold text-zinc-700 dark:text-zinc-350">Company Name</FormLabel>
                     <FormControl>
-                      <Input placeholder="Acme Corporation" {...field} />
+                      <Input placeholder="Acme Inc" disabled={isLoading} className="text-xs h-9 rounded-lg" {...field} />
                     </FormControl>
-                    <FormMessage />
+                    <FormMessage className="text-[10px]" />
                   </FormItem>
                 )}
               />
-
               <FormField
-                control={addForm.control as any}
+                control={addForm.control}
                 name="primaryEmail"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Primary Contact Email</FormLabel>
+                    <FormLabel className="text-xs font-semibold text-zinc-700 dark:text-zinc-350">Primary Contact Email</FormLabel>
                     <FormControl>
-                      <Input type="email" placeholder="billing@acme.com" {...field} />
+                      <Input type="email" placeholder="billing@acme.com" disabled={isLoading} className="text-xs h-9 rounded-lg" {...field} />
                     </FormControl>
-                    <FormMessage />
+                    <FormMessage className="text-[10px]" />
                   </FormItem>
                 )}
               />
-
               <FormField
-                control={addForm.control as any}
+                control={addForm.control}
                 name="phone"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Phone Number</FormLabel>
+                    <FormLabel className="text-xs font-semibold text-zinc-700 dark:text-zinc-350">Phone Number</FormLabel>
                     <FormControl>
-                      <Input placeholder="+1 (555) 000-0000" {...field} />
+                      <Input placeholder="+62xxxxxxxx" disabled={isLoading} className="text-xs h-9 rounded-lg" {...field} />
                     </FormControl>
-                    <FormMessage />
+                    <FormMessage className="text-[10px]" />
                   </FormItem>
                 )}
               />
-
               <FormField
-                control={addForm.control as any}
+                control={addForm.control}
                 name="notes"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Notes / Description (Optional)</FormLabel>
+                    <FormLabel className="text-xs font-semibold text-zinc-700 dark:text-zinc-350">Internal Notes</FormLabel>
                     <FormControl>
-                      <Textarea 
-                        placeholder="Key client details, industry, address, timezone, or billing cycle details..." 
-                        className="resize-none h-20"
-                        {...field} 
-                      />
+                      <Textarea placeholder="Describe the client sector, core business..." disabled={isLoading} className="text-xs min-h-[80px] rounded-lg resize-none" {...field} />
                     </FormControl>
-                    <FormMessage />
+                    <FormMessage className="text-[10px]" />
                   </FormItem>
                 )}
               />
-
-              <DialogFooter className="pt-4">
-                <Button type="button" variant="outline" onClick={() => setIsAddOpen(false)}>
-                  Cancel
-                </Button>
-                <Button type="submit" disabled={isLoading}>
-                  {isLoading ? 'Creating...' : 'Create Client'}
+              <DialogFooter className="pt-2">
+                <Button type="submit" disabled={isLoading} className="cursor-pointer text-xs h-9 font-semibold">
+                  {isLoading ? 'Adding...' : 'Add Client'}
                 </Button>
               </DialogFooter>
             </form>
@@ -429,85 +455,73 @@ export function ClientList({ initialClients, workspaceId, workspaceSlug }: Clien
       </Dialog>
 
       {/* Edit Client Dialog */}
-      <Dialog open={isEditOpen} onOpenChange={(open) => {
-        setIsEditOpen(open);
-        if (!open) setEditingClient(null);
-      }}>
-        <DialogContent className="sm:max-w-[425px]">
+      <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
+        <DialogContent className="max-w-md p-6 bg-white dark:bg-zinc-900 border border-zinc-250 dark:border-zinc-800 rounded-xl">
           <DialogHeader>
-            <DialogTitle>Edit Client</DialogTitle>
-            <DialogDescription>
-              Update client company profile details and contacts.
+            <DialogTitle className="text-base font-bold text-zinc-900 dark:text-zinc-50 flex items-center gap-2">
+              <Building className="h-4 w-4 text-primary" />
+              <span>Modify Client Details</span>
+            </DialogTitle>
+            <DialogDescription className="text-zinc-400 dark:text-zinc-500 text-xs">
+              Update general settings and internal records for this client account.
             </DialogDescription>
           </DialogHeader>
-
           <Form {...editForm}>
-            <form onSubmit={editForm.handleSubmit(handleUpdateClient)} className="space-y-4">
+            <form onSubmit={editForm.handleSubmit(handleUpdateClient)} className="space-y-4 pt-2">
               <FormField
-                control={editForm.control as any}
+                control={editForm.control}
                 name="companyName"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Company Name</FormLabel>
+                    <FormLabel className="text-xs font-semibold text-zinc-700 dark:text-zinc-350">Company Name</FormLabel>
                     <FormControl>
-                      <Input placeholder="Acme Corporation" {...field} />
+                      <Input placeholder="Acme Inc" disabled={isLoading} className="text-xs h-9 rounded-lg" {...field} />
                     </FormControl>
-                    <FormMessage />
+                    <FormMessage className="text-[10px]" />
                   </FormItem>
                 )}
               />
-
               <FormField
-                control={editForm.control as any}
+                control={editForm.control}
                 name="primaryEmail"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Primary Contact Email</FormLabel>
+                    <FormLabel className="text-xs font-semibold text-zinc-700 dark:text-zinc-350">Primary Contact Email</FormLabel>
                     <FormControl>
-                      <Input type="email" placeholder="billing@acme.com" {...field} />
+                      <Input type="email" placeholder="billing@acme.com" disabled={isLoading} className="text-xs h-9 rounded-lg" {...field} />
                     </FormControl>
-                    <FormMessage />
+                    <FormMessage className="text-[10px]" />
                   </FormItem>
                 )}
               />
-
               <FormField
-                control={editForm.control as any}
+                control={editForm.control}
                 name="phone"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Phone Number</FormLabel>
+                    <FormLabel className="text-xs font-semibold text-zinc-700 dark:text-zinc-350">Phone Number</FormLabel>
                     <FormControl>
-                      <Input placeholder="+1 (555) 000-0000" {...field} />
+                      <Input placeholder="+62xxxxxxxx" disabled={isLoading} className="text-xs h-9 rounded-lg" {...field} />
                     </FormControl>
-                    <FormMessage />
+                    <FormMessage className="text-[10px]" />
                   </FormItem>
                 )}
               />
-
               <FormField
-                control={editForm.control as any}
+                control={editForm.control}
                 name="notes"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Notes / Description (Optional)</FormLabel>
+                    <FormLabel className="text-xs font-semibold text-zinc-700 dark:text-zinc-350">Internal Notes</FormLabel>
                     <FormControl>
-                      <Textarea 
-                        placeholder="Key client details..." 
-                        className="resize-none h-20"
-                        {...field} 
-                      />
+                      <Textarea placeholder="Describe the client sector, core business..." disabled={isLoading} className="text-xs min-h-[80px] rounded-lg resize-none" {...field} />
                     </FormControl>
-                    <FormMessage />
+                    <FormMessage className="text-[10px]" />
                   </FormItem>
                 )}
               />
-
-              <DialogFooter className="pt-4">
-                <Button type="button" variant="outline" onClick={() => setIsEditOpen(false)}>
-                  Cancel
-                </Button>
-                <Button type="submit" disabled={isLoading}>
+              <DialogFooter className="pt-2">
+                <Button type="submit" disabled={isLoading} className="cursor-pointer text-xs h-9 font-semibold">
                   {isLoading ? 'Saving...' : 'Save Changes'}
                 </Button>
               </DialogFooter>

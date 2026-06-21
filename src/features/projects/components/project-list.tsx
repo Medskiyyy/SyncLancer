@@ -13,7 +13,8 @@ import {
   Trash2, 
   ExternalLink,
   ChevronRight,
-  TrendingUp
+  TrendingUp,
+  Sparkles,
 } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -39,6 +40,7 @@ import {
 } from '@/components/ui/dialog';
 
 import { deleteProjectAction } from '../actions/project-actions';
+import { cn } from '@/lib/utils';
 
 interface ExtendedProject extends Project {
   client?: Client;
@@ -50,13 +52,13 @@ interface ProjectListProps {
   workspaceSlug: string;
 }
 
-const STATUS_COLORS: Record<string, string> = {
-  DRAFT: 'bg-slate-100 text-slate-800 dark:bg-slate-800 dark:text-slate-200',
-  ACTIVE: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300',
-  ON_HOLD: 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300',
-  REVIEW: 'bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300',
-  COMPLETED: 'bg-purple-100 text-purple-800 dark:bg-purple-950 dark:text-purple-300',
-  CANCELLED: 'bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300',
+const STATUS_THEMES: Record<string, string> = {
+  DRAFT: 'bg-zinc-50 dark:bg-zinc-950 text-zinc-400 dark:text-zinc-505 border-zinc-200/60 dark:border-zinc-850',
+  ACTIVE: 'bg-green-550/10 text-green-600 dark:text-green-400 border-green-550/15',
+  ON_HOLD: 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/15',
+  REVIEW: 'bg-stone-500/10 text-stone-650 dark:text-stone-400 border-stone-550/15',
+  COMPLETED: 'bg-amber-550/10 text-amber-600 dark:text-amber-400 border-amber-500/20',
+  CANCELLED: 'bg-red-500/10 text-red-655 dark:text-red-400 border-red-550/15',
 };
 
 export function ProjectList({ initialProjects, workspaceId, workspaceSlug }: ProjectListProps) {
@@ -109,174 +111,174 @@ export function ProjectList({ initialProjects, workspaceId, workspaceSlug }: Pro
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
       currency: currency,
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
     }).format(num);
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+    <div className="space-y-6 animate-in fade-in-50 duration-300">
+      {/* Header Banner */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-zinc-200/60 dark:border-zinc-800/80 pb-5">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-50">Projects</h1>
-          <p className="text-sm text-slate-500 dark:text-slate-400">
-            Manage your client engagements, budgets, milestones, and deliverables.
+          <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight text-zinc-900 dark:text-zinc-55">Projects Directory</h1>
+          <p className="text-sm text-zinc-500 dark:text-zinc-400">
+            Manage your active client engagements, budgets, milestones, and deliverables.
           </p>
         </div>
         <Link href={`/${workspaceSlug}/projects/new`}>
-          <Button className="w-full sm:w-auto bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700 text-white font-medium shadow-md shadow-indigo-500/10">
-            <Plus className="mr-2 h-4 w-4" /> New Project
+          <Button className="cursor-pointer font-semibold text-xs h-9">
+            <Plus className="mr-1.5 h-4 w-4" /> New Project
           </Button>
         </Link>
       </div>
 
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+      {/* Search & Filters */}
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="relative w-full max-w-sm">
+          <Search className="absolute left-3 top-2.5 h-4 w-4 text-zinc-400 dark:text-zinc-505" />
           <Input
             placeholder="Search projects or clients..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-9 bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800"
+            className="pl-9 bg-white dark:bg-zinc-900 text-xs h-9 rounded-lg"
           />
         </div>
-        <div className="flex flex-wrap gap-2">
-          {['ALL', 'DRAFT', 'ACTIVE', 'ON_HOLD', 'REVIEW', 'COMPLETED', 'CANCELLED'].map((status) => (
-            <Button
+        <div className="flex flex-wrap bg-zinc-100 dark:bg-zinc-800 p-0.5 rounded-lg border border-zinc-200/50 dark:border-zinc-700/50 self-start max-w-full overflow-x-auto">
+          {['ALL', 'ACTIVE', 'ON_HOLD', 'REVIEW', 'COMPLETED'].map((status) => (
+            <button
               key={status}
-              variant={statusFilter === status ? 'default' : 'outline'}
-              size="sm"
               onClick={() => setStatusFilter(status)}
-              className={`text-xs font-semibold ${
-                statusFilter === status 
-                  ? 'bg-slate-900 text-white dark:bg-slate-50 dark:text-slate-950' 
-                  : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400'
-              }`}
+              className={cn(
+                "px-3 py-1 text-xs font-semibold rounded-md transition-all cursor-pointer whitespace-nowrap",
+                statusFilter === status
+                  ? "bg-white dark:bg-zinc-900 text-zinc-950 dark:text-zinc-50 shadow-xs"
+                  : "text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-200"
+              )}
             >
               {status}
-            </Button>
+            </button>
           ))}
         </div>
       </div>
 
+      {/* Grid List */}
       {filteredProjects.length === 0 ? (
-        <Card className="border-dashed border-slate-200 dark:border-slate-800 bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm py-12 text-center">
-          <CardContent className="flex flex-col items-center justify-center space-y-3">
-            <div className="rounded-full bg-slate-100 dark:bg-slate-800 p-3 text-slate-400 dark:text-slate-500">
-              <Briefcase className="h-6 w-6" />
-            </div>
-            <div className="space-y-1">
-              <h3 className="font-semibold text-slate-900 dark:text-slate-100">No projects found</h3>
-              <p className="text-sm text-slate-500 dark:text-slate-400">
-                {searchQuery || statusFilter !== 'ALL'
-                  ? 'Try adjusting your search filters.'
-                  : 'Get started by creating your first project.'}
-              </p>
-            </div>
-            {!searchQuery && statusFilter === 'ALL' && (
-              <Link href={`/${workspaceSlug}/projects/new`}>
-                <Button variant="outline" size="sm" className="mt-2 border-slate-200 dark:border-slate-800">
-                  <Plus className="mr-2 h-4 w-4" /> Create Project
-                </Button>
-              </Link>
-            )}
-          </CardContent>
+        <Card className="flex flex-col items-center justify-center p-12 text-center border-dashed border-zinc-200/60 dark:border-zinc-800">
+          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-zinc-50 dark:bg-zinc-950 text-zinc-400 mb-4 border border-zinc-200/50 dark:border-zinc-800/80">
+            <Briefcase className="h-6 w-6 text-zinc-400" />
+          </div>
+          <CardTitle className="text-sm font-bold text-zinc-900 dark:text-zinc-55">No projects found</CardTitle>
+          <CardDescription className="max-w-sm mt-1 text-xs text-zinc-500 dark:text-zinc-400">
+            {searchQuery || statusFilter !== 'ALL'
+              ? 'Try adjusting your search query or filters.'
+              : 'Create a project scope to track milestones, tasks, files and log billable times.'}
+          </CardDescription>
+          {!searchQuery && statusFilter === 'ALL' && (
+            <Link href={`/${workspaceSlug}/projects/new`}>
+              <Button className="mt-4 flex items-center gap-2 cursor-pointer font-semibold text-xs h-9">
+                <Plus className="h-4 w-4" /> Create Project
+              </Button>
+            </Link>
+          )}
         </Card>
       ) : (
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {filteredProjects.map((project) => (
             <Card 
               key={project.id} 
-              className="group relative flex flex-col justify-between overflow-hidden border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:shadow-xl hover:border-slate-300 dark:hover:border-slate-700 transition-all duration-300 rounded-xl"
+              className="group relative flex flex-col justify-between overflow-hidden border-zinc-200/70 dark:border-zinc-850 bg-white dark:bg-zinc-900 hover-lift rounded-xl"
             >
               <CardHeader className="pb-4">
                 <div className="flex items-start justify-between">
-                  <Badge className={`font-semibold uppercase tracking-wider text-[10px] ${STATUS_COLORS[project.status] || 'bg-slate-100 text-slate-800'}`}>
+                  <Badge className={cn("text-[9px] font-bold px-1.5 py-0.5 border shadow-xs", STATUS_THEMES[project.status] || 'bg-zinc-100 text-zinc-800')}>
                     {project.status}
                   </Badge>
                   <DropdownMenu>
-                    <DropdownMenuTrigger className="h-8 w-8 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 rounded-md hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center justify-center cursor-pointer outline-none">
+                    <DropdownMenuTrigger className="h-7 w-7 text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 flex items-center justify-center cursor-pointer outline-none transition-colors">
                       <MoreVertical className="h-4 w-4" />
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-40 border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950">
+                    <DropdownMenuContent align="end" className="w-40 p-1 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg shadow-lg">
                       <DropdownMenuItem 
                         onClick={() => router.push(`/${workspaceSlug}/projects/${project.id}`)}
-                        className="cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-900"
+                        className="flex items-center gap-2 px-2.5 py-2 text-xs font-semibold rounded-md hover:bg-zinc-50 dark:hover:bg-zinc-800/50 cursor-pointer text-zinc-700 dark:text-zinc-300"
                       >
-                        <ExternalLink className="mr-2 h-4 w-4" /> View Details
+                        <ExternalLink className="h-3.5 w-3.5" /> View Details
                       </DropdownMenuItem>
                       <DropdownMenuItem 
                         onClick={() => router.push(`/${workspaceSlug}/projects/${project.id}/edit`)}
-                        className="cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-900"
+                        className="flex items-center gap-2 px-2.5 py-2 text-xs font-semibold rounded-md hover:bg-zinc-50 dark:hover:bg-zinc-800/50 cursor-pointer text-zinc-700 dark:text-zinc-300"
                       >
-                        <Edit className="mr-2 h-4 w-4" /> Edit Project
+                        <Edit className="h-3.5 w-3.5" /> Edit Project
                       </DropdownMenuItem>
                       <DropdownMenuItem 
                         onClick={() => {
                           setDeletingProject(project);
                           setIsDeleteOpen(true);
                         }}
-                        className="cursor-pointer text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/20"
+                        className="flex items-center gap-2 px-2.5 py-2 text-xs font-semibold rounded-md hover:bg-red-50 dark:hover:bg-red-950/20 cursor-pointer text-destructive"
                       >
-                        <Trash2 className="mr-2 h-4 w-4" /> Delete
+                        <Trash2 className="h-3.5 w-3.5" /> Delete Project
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </div>
-                <div className="mt-2 space-y-1">
-                  <Link href={`/${workspaceSlug}/projects/${project.id}`} className="hover:underline">
-                    <CardTitle className="text-lg font-bold text-slate-900 dark:text-slate-50 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
-                      {project.name}
-                    </CardTitle>
+                
+                <div className="mt-3 space-y-1">
+                  <Link href={`/${workspaceSlug}/projects/${project.id}`} className="font-extrabold text-sm text-zinc-900 dark:text-zinc-50 group-hover:text-primary transition-colors inline-block leading-snug">
+                    {project.name}
                   </Link>
-                  <CardDescription className="text-xs font-medium text-slate-400 dark:text-slate-500">
-                    Client: <span className="text-slate-600 dark:text-slate-300">{project.client?.companyName || 'N/A'}</span>
+                  <CardDescription className="text-[10px] font-bold text-zinc-400">
+                    Client: <span className="text-zinc-750 dark:text-zinc-350">{project.client?.companyName || 'None'}</span>
                   </CardDescription>
                 </div>
               </CardHeader>
               <CardContent className="space-y-4 pt-0">
                 {project.description && (
-                  <p className="text-sm text-slate-500 dark:text-slate-400 line-clamp-2 min-h-[40px]">
+                  <p className="text-xs text-zinc-500 dark:text-zinc-450 line-clamp-2 min-h-[32px] font-medium leading-relaxed">
                     {project.description}
                   </p>
                 )}
 
-                <div className="grid grid-cols-2 gap-4 border-t border-slate-100 dark:border-slate-800 pt-4">
+                <div className="grid grid-cols-2 gap-4 border-t border-zinc-100 dark:border-zinc-800/60 pt-4 text-xs font-semibold">
                   <div className="space-y-1">
-                    <span className="flex items-center text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
-                      <DollarSign className="mr-1 h-3 w-3" /> Budget
+                    <span className="flex items-center text-[9px] font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">
+                      <DollarSign className="mr-1 h-3.5 w-3.5" /> Budget
                     </span>
-                    <span className="text-sm font-semibold text-slate-800 dark:text-slate-200">
+                    <span className="text-xs font-bold text-zinc-800 dark:text-zinc-200 font-mono">
                       {formatCurrency(project.budget, project.currency)}
                     </span>
                   </div>
                   <div className="space-y-1">
-                    <span className="flex items-center text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
-                      <Calendar className="mr-1 h-3 w-3" /> Deadline
+                    <span className="flex items-center text-[9px] font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">
+                      <Calendar className="mr-1 h-3.5 w-3.5" /> Deadline
                     </span>
-                    <span className="text-sm font-semibold text-slate-800 dark:text-slate-200">
+                    <span className="text-xs font-bold text-zinc-800 dark:text-zinc-200">
                       {formatDate(project.deadline)}
                     </span>
                   </div>
                 </div>
 
-                <div className="space-y-2 pt-2">
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="flex items-center font-medium text-slate-500 dark:text-slate-400">
-                      <TrendingUp className="mr-1 h-3.5 w-3.5 text-indigo-500" /> Progress
+                <div className="space-y-2 pt-2 border-t border-zinc-100 dark:border-zinc-800/65">
+                  <div className="flex items-center justify-between text-xs font-semibold">
+                    <span className="flex items-center text-zinc-500 dark:text-zinc-450">
+                      <TrendingUp className="mr-1 h-3.5 w-3.5 text-amber-500" /> Progress
                     </span>
-                    <span className="font-bold text-slate-700 dark:text-slate-300">{project.progress}%</span>
+                    <span className="font-bold text-zinc-800 dark:text-zinc-200 font-mono">{project.progress}%</span>
                   </div>
-                  <div className="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-2 overflow-hidden">
+                  <div className="w-full bg-zinc-100 dark:bg-zinc-800 rounded-full h-1.5 overflow-hidden">
                     <div 
-                      className="bg-indigo-600 dark:bg-indigo-500 h-2 rounded-full transition-all duration-500" 
+                      className="bg-gradient-to-r from-amber-500 to-amber-600 h-full rounded-full transition-all duration-500" 
                       style={{ width: `${project.progress}%` }}
-                    ></div>
+                    />
                   </div>
                 </div>
 
-                <div className="flex justify-end pt-2">
+                <div className="flex justify-end pt-1">
                   <Link href={`/${workspaceSlug}/projects/${project.id}`}>
-                    <Button variant="ghost" size="sm" className="text-xs text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 font-semibold pr-0">
-                      View details <ChevronRight className="ml-1 h-3.5 w-3.5" />
+                    <Button variant="ghost" size="sm" className="cursor-pointer text-[10px] text-zinc-550 dark:text-zinc-400 hover:text-primary dark:hover:text-primary hover:bg-transparent dark:hover:bg-transparent font-bold pr-0 h-7 flex items-center gap-0.5">
+                      <span>Explore details</span>
+                      <ChevronRight className="h-3.5 w-3.5" />
                     </Button>
                   </Link>
                 </div>
@@ -288,12 +290,15 @@ export function ProjectList({ initialProjects, workspaceId, workspaceSlug }: Pro
 
       {/* Delete Dialog */}
       <Dialog open={isDeleteOpen} onOpenChange={setIsDeleteOpen}>
-        <DialogContent className="border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 sm:max-w-md">
+        <DialogContent className="max-w-md p-6 bg-white dark:bg-zinc-900 border border-zinc-250 dark:border-zinc-800 rounded-xl">
           <DialogHeader>
-            <DialogTitle className="text-slate-900 dark:text-slate-100">Delete Project</DialogTitle>
-            <DialogDescription className="text-slate-500 dark:text-slate-400">
-              Are you sure you want to delete project <strong className="text-slate-900 dark:text-slate-100">"{deletingProject?.name}"</strong>? 
-              This will not delete invoices or files, but it will hide this project and remove it from active plan limits.
+            <DialogTitle className="text-base font-bold text-zinc-900 dark:text-zinc-50 flex items-center gap-2">
+              <Trash2 className="h-4 w-4 text-destructive" />
+              <span>Delete Project</span>
+            </DialogTitle>
+            <DialogDescription className="text-zinc-400 dark:text-zinc-550 text-xs mt-2">
+              Are you sure you want to delete project <strong className="text-zinc-850 dark:text-zinc-100">&ldquo;{deletingProject?.name}&rdquo;</strong>? 
+              This will hide this project and remove it from active plan limits, but will not delete related invoices or uploaded files.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="mt-4 flex flex-col sm:flex-row gap-2 sm:justify-end">
@@ -304,7 +309,7 @@ export function ProjectList({ initialProjects, workspaceId, workspaceSlug }: Pro
                 setIsDeleteOpen(false);
                 setDeletingProject(null);
               }}
-              className="border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300"
+              className="cursor-pointer text-xs h-9 font-semibold bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800"
             >
               Cancel
             </Button>
@@ -312,7 +317,7 @@ export function ProjectList({ initialProjects, workspaceId, workspaceSlug }: Pro
               variant="destructive"
               disabled={isLoading}
               onClick={handleDelete}
-              className="bg-red-600 hover:bg-red-700 text-white font-medium"
+              className="cursor-pointer text-xs h-9 font-semibold"
             >
               {isLoading ? 'Deleting...' : 'Delete Project'}
             </Button>

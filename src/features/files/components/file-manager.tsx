@@ -208,16 +208,16 @@ export function FileManager({ projectId, workspaceId, initialFiles, workspaceSlu
     <div className="space-y-6">
       {/* Storage Progress bar (Free plan limits) */}
       {storageUsage && (
-        <Card className="border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 rounded-xl shadow-sm">
+        <Card className="border-zinc-200/60 dark:border-zinc-800/80 bg-white dark:bg-slate-900 rounded-xl shadow-sm">
           <CardContent className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div className="flex items-center gap-3">
-              <HardDrive className="h-5 w-5 text-indigo-500 shrink-0" />
+              <HardDrive className="h-5 w-5 text-amber-550 shrink-0" />
               <div>
-                <p className="text-xs font-bold text-slate-800 dark:text-slate-200">Workspace Storage Usage</p>
-                <p className="text-[10px] text-slate-500 dark:text-slate-400">
-                  Used: <span className="font-semibold text-slate-700 dark:text-slate-350">{formatBytes(storageUsage.usedBytes)}</span>
+                <p className="text-xs font-bold text-zinc-800 dark:text-zinc-200">Workspace Storage Usage</p>
+                <p className="text-[10px] text-zinc-500 dark:text-zinc-400">
+                  Used: <span className="font-semibold text-zinc-700 dark:text-slate-350">{formatBytes(storageUsage.usedBytes)}</span>
                   {storageUsage.limitBytes !== Infinity ? (
-                    <> of <span className="font-semibold text-slate-700 dark:text-slate-350">{formatBytes(storageUsage.limitBytes)}</span> (Free Plan)</>
+                    <> of <span className="font-semibold text-zinc-700 dark:text-slate-350">{formatBytes(storageUsage.limitBytes)}</span> (Free Plan)</>
                   ) : (
                     <> (Pro Plan - Unlimited)</>
                   )}
@@ -227,19 +227,19 @@ export function FileManager({ projectId, workspaceId, initialFiles, workspaceSlu
 
             {storageUsage.limitBytes !== Infinity && (
               <div className="w-full sm:max-w-xs space-y-1">
-                <div className="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-2 overflow-hidden">
+                <div className="w-full bg-zinc-100 dark:bg-zinc-800 rounded-full h-2 overflow-hidden">
                   <div 
                     className={`h-2 rounded-full transition-all duration-500 ${
                       storagePercentage > 90 
                         ? 'bg-red-500' 
                         : storagePercentage > 75 
                         ? 'bg-orange-500' 
-                        : 'bg-indigo-500'
+                        : 'bg-primary'
                     }`} 
                     style={{ width: `${storagePercentage}%` }}
                   ></div>
                 </div>
-                <div className="text-[9px] text-right font-semibold text-slate-500">
+                <div className="text-[9px] text-right font-semibold text-zinc-500">
                   {storagePercentage.toFixed(1)}% full
                 </div>
               </div>
@@ -255,8 +255,8 @@ export function FileManager({ projectId, workspaceId, initialFiles, workspaceSlu
         onDrop={handleDrop}
         className={`border-2 border-dashed rounded-xl p-8 text-center transition-all cursor-pointer flex flex-col items-center justify-center space-y-3 ${
           isDragOver 
-            ? 'border-indigo-500 bg-indigo-50/20 dark:bg-indigo-950/10' 
-            : 'border-slate-250 hover:border-indigo-400 bg-white dark:border-slate-800 dark:bg-slate-900 dark:hover:border-indigo-500'
+            ? 'border-primary bg-amber-500/5 dark:bg-amber-950/5' 
+            : 'border-zinc-200/60 hover:border-amber-500/40 bg-white dark:border-zinc-800/80 dark:bg-slate-900 dark:hover:border-primary'
         }`}
         onClick={() => fileInputRef.current?.click()}
       >
@@ -269,15 +269,15 @@ export function FileManager({ projectId, workspaceId, initialFiles, workspaceSlu
         
         {isUploading ? (
           <>
-            <Loader2 className="h-10 w-10 text-indigo-500 animate-spin" />
-            <p className="text-sm font-bold text-slate-800 dark:text-slate-200">Uploading file...</p>
+            <Loader2 className="h-10 w-10 text-amber-550 animate-spin" />
+            <p className="text-sm font-bold text-zinc-800 dark:text-zinc-200">Uploading file...</p>
             <p className="text-xs text-slate-400">Verifying limits and pushing data to cloud storage.</p>
           </>
         ) : (
           <>
             <UploadCloud className="h-10 w-10 text-slate-450 dark:text-slate-550" />
-            <p className="text-sm font-bold text-slate-800 dark:text-slate-200">
-              Drag & drop a file here, or <span className="text-indigo-650 dark:text-indigo-400 hover:underline">browse files</span>
+            <p className="text-sm font-bold text-zinc-800 dark:text-zinc-200">
+              Drag & drop a file here, or <span className="text-amber-600 dark:text-amber-400 hover:underline">browse files</span>
             </p>
             <p className="text-xs text-slate-400 max-w-sm">
               Supports Images, PDF, Word, Excel, ZIP, RAR up to 10MB.
@@ -287,10 +287,10 @@ export function FileManager({ projectId, workspaceId, initialFiles, workspaceSlu
       </div>
 
       {/* Files List Card */}
-      <Card className="border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 rounded-xl shadow-sm overflow-hidden">
-        <CardHeader className="border-b border-slate-100 dark:border-slate-850 pb-4">
-          <CardTitle className="text-base font-bold text-slate-900 dark:text-slate-50 flex items-center gap-2">
-            <FileText className="h-5 w-5 text-indigo-500" /> Uploaded Files
+      <Card className="border-zinc-200/60 dark:border-zinc-800/80 bg-white dark:bg-slate-900 rounded-xl shadow-sm overflow-hidden">
+        <CardHeader className="border-b border-zinc-150 dark:border-zinc-800/50 pb-4">
+          <CardTitle className="text-base font-bold text-zinc-950 dark:text-zinc-50 flex items-center gap-2">
+            <FileText className="h-5 w-5 text-amber-550" /> Uploaded Files
           </CardTitle>
           <CardDescription className="text-xs">
             Documents, mockups, and client handovers linked to this project.
@@ -298,8 +298,8 @@ export function FileManager({ projectId, workspaceId, initialFiles, workspaceSlu
         </CardHeader>
         <CardContent className="p-0">
           {files.length === 0 ? (
-            <div className="text-center py-12 text-slate-550 dark:text-slate-400 space-y-2">
-              <FileText className="h-10 w-10 mx-auto text-slate-300 dark:text-slate-700" />
+            <div className="text-center py-12 text-slate-550 dark:text-zinc-400 space-y-2">
+              <FileText className="h-10 w-10 mx-auto text-slate-300 dark:text-zinc-700" />
               <p className="text-sm font-semibold">No files uploaded yet</p>
               <p className="text-xs text-slate-450 max-w-xs mx-auto">
                 Drag a document or image into the upload area above to share it with your workspace.
@@ -309,7 +309,7 @@ export function FileManager({ projectId, workspaceId, initialFiles, workspaceSlu
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse">
                 <thead>
-                  <tr className="border-b border-slate-100 dark:border-slate-805 bg-slate-50/50 dark:bg-slate-950/20 text-xs font-bold text-slate-500 dark:text-slate-400">
+                  <tr className="border-b border-zinc-150 dark:border-slate-805 bg-zinc-50/50/50 dark:bg-zinc-950/20/20 text-xs font-bold text-zinc-500 dark:text-zinc-400">
                     <th className="py-3 px-4 font-bold">File Name</th>
                     <th className="py-3 px-4 font-bold">Size</th>
                     <th className="py-3 px-4 font-bold">Uploaded By</th>
@@ -319,20 +319,20 @@ export function FileManager({ projectId, workspaceId, initialFiles, workspaceSlu
                 </thead>
                 <tbody className="divide-y divide-slate-100 dark:divide-slate-850 text-xs">
                   {files.map((file) => (
-                    <tr key={file.id} className="hover:bg-slate-50/40 dark:hover:bg-slate-950/10 transition-colors">
-                      <td className="py-3.5 px-4 font-medium text-slate-800 dark:text-slate-200">
+                    <tr key={file.id} className="hover:bg-zinc-50/50/40 dark:hover:bg-slate-950/10 transition-colors">
+                      <td className="py-3.5 px-4 font-medium text-zinc-800 dark:text-zinc-200">
                         <div className="flex items-center gap-2 max-w-[250px] sm:max-w-md truncate">
-                          <FileText className="h-4 w-4 text-indigo-500 shrink-0" />
+                          <FileText className="h-4 w-4 text-amber-550 shrink-0" />
                           <span className="truncate" title={file.fileName}>{file.fileName}</span>
                         </div>
                       </td>
-                      <td className="py-3.5 px-4 text-slate-600 dark:text-slate-400">
+                      <td className="py-3.5 px-4 text-slate-600 dark:text-zinc-400">
                         {formatBytes(file.fileSize)}
                       </td>
-                      <td className="py-3.5 px-4 text-slate-600 dark:text-slate-400">
+                      <td className="py-3.5 px-4 text-slate-600 dark:text-zinc-400">
                         {file.uploader?.fullName || 'Workspace member'}
                       </td>
-                      <td className="py-3.5 px-4 text-slate-600 dark:text-slate-400">
+                      <td className="py-3.5 px-4 text-slate-600 dark:text-zinc-400">
                         {formatDate(file.createdAt)}
                       </td>
                       <td className="py-3.5 px-4 text-right">
@@ -340,7 +340,7 @@ export function FileManager({ projectId, workspaceId, initialFiles, workspaceSlu
                           <Button
                             variant="ghost"
                             size="icon"
-                            className="h-7 w-7 text-slate-450 hover:text-slate-650 dark:hover:text-slate-250"
+                            className="cursor-pointer h-7 w-7 text-slate-450 hover:text-zinc-650 dark:hover:text-slate-250"
                             onClick={() => handleDownload(file)}
                             title="Download file"
                           >
@@ -349,7 +349,7 @@ export function FileManager({ projectId, workspaceId, initialFiles, workspaceSlu
                           <Button
                             variant="ghost"
                             size="icon"
-                            className="h-7 w-7 text-red-400 hover:text-red-650 dark:hover:text-red-450"
+                            className="cursor-pointer h-7 w-7 text-red-400 hover:text-red-650 dark:hover:text-red-450"
                             onClick={() => {
                               setFileToDelete(file);
                               setIsDeleteOpen(true);
@@ -371,22 +371,22 @@ export function FileManager({ projectId, workspaceId, initialFiles, workspaceSlu
 
       {/* Delete Confirmation Dialog */}
       <Dialog open={isDeleteOpen} onOpenChange={setIsDeleteOpen}>
-        <DialogContent className="border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 sm:max-w-md">
+        <DialogContent className="border-zinc-200/60 dark:border-zinc-800/80 bg-white dark:bg-zinc-950/20 sm:max-w-md">
           <DialogHeader>
-            <DialogTitle className="text-slate-900 dark:text-slate-100">Delete File</DialogTitle>
-            <DialogDescription className="text-slate-550 dark:text-slate-400 text-xs">
+            <DialogTitle className="text-zinc-950 dark:text-zinc-100">Delete File</DialogTitle>
+            <DialogDescription className="text-slate-550 dark:text-zinc-400 text-xs">
               Are you sure you want to permanently delete this file? This will remove the file from cloud storage and database.
             </DialogDescription>
           </DialogHeader>
           {fileToDelete && (
             <div className="py-2 space-y-1 text-xs">
-              <div className="flex justify-between text-slate-500 dark:text-slate-400">
+              <div className="flex justify-between text-zinc-500 dark:text-zinc-400">
                 <span>Name:</span>
-                <span className="font-semibold text-slate-700 dark:text-slate-300 max-w-[200px] truncate">{fileToDelete.fileName}</span>
+                <span className="font-semibold text-zinc-700 dark:text-zinc-300 max-w-[200px] truncate">{fileToDelete.fileName}</span>
               </div>
-              <div className="flex justify-between text-slate-500 dark:text-slate-400">
+              <div className="flex justify-between text-zinc-500 dark:text-zinc-400">
                 <span>Size:</span>
-                <span className="font-semibold text-slate-700 dark:text-slate-300">{formatBytes(fileToDelete.fileSize)}</span>
+                <span className="font-semibold text-zinc-700 dark:text-zinc-300">{formatBytes(fileToDelete.fileSize)}</span>
               </div>
             </div>
           )}
@@ -398,7 +398,7 @@ export function FileManager({ projectId, workspaceId, initialFiles, workspaceSlu
                 setIsDeleteOpen(false);
                 setFileToDelete(null);
               }}
-              className="border-slate-200 dark:border-slate-800 text-slate-750 dark:text-slate-350"
+              className="cursor-pointer border-zinc-200/60 dark:border-zinc-800/80 text-slate-750 dark:text-slate-350"
             >
               Cancel
             </Button>
@@ -406,7 +406,7 @@ export function FileManager({ projectId, workspaceId, initialFiles, workspaceSlu
               variant="destructive"
               disabled={isLoading}
               onClick={handleDelete}
-              className="bg-red-650 hover:bg-red-700 text-white font-medium"
+              className="cursor-pointer bg-red-650 hover:bg-red-700 text-white font-medium"
             >
               {isLoading ? 'Deleting...' : 'Delete'}
             </Button>

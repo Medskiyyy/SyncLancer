@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { updateWorkspaceAction, updateWorkspacePlanAction } from '../actions/workspace-actions';
+import { cn } from '@/lib/utils';
 import { Settings, Shield, HardDrive, FolderKanban, Users, CheckCircle, Loader2 } from 'lucide-react';
 
 interface WorkspaceSettingsProps {
@@ -135,7 +136,7 @@ export function WorkspaceSettings({ workspace, usage }: WorkspaceSettingsProps) 
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     required
-                    className="w-full h-10 px-3 border border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-950/20 rounded-lg text-sm text-zinc-800 dark:text-zinc-150 focus:border-indigo-500 outline-none transition-colors"
+                    className="w-full h-10 px-3 border border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-950/20 rounded-lg text-sm text-zinc-800 dark:text-zinc-150 focus:border-primary outline-none transition-colors"
                   />
                 </div>
 
@@ -148,12 +149,12 @@ export function WorkspaceSettings({ workspace, usage }: WorkspaceSettingsProps) 
                     value={logoUrl}
                     onChange={(e) => setLogoUrl(e.target.value)}
                     placeholder="https://example.com/logo.png"
-                    className="w-full h-10 px-3 border border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-950/20 rounded-lg text-sm text-zinc-800 dark:text-zinc-150 focus:border-indigo-500 outline-none transition-colors"
+                    className="w-full h-10 px-3 border border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-950/20 rounded-lg text-sm text-zinc-800 dark:text-zinc-150 focus:border-primary outline-none transition-colors"
                   />
                 </div>
 
                 <div className="pt-2">
-                  <Button type="submit" disabled={updatingGeneral} className="bg-indigo-650 hover:bg-indigo-750 text-white font-semibold">
+                  <Button type="submit" disabled={updatingGeneral} className="bg-amber-600 hover:bg-amber-700 text-white font-semibold">
                     {updatingGeneral ? (
                       <>
                         <Loader2 className="h-4 w-4 animate-spin mr-2" />
@@ -180,7 +181,7 @@ export function WorkspaceSettings({ workspace, usage }: WorkspaceSettingsProps) 
                     <p className="text-xs text-zinc-500 dark:text-zinc-400">Manage plan levels and monitor resource utilization limits.</p>
                   </div>
                   {workspace.plan === 'PRO' ? (
-                    <Badge className="px-3 py-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white font-extrabold shadow-md border-0 uppercase tracking-widest text-[10px]">
+                    <Badge className="px-3 py-1 bg-gradient-to-r from-amber-500 to-yellow-600 text-white font-extrabold shadow-md border-0 uppercase tracking-widest text-[10px]">
                       PRO UNLOCKED
                     </Badge>
                   ) : (
@@ -204,14 +205,14 @@ export function WorkspaceSettings({ workspace, usage }: WorkspaceSettingsProps) 
                   <div className="space-y-2">
                     <div className="flex justify-between items-center text-sm font-semibold text-zinc-800 dark:text-zinc-200">
                       <div className="flex items-center gap-2">
-                        <FolderKanban className="h-4 w-4 text-indigo-500" />
+                        <FolderKanban className="h-4 w-4 text-amber-550" />
                         <span>Active Projects</span>
                       </div>
                       <span>{usage.activeProjectsCount} / 3</span>
                     </div>
                     <div className="h-2 w-full rounded-full bg-zinc-100 dark:bg-zinc-800 overflow-hidden">
                       <div 
-                        className={`h-full rounded-full ${projectsPercent >= 100 ? 'bg-red-500 animate-pulse' : 'bg-indigo-650'}`}
+                        className={`h-full rounded-full ${projectsPercent >= 100 ? 'bg-red-500 animate-pulse' : 'bg-amber-600'}`}
                         style={{ width: `${projectsPercent}%` }}
                       />
                     </div>
@@ -263,26 +264,26 @@ export function WorkspaceSettings({ workspace, usage }: WorkspaceSettingsProps) 
               <CardContent className="p-6">
                 {workspace.plan === 'FREE' ? (
                   <div className="space-y-6">
-                    <div className="rounded-xl border border-indigo-100 dark:border-indigo-950 bg-indigo-50/20 dark:bg-indigo-950/10 p-6 space-y-4">
+                    <div className="rounded-xl border border-amber-500/15 dark:border-amber-950/20 bg-amber-500/5 dark:bg-amber-950/5 p-6 space-y-4">
                       <div className="space-y-1">
-                        <h4 className="text-lg font-bold text-indigo-700 dark:text-indigo-400">SyncLancer PRO</h4>
+                        <h4 className="text-lg font-bold text-amber-600 dark:text-indigo-400">SyncLancer PRO</h4>
                         <p className="text-xs text-zinc-500 dark:text-zinc-450">Everything a professional freelancer needs to scale billing.</p>
                       </div>
                       <div className="grid gap-2 sm:grid-cols-2 text-sm text-zinc-700 dark:text-zinc-300 font-semibold">
                         <div className="flex items-center gap-2">
-                          <CheckCircle className="h-4 w-4 text-indigo-550 shrink-0" />
+                          <CheckCircle className="h-4 w-4 text-primary shrink-0" />
                           <span>Unlimited projects</span>
                         </div>
                         <div className="flex items-center gap-2">
-                          <CheckCircle className="h-4 w-4 text-indigo-550 shrink-0" />
+                          <CheckCircle className="h-4 w-4 text-primary shrink-0" />
                           <span>Unlimited clients</span>
                         </div>
                         <div className="flex items-center gap-2">
-                          <CheckCircle className="h-4 w-4 text-indigo-550 shrink-0" />
+                          <CheckCircle className="h-4 w-4 text-primary shrink-0" />
                           <span>10GB storage limit</span>
                         </div>
                         <div className="flex items-center gap-2">
-                          <CheckCircle className="h-4 w-4 text-indigo-550 shrink-0" />
+                          <CheckCircle className="h-4 w-4 text-primary shrink-0" />
                           <span>Multiple workspaces</span>
                         </div>
                       </div>
@@ -291,7 +292,7 @@ export function WorkspaceSettings({ workspace, usage }: WorkspaceSettingsProps) 
                       <Button 
                         onClick={() => handleTogglePlan('PRO')} 
                         disabled={updatingPlan}
-                        className="bg-indigo-650 hover:bg-indigo-750 text-white font-extrabold w-full h-11 text-base shadow-lg shadow-indigo-650/20"
+                        className="bg-amber-600 hover:bg-amber-700 text-white font-extrabold w-full h-11 text-base shadow-lg shadow-amber-550/10"
                       >
                         {updatingPlan ? (
                           <>
@@ -319,7 +320,7 @@ export function WorkspaceSettings({ workspace, usage }: WorkspaceSettingsProps) 
                         variant="destructive"
                         onClick={() => handleTogglePlan('FREE')} 
                         disabled={updatingPlan}
-                        className="w-full h-11 text-base font-extrabold"
+                        className="cursor-pointer w-full h-11 text-base font-extrabold"
                       >
                         {updatingPlan ? (
                           <>

@@ -90,11 +90,11 @@ interface BuilderItem {
 }
 
 const STATUS_COLORS: Record<string, string> = {
-  DRAFT: 'bg-slate-100 text-slate-800 dark:bg-slate-800 dark:text-slate-200 border-slate-200',
-  SENT: 'bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300 border-blue-200',
-  PAID: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 border-emerald-250',
-  OVERDUE: 'bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300 border-rose-200',
-  CANCELLED: 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300 border-amber-200',
+  DRAFT: 'bg-zinc-50 dark:bg-zinc-950 text-zinc-400 dark:text-zinc-505 border-zinc-200/60 dark:border-zinc-850',
+  SENT: 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/15',
+  PAID: 'bg-green-500/10 text-green-600 dark:text-green-400 border border-green-550/15',
+  OVERDUE: 'bg-red-500/10 text-red-655 dark:text-red-400 border border-red-550/15',
+  CANCELLED: 'bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 border border-zinc-200/30',
 };
 
 export function WorkspaceInvoiceManager({ 
@@ -329,7 +329,7 @@ export function WorkspaceInvoiceManager({
         {/* Action buttons */}
         <Button 
           onClick={() => setIsCreateOpen(true)}
-          className="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg px-4 h-9 font-semibold text-xs flex items-center gap-2 shadow-sm"
+          className="w-full sm:w-auto bg-amber-600 hover:bg-amber-700 text-white rounded-lg px-4 h-9 font-semibold text-xs flex items-center gap-2 shadow-sm"
         >
           <Plus className="h-4 w-4" /> Create Invoice
         </Button>
@@ -373,7 +373,7 @@ export function WorkspaceInvoiceManager({
                         {new Date(invoice.dueDate).toLocaleDateString()}
                       </td>
                       <td className="py-3.5 px-4">
-                        <Badge variant="outline" className={`text-[9px] font-bold uppercase tracking-wider px-2 border ${STATUS_COLORS[invoice.status]}`}>
+                        <Badge variant="outline" className={`cursor-pointer text-[9px] font-bold uppercase tracking-wider px-2 border ${STATUS_COLORS[invoice.status]}`}>
                           {invoice.status}
                         </Badge>
                       </td>
@@ -382,7 +382,7 @@ export function WorkspaceInvoiceManager({
                       </td>
                       <td className="py-3.5 px-4 text-right">
                         <div className="flex items-center justify-end gap-1.5">
-                          <a 
+                           <a 
                             href={`/api/v1/invoices/${invoice.id}/pdf?workspaceId=${workspaceId}`}
                             target="_blank"
                             rel="noreferrer"
@@ -390,7 +390,7 @@ export function WorkspaceInvoiceManager({
                             <Button
                               variant="ghost"
                               size="icon"
-                              className="h-7 w-7 text-zinc-450 hover:text-indigo-600 dark:hover:text-indigo-400"
+                              className="cursor-pointer h-7 w-7 text-zinc-450 hover:text-primary dark:hover:text-amber-400"
                               title="Download PDF"
                             >
                               <Download className="h-3.5 w-3.5" />
@@ -403,7 +403,7 @@ export function WorkspaceInvoiceManager({
                               size="icon"
                               onClick={() => handleSendInvoice(invoice.id, invoice.projectId)}
                               disabled={isLoading}
-                              className="h-7 w-7 text-zinc-450 hover:text-blue-650 dark:hover:text-blue-400"
+                              className="cursor-pointer h-7 w-7 text-zinc-450 hover:text-blue-650 dark:hover:text-blue-400"
                               title="Send to Client"
                             >
                               <Send className="h-3.5 w-3.5" />
@@ -416,7 +416,7 @@ export function WorkspaceInvoiceManager({
                               size="icon"
                               onClick={() => handleMarkAsPaid(invoice.id, invoice.projectId)}
                               disabled={isLoading}
-                              className="h-7 w-7 text-zinc-450 hover:text-emerald-650 dark:hover:text-emerald-400"
+                              className="cursor-pointer h-7 w-7 text-zinc-450 hover:text-emerald-650 dark:hover:text-emerald-400"
                               title="Mark as Paid"
                             >
                               <CheckCircle className="h-3.5 w-3.5" />
@@ -431,7 +431,7 @@ export function WorkspaceInvoiceManager({
                               setInvoiceToDelete(invoice);
                               setIsDeleteOpen(true);
                             }}
-                            className="h-7 w-7 text-zinc-450 hover:text-destructive hover:bg-destructive/10"
+                            className="cursor-pointer h-7 w-7 text-zinc-450 hover:text-destructive hover:bg-destructive/10"
                             title="Delete"
                           >
                             <Trash2 className="h-3.5 w-3.5" />
@@ -465,7 +465,7 @@ export function WorkspaceInvoiceManager({
               variant="ghost"
               size="sm"
               onClick={() => setIsDeleteOpen(false)}
-              className="text-xs"
+              className="cursor-pointer text-xs"
             >
               Cancel
             </Button>
@@ -475,7 +475,7 @@ export function WorkspaceInvoiceManager({
               size="sm"
               disabled={isLoading}
               onClick={handleDeleteInvoice}
-              className="text-xs font-semibold"
+              className="cursor-pointer text-xs font-semibold"
             >
               Delete Invoice
             </Button>
@@ -580,7 +580,7 @@ export function WorkspaceInvoiceManager({
                   variant="ghost" 
                   size="sm"
                   onClick={handleAddItem}
-                  className="text-indigo-650 dark:text-indigo-400 text-xs font-semibold flex items-center gap-1"
+                  className="cursor-pointer text-primary dark:text-indigo-400 text-xs font-semibold flex items-center gap-1"
                 >
                   <PlusCircle className="h-4 w-4" /> Add Item
                 </Button>
@@ -634,7 +634,7 @@ export function WorkspaceInvoiceManager({
                           size="icon"
                           onClick={() => handleRemoveItem(idx)}
                           disabled={items.length === 1}
-                          className="h-9 w-9 text-zinc-400 hover:text-destructive hover:bg-destructive/10"
+                          className="cursor-pointer h-9 w-9 text-zinc-400 hover:text-destructive hover:bg-destructive/10"
                         >
                           <MinusCircle className="h-4.5 w-4.5" />
                         </Button>
@@ -676,14 +676,14 @@ export function WorkspaceInvoiceManager({
                 type="button"
                 variant="ghost"
                 onClick={() => setIsCreateOpen(false)}
-                className="text-xs"
+                className="cursor-pointer text-xs"
               >
                 Cancel
               </Button>
               <Button
                 type="submit"
                 disabled={isLoading}
-                className="bg-indigo-650 hover:bg-indigo-700 text-white font-semibold text-xs rounded-lg px-4 h-9 shadow-sm"
+                className="bg-amber-600 hover:bg-amber-700 text-white font-semibold text-xs rounded-lg px-4 h-9 shadow-sm"
               >
                 Create Draft Invoice
               </Button>

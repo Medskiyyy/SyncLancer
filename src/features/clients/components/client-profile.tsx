@@ -19,8 +19,8 @@ import {
   UserPlus, 
   ShieldCheck, 
   Clock, 
-  ExternalLink,
-  ChevronRight
+  ChevronRight,
+  Sparkles,
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -39,6 +39,7 @@ import {
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 
 import { inviteClientPortalAction } from '../actions/client-actions';
+import { cn } from '@/lib/utils';
 
 interface ExtendedClientUser extends ClientUser {
   user: User;
@@ -112,37 +113,47 @@ export function ClientProfile({ client, files, workspaceId, workspaceSlug }: Cli
         return (
           <div className="space-y-6">
             {/* Active Projects */}
-            <Card className="shadow-sm">
-              <CardHeader className="pb-3 flex flex-row items-center justify-between space-y-0">
+            <Card className="shadow-xs border border-zinc-200/60 dark:border-zinc-800/80 rounded-xl overflow-hidden bg-white dark:bg-zinc-900">
+              <CardHeader className="pb-3 border-b border-zinc-100 dark:border-zinc-800/60 flex flex-row items-center justify-between space-y-0">
                 <div>
-                  <CardTitle className="text-lg font-bold">Projects</CardTitle>
-                  <CardDescription>Active and completed scopes of work</CardDescription>
+                  <CardTitle className="text-sm font-bold text-zinc-900 dark:text-zinc-55">Projects Scopes</CardTitle>
+                  <CardDescription className="text-xs text-zinc-500 dark:text-zinc-400">Active and completed scopes of work under this client account</CardDescription>
                 </div>
-                <Badge variant="outline">{client.projects.length} Total</Badge>
+                <Badge variant="secondary" className="rounded-full font-mono text-[10px] px-2 py-0.5 border border-zinc-200/40 dark:border-zinc-800/40">{client.projects.length} Total</Badge>
               </CardHeader>
-              <CardContent>
+              <CardContent className="pt-4">
                 {client.projects.length === 0 ? (
-                  <div className="text-center py-8 text-zinc-500 dark:text-zinc-400 text-sm">
+                  <div className="text-center py-8 text-zinc-400 dark:text-zinc-500 text-xs font-medium">
                     No projects found for this client. Create a project from Settings or Proposals.
                   </div>
                 ) : (
-                  <div className="divide-y divide-zinc-100 dark:divide-zinc-800">
+                  <div className="divide-y divide-zinc-150 dark:divide-zinc-800/80">
                     {client.projects.map((project) => (
-                      <div key={project.id} className="py-3 flex items-center justify-between first:pt-0 last:pb-0">
+                      <div key={project.id} className="py-4 flex items-center justify-between first:pt-0 last:pb-0">
                         <div>
-                          <div className="font-semibold text-sm text-zinc-900 dark:text-zinc-50">{project.name}</div>
-                          <div className="text-xs text-muted-foreground mt-0.5">
-                            Budget: {new Intl.NumberFormat('en-US', { style: 'currency', currency: project.currency }).format(Number(project.budget))} &middot; Deadline: {new Date(project.deadline).toLocaleDateString()}
+                          <Link href={`/${workspaceSlug}/projects/${project.id}`} className="font-semibold text-xs text-zinc-900 dark:text-zinc-100 hover:text-primary hover:underline transition-colors">
+                            {project.name}
+                          </Link>
+                          <div className="text-[10px] text-zinc-400 dark:text-zinc-500 mt-1 font-medium">
+                            Budget: {new Intl.NumberFormat('en-US', { style: 'currency', currency: project.currency, minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(Number(project.budget))} &middot; Deadline: {new Date(project.deadline).toLocaleDateString()}
                           </div>
                         </div>
                         <div className="flex items-center gap-3">
                           <div className="flex items-center gap-1.5">
                             <div className="h-1.5 w-16 bg-zinc-100 dark:bg-zinc-800 rounded-full overflow-hidden">
-                              <div className="h-full bg-primary" style={{ width: `${project.progress}%` }} />
+                              <div className="h-full bg-gradient-to-r from-amber-500 to-amber-600" style={{ width: `${project.progress}%` }} />
                             </div>
-                            <span className="text-xs font-medium">{project.progress}%</span>
+                            <span className="text-[10px] font-mono font-bold text-zinc-650 dark:text-zinc-400">{project.progress}%</span>
                           </div>
-                          <Badge variant={project.status === 'ACTIVE' ? 'default' : 'secondary'}>
+                          <Badge 
+                            className={cn(
+                              "text-[9px] font-bold px-1.5 py-0.5",
+                              project.status === 'ACTIVE' 
+                                ? "bg-green-500/10 text-green-600 dark:text-green-400 border border-green-550/15"
+                                : "bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 border border-zinc-200/30"
+                            )}
+                            variant="secondary"
+                          >
                             {project.status}
                           </Badge>
                         </div>
@@ -154,12 +165,12 @@ export function ClientProfile({ client, files, workspaceId, workspaceSlug }: Cli
             </Card>
 
             {/* Notes & Description */}
-            <Card className="shadow-sm">
-              <CardHeader>
-                <CardTitle className="text-lg font-bold">Internal Notes</CardTitle>
-                <CardDescription>Important business context and background information</CardDescription>
+            <Card className="shadow-xs border border-zinc-200/60 dark:border-zinc-800/80 rounded-xl overflow-hidden bg-white dark:bg-zinc-900">
+              <CardHeader className="pb-3 border-b border-zinc-100 dark:border-zinc-800/60">
+                <CardTitle className="text-sm font-bold text-zinc-900 dark:text-zinc-55">Internal Notes</CardTitle>
+                <CardDescription className="text-xs text-zinc-500 dark:text-zinc-400">Important business context, preferences, and background information</CardDescription>
               </CardHeader>
-              <CardContent className="text-sm text-zinc-700 dark:text-zinc-300 whitespace-pre-wrap">
+              <CardContent className="text-xs text-zinc-700 dark:text-zinc-355 whitespace-pre-wrap pt-4 leading-relaxed font-medium">
                 {client.notes || 'No internal notes recorded for this client.'}
               </CardContent>
             </Card>
@@ -168,49 +179,63 @@ export function ClientProfile({ client, files, workspaceId, workspaceSlug }: Cli
 
       case 'proposals':
         return (
-          <Card className="shadow-sm">
-            <CardHeader className="pb-3 flex flex-row items-center justify-between space-y-0">
+          <Card className="shadow-xs border border-zinc-200/60 dark:border-zinc-800/80 rounded-xl overflow-hidden bg-white dark:bg-zinc-900">
+            <CardHeader className="pb-3 border-b border-zinc-100 dark:border-zinc-800/60 flex flex-row items-center justify-between space-y-0">
               <div>
-                <CardTitle className="text-lg font-bold">Proposals</CardTitle>
-                <CardDescription>Submitted cost estimates and contracts</CardDescription>
+                <CardTitle className="text-sm font-bold text-zinc-900 dark:text-zinc-55">Submitted Proposals</CardTitle>
+                <CardDescription className="text-xs text-zinc-500 dark:text-zinc-400">Submitted estimates, bids, and scopes agreements</CardDescription>
               </div>
-              <Badge variant="outline">{client.proposals.length} Total</Badge>
+              <Badge variant="secondary" className="rounded-full font-mono text-[10px] px-2 py-0.5 border border-zinc-200/40 dark:border-zinc-800/40">{client.proposals.length} Total</Badge>
             </CardHeader>
-            <CardContent>
+            <CardContent className="p-0">
               {client.proposals.length === 0 ? (
-                <div className="text-center py-8 text-zinc-500 dark:text-zinc-400 text-sm">
-                  No proposals found. Let's create your first proposal for this client.
+                <div className="text-center py-8 text-zinc-400 dark:text-zinc-500 text-xs font-medium pt-8">
+                  No proposals found. Let&apos;s create your first proposal for this client.
                 </div>
               ) : (
                 <div className="overflow-x-auto">
-                  <table className="w-full text-left border-collapse text-sm">
+                  <table className="w-full text-left border-collapse text-xs">
                     <thead>
-                      <tr className="border-b border-zinc-200 dark:border-zinc-800 text-xs font-semibold text-zinc-500 uppercase">
-                        <th className="pb-3">Number</th>
-                        <th className="pb-3">Title</th>
-                        <th className="pb-3">Amount</th>
-                        <th className="pb-3">Status</th>
-                        <th className="pb-3">Expiry Date</th>
+                      <tr className="border-b border-zinc-150 dark:border-zinc-800 text-[9px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider bg-zinc-50/50 dark:bg-zinc-900/30">
+                        <th className="px-5 py-3">Number</th>
+                        <th className="px-5 py-3">Proposal Title</th>
+                        <th className="px-5 py-3">Total Cost</th>
+                        <th className="px-5 py-3">Status</th>
+                        <th className="px-5 py-3">Expiry Date</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800">
+                    <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800/60 bg-white dark:bg-zinc-900">
                       {client.proposals.map((proposal) => (
-                        <tr key={proposal.id} className="hover:bg-zinc-50/50 dark:hover:bg-zinc-900/50 transition-colors">
-                          <td className="py-3.5 font-mono text-xs">{proposal.proposalNumber}</td>
-                          <td className="py-3.5 font-medium">{proposal.title}</td>
-                          <td className="py-3.5 font-medium">
+                        <tr key={proposal.id} className="hover:bg-zinc-50/40 dark:hover:bg-zinc-900/40 transition-colors">
+                          <td className="px-5 py-3 font-mono font-bold text-zinc-600 dark:text-zinc-400 text-[10px]">
+                            {proposal.proposalNumber}
+                          </td>
+                          <td className="px-5 py-3 font-semibold text-zinc-800 dark:text-zinc-200">
+                            {proposal.title}
+                          </td>
+                          <td className="px-5 py-3 font-bold font-mono text-zinc-900 dark:text-zinc-100">
                             {new Intl.NumberFormat('en-US', { style: 'currency', currency: proposal.currency }).format(Number(proposal.totalAmount))}
                           </td>
-                          <td className="py-3.5">
-                            <Badge variant={
-                              proposal.status === 'APPROVED' ? 'default' :
-                              proposal.status === 'SENT' ? 'secondary' :
-                              proposal.status === 'REJECTED' ? 'destructive' : 'outline'
-                            }>
+                          <td className="px-5 py-3">
+                            <Badge 
+                              className={cn(
+                                "text-[9px] font-bold px-1.5 py-0.5",
+                                proposal.status === 'APPROVED' 
+                                  ? "bg-green-500/10 text-green-600 dark:text-green-400 border border-green-550/15"
+                                  : proposal.status === 'SENT'
+                                    ? "bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-550/15"
+                                    : proposal.status === 'REJECTED'
+                                      ? "bg-red-500/10 text-red-650 dark:text-red-400 border border-red-550/15"
+                                      : "bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 border border-zinc-200/30"
+                              )}
+                              variant="secondary"
+                            >
                               {proposal.status}
                             </Badge>
                           </td>
-                          <td className="py-3.5 text-zinc-500">{new Date(proposal.expiresAt).toLocaleDateString()}</td>
+                          <td className="px-5 py-3 text-zinc-400 dark:text-zinc-500 font-medium">
+                            {new Date(proposal.expiresAt).toLocaleDateString()}
+                          </td>
                         </tr>
                       ))}
                     </tbody>
@@ -223,47 +248,59 @@ export function ClientProfile({ client, files, workspaceId, workspaceSlug }: Cli
 
       case 'invoices':
         return (
-          <Card className="shadow-sm">
-            <CardHeader className="pb-3 flex flex-row items-center justify-between space-y-0">
+          <Card className="shadow-xs border border-zinc-200/60 dark:border-zinc-800/80 rounded-xl overflow-hidden bg-white dark:bg-zinc-900">
+            <CardHeader className="pb-3 border-b border-zinc-100 dark:border-zinc-800/60 flex flex-row items-center justify-between space-y-0">
               <div>
-                <CardTitle className="text-lg font-bold">Invoices</CardTitle>
-                <CardDescription>Billing history and outstanding payments</CardDescription>
+                <CardTitle className="text-sm font-bold text-zinc-900 dark:text-zinc-55">Billing & Invoices</CardTitle>
+                <CardDescription className="text-xs text-zinc-500 dark:text-zinc-400">Billing history, balances, and payment records</CardDescription>
               </div>
-              <Badge variant="outline">{client.invoices.length} Total</Badge>
+              <Badge variant="secondary" className="rounded-full font-mono text-[10px] px-2 py-0.5 border border-zinc-200/40 dark:border-zinc-800/40">{client.invoices.length} Total</Badge>
             </CardHeader>
-            <CardContent>
+            <CardContent className="p-0">
               {client.invoices.length === 0 ? (
-                <div className="text-center py-8 text-zinc-500 dark:text-zinc-400 text-sm">
+                <div className="text-center py-8 text-zinc-400 dark:text-zinc-500 text-xs font-medium pt-8">
                   No billing records found. You can generate invoices inside the Invoice section.
                 </div>
               ) : (
                 <div className="overflow-x-auto">
-                  <table className="w-full text-left border-collapse text-sm">
+                  <table className="w-full text-left border-collapse text-xs">
                     <thead>
-                      <tr className="border-b border-zinc-200 dark:border-zinc-800 text-xs font-semibold text-zinc-500 uppercase">
-                        <th className="pb-3">Number</th>
-                        <th className="pb-3">Amount</th>
-                        <th className="pb-3">Status</th>
-                        <th className="pb-3">Due Date</th>
+                      <tr className="border-b border-zinc-150 dark:border-zinc-800 text-[9px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider bg-zinc-50/50 dark:bg-zinc-900/30">
+                        <th className="px-5 py-3">Invoice Number</th>
+                        <th className="px-5 py-3">Total Amount</th>
+                        <th className="px-5 py-3">Payment Status</th>
+                        <th className="px-5 py-3">Due Date</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800">
+                    <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800/60 bg-white dark:bg-zinc-900">
                       {client.invoices.map((invoice) => (
-                        <tr key={invoice.id} className="hover:bg-zinc-50/50 dark:hover:bg-zinc-900/50 transition-colors">
-                          <td className="py-3.5 font-mono text-xs">{invoice.invoiceNumber}</td>
-                          <td className="py-3.5 font-medium">
+                        <tr key={invoice.id} className="hover:bg-zinc-50/40 dark:hover:bg-zinc-900/40 transition-colors">
+                          <td className="px-5 py-3 font-mono font-bold text-zinc-650 dark:text-zinc-400 text-[10px]">
+                            {invoice.invoiceNumber}
+                          </td>
+                          <td className="px-5 py-3 font-bold font-mono text-zinc-900 dark:text-zinc-100">
                             {new Intl.NumberFormat('en-US', { style: 'currency', currency: invoice.currency }).format(Number(invoice.totalAmount))}
                           </td>
-                          <td className="py-3.5">
-                            <Badge variant={
-                              invoice.status === 'PAID' ? 'default' :
-                              invoice.status === 'OVERDUE' ? 'destructive' :
-                              invoice.status === 'SENT' ? 'secondary' : 'outline'
-                            }>
+                          <td className="px-5 py-3">
+                            <Badge 
+                              className={cn(
+                                "text-[9px] font-bold px-1.5 py-0.5",
+                                invoice.status === 'PAID' 
+                                  ? "bg-green-500/10 text-green-600 dark:text-green-400 border border-green-550/15"
+                                  : invoice.status === 'OVERDUE'
+                                    ? "bg-red-500/10 text-red-650 dark:text-red-400 border border-red-550/15"
+                                    : invoice.status === 'SENT'
+                                      ? "bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-550/15"
+                                      : "bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 border border-zinc-200/30"
+                              )}
+                              variant="secondary"
+                            >
                               {invoice.status}
                             </Badge>
                           </td>
-                          <td className="py-3.5 text-zinc-500">{new Date(invoice.dueDate).toLocaleDateString()}</td>
+                          <td className="px-5 py-3 text-zinc-400 dark:text-zinc-500 font-medium">
+                            {new Date(invoice.dueDate).toLocaleDateString()}
+                          </td>
                         </tr>
                       ))}
                     </tbody>
@@ -276,33 +313,33 @@ export function ClientProfile({ client, files, workspaceId, workspaceSlug }: Cli
 
       case 'files':
         return (
-          <Card className="shadow-sm">
-            <CardHeader className="pb-3 flex flex-row items-center justify-between space-y-0">
+          <Card className="shadow-xs border border-zinc-200/60 dark:border-zinc-800/80 rounded-xl overflow-hidden bg-white dark:bg-zinc-900">
+            <CardHeader className="pb-3 border-b border-zinc-100 dark:border-zinc-800/60 flex flex-row items-center justify-between space-y-0">
               <div>
-                <CardTitle className="text-lg font-bold">Client Files</CardTitle>
-                <CardDescription>Aggregated documents and media uploaded under client projects</CardDescription>
+                <CardTitle className="text-sm font-bold text-zinc-900 dark:text-zinc-55">Workspace Materials</CardTitle>
+                <CardDescription className="text-xs text-zinc-500 dark:text-zinc-400">Aggregated scope files, assets, and design sheets uploaded under this client</CardDescription>
               </div>
-              <Badge variant="outline">{files.length} Files</Badge>
+              <Badge variant="secondary" className="rounded-full font-mono text-[10px] px-2 py-0.5 border border-zinc-200/40 dark:border-zinc-800/40">{files.length} Files</Badge>
             </CardHeader>
-            <CardContent>
+            <CardContent className="pt-4">
               {files.length === 0 ? (
-                <div className="text-center py-8 text-zinc-500 dark:text-zinc-400 text-sm">
-                  No files uploaded for this client's projects.
+                <div className="text-center py-8 text-zinc-400 dark:text-zinc-500 text-xs font-medium">
+                  No files uploaded for this client&apos;s projects.
                 </div>
               ) : (
-                <div className="divide-y divide-zinc-100 dark:divide-zinc-800">
+                <div className="divide-y divide-zinc-150 dark:divide-zinc-800/80">
                   {files.map((file) => (
                     <div key={file.id} className="py-3 flex items-center justify-between first:pt-0 last:pb-0">
                       <div className="flex items-center gap-3">
-                        <FolderOpen className="h-5 w-5 text-zinc-400 shrink-0" />
+                        <FolderOpen className="h-4 w-4 text-zinc-400 shrink-0" />
                         <div>
-                          <div className="font-semibold text-sm text-zinc-900 dark:text-zinc-50">{file.fileName}</div>
-                          <div className="text-xs text-muted-foreground mt-0.5">
+                          <div className="font-semibold text-xs text-zinc-800 dark:text-zinc-200">{file.fileName}</div>
+                          <div className="text-[10px] text-zinc-400 dark:text-zinc-500 mt-1 font-medium">
                             {file.fileType.toUpperCase()} &middot; {new Intl.NumberFormat('en', { notation: 'compact', style: 'unit', unit: 'byte' }).format(Number(file.fileSize))}
                           </div>
                         </div>
                       </div>
-                      <div className="text-xs text-zinc-400">
+                      <div className="text-[10px] text-zinc-400 dark:text-zinc-550 font-medium">
                         Uploaded: {new Date(file.createdAt).toLocaleDateString()}
                       </div>
                     </div>
@@ -316,14 +353,14 @@ export function ClientProfile({ client, files, workspaceId, workspaceSlug }: Cli
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 animate-in fade-in-50 duration-300">
       {/* Breadcrumbs & Back Button */}
-      <div className="flex items-center gap-2 text-sm text-zinc-500">
+      <div className="flex items-center gap-2 text-xs text-zinc-500 font-semibold uppercase tracking-wider">
         <Link href={`/${workspaceSlug}/clients`} className="hover:text-zinc-900 dark:hover:text-zinc-50 transition-colors">
           Clients
         </Link>
-        <ChevronRight className="h-4 w-4 shrink-0" />
-        <span className="text-zinc-900 dark:text-zinc-50 font-medium truncate">{client.companyName}</span>
+        <ChevronRight className="h-3 w-3 shrink-0" />
+        <span className="text-zinc-900 dark:text-zinc-50 font-extrabold truncate">{client.companyName}</span>
       </div>
 
       {/* Main Profile Layout Grid */}
@@ -331,61 +368,71 @@ export function ClientProfile({ client, files, workspaceId, workspaceSlug }: Cli
         {/* Left Side: Client Info Card & Portal Members */}
         <div className="space-y-6 lg:col-span-1">
           {/* Main Info Card */}
-          <Card className="shadow-sm">
-            <CardHeader className="pb-4 border-b border-zinc-100 dark:border-zinc-800">
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary mb-3">
-                <Building className="h-6 w-6" />
+          <Card className="shadow-xs border border-zinc-200/60 dark:border-zinc-800/80 rounded-xl overflow-hidden bg-white dark:bg-zinc-900">
+            <CardHeader className="pb-4 border-b border-zinc-150 dark:border-zinc-800">
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/15 shadow-xs mb-3">
+                <Building className="h-5 w-5" />
               </div>
-              <CardTitle className="text-xl font-bold">{client.companyName}</CardTitle>
-              <CardDescription className="text-xs">
-                Member since {new Date(client.createdAt).toLocaleDateString()}
+              <CardTitle className="text-base font-bold text-zinc-950 dark:text-zinc-50">{client.companyName}</CardTitle>
+              <CardDescription className="text-[10px] text-zinc-400 dark:text-zinc-500 font-medium">
+                Client directory entry since {new Date(client.createdAt).toLocaleDateString()}
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4 pt-4 text-sm">
+            <CardContent className="space-y-4 pt-4 text-xs font-medium">
               <div className="flex items-center gap-3">
                 <Mail className="h-4 w-4 text-zinc-400 shrink-0" />
-                <span className="text-zinc-700 dark:text-zinc-300 truncate">{client.primaryEmail}</span>
+                <span className="text-zinc-700 dark:text-zinc-305 truncate">{client.primaryEmail}</span>
               </div>
-              <div className="flex items-center gap-3">
-                <Phone className="h-4 w-4 text-zinc-400 shrink-0" />
-                <span className="text-zinc-700 dark:text-zinc-300">{client.phone}</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <Badge variant={client.archived ? 'secondary' : 'default'}>
-                  {client.archived ? 'Archived' : 'Active Client'}
+              {client.phone && (
+                <div className="flex items-center gap-3">
+                  <Phone className="h-4 w-4 text-zinc-400 shrink-0" />
+                  <span className="text-zinc-700 dark:text-zinc-305">{client.phone}</span>
+                </div>
+              )}
+              <div className="pt-1">
+                <Badge 
+                  className={cn(
+                    "text-[9px] font-bold px-1.5 py-0.5",
+                    client.archived 
+                      ? "bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 border border-zinc-200/30"
+                      : "bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-550/15"
+                  )}
+                  variant="secondary"
+                >
+                  {client.archived ? 'Archived Client' : 'Active Workspace Client'}
                 </Badge>
               </div>
             </CardContent>
           </Card>
 
           {/* Portal User Invitation / List */}
-          <Card className="shadow-sm">
-            <CardHeader className="pb-3 flex flex-row items-center justify-between space-y-0">
+          <Card className="shadow-xs border border-zinc-200/60 dark:border-zinc-800/80 rounded-xl overflow-hidden bg-white dark:bg-zinc-900">
+            <CardHeader className="pb-3 border-b border-zinc-150 dark:border-zinc-800 flex flex-row items-center justify-between space-y-0">
               <div>
-                <CardTitle className="text-base font-bold">Client Portal Users</CardTitle>
-                <CardDescription className="text-xs">Representatives with secure dashboard access</CardDescription>
+                <CardTitle className="text-xs font-bold text-zinc-900 dark:text-zinc-50 uppercase tracking-wider">Client Portal keys</CardTitle>
+                <CardDescription className="text-[10px] text-zinc-400 dark:text-zinc-500">Security tokens for client representatives</CardDescription>
               </div>
               <Button 
                 variant="ghost" 
                 size="icon" 
                 title="Invite Portal User"
                 onClick={() => setIsInviteOpen(true)}
-                className="h-8 w-8 hover:bg-zinc-100 dark:hover:bg-zinc-800"
+                className="h-7 w-7 text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 cursor-pointer"
               >
-                <UserPlus className="h-4 w-4 text-primary" />
+                <UserPlus className="h-4 w-4" />
               </Button>
             </CardHeader>
-            <CardContent>
+            <CardContent className="pt-4">
               {portalUsers.length === 0 ? (
-                <div className="text-center py-6 text-zinc-500 dark:text-zinc-400 text-xs">
+                <div className="text-center py-6 text-zinc-400 dark:text-zinc-500 text-xs font-medium">
                   No secure portal users set up yet. Invite one below.
                   <Button 
                     variant="outline" 
                     size="sm" 
                     onClick={() => setIsInviteOpen(true)} 
-                    className="w-full mt-3 flex items-center justify-center gap-1.5"
+                    className="w-full mt-3 flex items-center justify-center gap-1.5 cursor-pointer text-[10px] font-bold h-8 rounded-lg"
                   >
-                    <UserPlus className="h-3.5 w-3.5" />
+                    <UserPlus className="h-3.5 w-3.5 text-primary" />
                     <span>Invite Client Rep</span>
                   </Button>
                 </div>
@@ -394,20 +441,20 @@ export function ClientProfile({ client, files, workspaceId, workspaceSlug }: Cli
                   {portalUsers.map((portalUser) => {
                     const isActive = !!portalUser.user.passwordHash;
                     return (
-                      <div key={portalUser.id} className="flex items-center justify-between text-xs p-2 rounded-lg bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-100 dark:border-zinc-800">
-                        <div className="min-w-0">
-                          <div className="font-semibold text-zinc-800 dark:text-zinc-200 truncate">{portalUser.user.email}</div>
-                          <div className="text-[10px] text-muted-foreground mt-0.5">{portalUser.title}</div>
+                      <div key={portalUser.id} className="flex items-center justify-between text-xs p-2.5 rounded-lg bg-zinc-50/50 dark:bg-zinc-950/20 border border-zinc-200/60 dark:border-zinc-800">
+                        <div className="min-w-0 pr-2">
+                          <div className="font-semibold text-zinc-850 dark:text-zinc-200 truncate">{portalUser.user.email}</div>
+                          <div className="text-[9px] text-zinc-400 dark:text-zinc-500 mt-0.5 font-medium">{portalUser.title}</div>
                         </div>
-                        <div className="flex items-center gap-1 shrink-0 ml-2">
+                        <div className="flex items-center gap-1 shrink-0">
                           {isActive ? (
-                            <Badge variant="default" className="text-[9px] px-1.5 py-0.5 bg-green-600 hover:bg-green-600 flex items-center gap-0.5">
+                            <Badge variant="default" className="text-[8px] font-extrabold px-1.5 py-0.5 bg-green-550/10 text-green-600 dark:text-green-400 border border-green-550/15 flex items-center gap-0.5">
                               <ShieldCheck className="h-2.5 w-2.5" />
                               <span>Active</span>
                             </Badge>
                           ) : (
-                            <Badge variant="secondary" className="text-[9px] px-1.5 py-0.5 flex items-center gap-0.5">
-                              <Clock className="h-2.5 w-2.5" />
+                            <Badge variant="secondary" className="text-[8px] font-extrabold px-1.5 py-0.5 bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 border border-zinc-200/30 flex items-center gap-0.5">
+                              <Clock className="h-2.5 w-2.5 animate-pulse" />
                               <span>Invited</span>
                             </Badge>
                           )}
@@ -424,49 +471,53 @@ export function ClientProfile({ client, files, workspaceId, workspaceSlug }: Cli
         {/* Right Side: Navigation Tabs & Tab Content */}
         <div className="lg:col-span-2 space-y-6">
           {/* Tab Navigation Menu */}
-          <div className="flex border-b border-zinc-200 dark:border-zinc-800">
+          <div className="flex border-b border-zinc-200 dark:border-zinc-850 bg-white/50 dark:bg-zinc-900/50 p-1 rounded-t-xl gap-1">
             <button
               onClick={() => setActiveTab('overview')}
-              className={`flex items-center gap-2 px-4 py-2.5 text-sm font-medium border-b-2 transition-colors ${
+              className={cn(
+                "flex items-center gap-2 px-4 py-2 text-xs font-bold rounded-lg border border-transparent transition-all cursor-pointer",
                 activeTab === 'overview'
-                  ? 'border-primary text-zinc-950 dark:text-zinc-50'
-                  : 'border-transparent text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-50'
-              }`}
+                  ? "bg-zinc-100 dark:bg-zinc-850 text-zinc-950 dark:text-zinc-50 border-zinc-200/40 dark:border-zinc-800"
+                  : "text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-200"
+              )}
             >
-              <FolderKanban className="h-4 w-4" />
+              <FolderKanban className="h-3.5 w-3.5" />
               <span>Overview</span>
             </button>
             <button
               onClick={() => setActiveTab('proposals')}
-              className={`flex items-center gap-2 px-4 py-2.5 text-sm font-medium border-b-2 transition-colors ${
+              className={cn(
+                "flex items-center gap-2 px-4 py-2 text-xs font-bold rounded-lg border border-transparent transition-all cursor-pointer",
                 activeTab === 'proposals'
-                  ? 'border-primary text-zinc-950 dark:text-zinc-50'
-                  : 'border-transparent text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-50'
-              }`}
+                  ? "bg-zinc-100 dark:bg-zinc-850 text-zinc-950 dark:text-zinc-50 border-zinc-200/40 dark:border-zinc-800"
+                  : "text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-200"
+              )}
             >
-              <FileText className="h-4 w-4" />
+              <FileText className="h-3.5 w-3.5" />
               <span>Proposals</span>
             </button>
             <button
               onClick={() => setActiveTab('invoices')}
-              className={`flex items-center gap-2 px-4 py-2.5 text-sm font-medium border-b-2 transition-colors ${
+              className={cn(
+                "flex items-center gap-2 px-4 py-2 text-xs font-bold rounded-lg border border-transparent transition-all cursor-pointer",
                 activeTab === 'invoices'
-                  ? 'border-primary text-zinc-950 dark:text-zinc-50'
-                  : 'border-transparent text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-50'
-              }`}
+                  ? "bg-zinc-100 dark:bg-zinc-850 text-zinc-950 dark:text-zinc-50 border-zinc-200/40 dark:border-zinc-800"
+                  : "text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-200"
+              )}
             >
-              <Receipt className="h-4 w-4" />
+              <Receipt className="h-3.5 w-3.5" />
               <span>Invoices</span>
             </button>
             <button
               onClick={() => setActiveTab('files')}
-              className={`flex items-center gap-2 px-4 py-2.5 text-sm font-medium border-b-2 transition-colors ${
+              className={cn(
+                "flex items-center gap-2 px-4 py-2 text-xs font-bold rounded-lg border border-transparent transition-all cursor-pointer",
                 activeTab === 'files'
-                  ? 'border-primary text-zinc-950 dark:text-zinc-50'
-                  : 'border-transparent text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-50'
-              }`}
+                  ? "bg-zinc-100 dark:bg-zinc-850 text-zinc-950 dark:text-zinc-50 border-zinc-200/40 dark:border-zinc-800"
+                  : "text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-200"
+              )}
             >
-              <FolderOpen className="h-4 w-4" />
+              <FolderOpen className="h-3.5 w-3.5" />
               <span>Files</span>
             </button>
           </div>
@@ -478,26 +529,29 @@ export function ClientProfile({ client, files, workspaceId, workspaceSlug }: Cli
 
       {/* Invite Client User Dialog */}
       <Dialog open={isInviteOpen} onOpenChange={setIsInviteOpen}>
-        <DialogContent className="sm:max-w-[425px]">
+        <DialogContent className="max-w-md p-6 bg-white dark:bg-zinc-900 border border-zinc-250 dark:border-zinc-800 rounded-xl">
           <DialogHeader>
-            <DialogTitle>Invite Portal User</DialogTitle>
-            <DialogDescription>
+            <DialogTitle className="text-base font-bold text-zinc-900 dark:text-zinc-50 flex items-center gap-2">
+              <Sparkles className="h-4 w-4 text-amber-500" />
+              <span>Invite Portal User</span>
+            </DialogTitle>
+            <DialogDescription className="text-zinc-400 dark:text-zinc-500 text-xs">
               Provide contact credentials for client representatives. An invitation will allow them to login securely to their own branded client portal.
             </DialogDescription>
           </DialogHeader>
 
           <Form {...inviteForm}>
-            <form onSubmit={inviteForm.handleSubmit(handleInviteUser)} className="space-y-4">
+            <form onSubmit={inviteForm.handleSubmit(handleInviteUser)} className="space-y-4 pt-2">
               <FormField
                 control={inviteForm.control}
                 name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Representative Email</FormLabel>
+                    <FormLabel className="text-xs font-semibold text-zinc-700 dark:text-zinc-350">Representative Email</FormLabel>
                     <FormControl>
-                      <Input type="email" placeholder="representative@acme.com" {...field} />
+                      <Input type="email" placeholder="representative@acme.com" className="text-xs h-9 rounded-lg" {...field} />
                     </FormControl>
-                    <FormMessage />
+                    <FormMessage className="text-[10px]" />
                   </FormItem>
                 )}
               />
@@ -507,20 +561,17 @@ export function ClientProfile({ client, files, workspaceId, workspaceSlug }: Cli
                 name="title"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Job Title / Role</FormLabel>
+                    <FormLabel className="text-xs font-semibold text-zinc-700 dark:text-zinc-350">Job Title / Role</FormLabel>
                     <FormControl>
-                      <Input placeholder="Project Manager / Tech Lead / Account Owner" {...field} />
+                      <Input placeholder="e.g. Project Manager, CEO, Tech Lead" className="text-xs h-9 rounded-lg" {...field} />
                     </FormControl>
-                    <FormMessage />
+                    <FormMessage className="text-[10px]" />
                   </FormItem>
                 )}
               />
 
-              <DialogFooter className="pt-4">
-                <Button type="button" variant="outline" onClick={() => setIsInviteOpen(false)}>
-                  Cancel
-                </Button>
-                <Button type="submit" disabled={isLoading}>
+              <DialogFooter className="pt-2">
+                <Button type="submit" disabled={isLoading} className="cursor-pointer text-xs h-9 font-semibold w-full sm:w-auto">
                   {isLoading ? 'Inviting...' : 'Send Portal Invite'}
                 </Button>
               </DialogFooter>

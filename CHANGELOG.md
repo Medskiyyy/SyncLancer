@@ -8,6 +8,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Premium SaaS Redesign**:
+  - Redesigned the entire application to follow a modern Stone/Amber SaaS aesthetic (inspired by Linear, Stripe, Attio, Notion, Framer).
+  - Setup unified global styling system in `globals.css` with Stone gray shades (`#fafaf9` / `#0c0a09`), amber highlights, thin crisp borders, and backdrop-blur glassmorphic features.
+  - Implemented client sidebar drawer with responsive styling, custom collapsible sections, and Notion-like Workspace Switcher.
+  - Developed Ctrl + K Command Palette search modal for global workspace action shortcuts and fast menu routing.
+  - Restyled Dashboard KPIs, Workload progress bar, and recent activity feed.
+  - Re-themed CRM Lead Kanban Board with priority dot labels, status tags, and drag-and-drop animations.
+  - Redesigned Clients, Proposals, Projects, Invoices, Files, Analytics, and Settings pages to align with the Stone/Amber theme.
+  - Created a unified `UI_SPEC.md` document mapping out the design tokens, components, visual hierarchy, and interaction design rules.
 - **Routing & Performance Audit**:
   - Implemented the three missing workspace-level freelancer routes: Invoices (`/[workspaceSlug]/invoices`), Files (`/[workspaceSlug]/files`), and Analytics (`/[workspaceSlug]/analytics`).
   - Created a global animated skeleton loading screen component at `/[workspaceSlug]/loading.tsx` to handle route transitions client-side instantaneously.
