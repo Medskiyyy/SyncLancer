@@ -41,7 +41,7 @@ export function ProjectStatusChart({ data }: ProjectStatusChartProps) {
 
   if (!hasData) {
     return (
-      <div className="flex flex-col items-center justify-center h-[300px] text-center border border-dashed border-zinc-200 dark:border-zinc-800 rounded-xl bg-zinc-50/30 p-6 min-h-[300px]">
+      <div className="flex flex-col items-center justify-center h-[360px] text-center border border-dashed border-zinc-200 dark:border-zinc-800 rounded-xl bg-zinc-50/30 p-6 min-h-[360px]">
         <FolderKanban className="h-10 w-10 text-zinc-400 dark:text-zinc-600 mb-3 shrink-0" />
         <h4 className="text-sm font-bold text-zinc-900 dark:text-zinc-100 mb-1">No projects data yet</h4>
         <p className="text-xs text-zinc-500 dark:text-zinc-400 max-w-[240px] mb-4">
@@ -57,7 +57,7 @@ export function ProjectStatusChart({ data }: ProjectStatusChartProps) {
   }
 
   return (
-    <div className="h-[300px] w-full">
+    <div className="h-[360px] w-full">
       <ResponsiveContainer width="100%" height="100%">
         <BarChart
           data={data}

@@ -37,11 +37,11 @@ export function RevenueChart({ data }: RevenueChartProps) {
 
   if (isEmpty) {
     return (
-      <div className="flex flex-col items-center justify-center h-[300px] text-center border border-dashed border-zinc-200 dark:border-zinc-800 rounded-xl bg-zinc-50/30 p-6 min-h-[300px]">
+      <div className="flex flex-col items-center justify-center h-[360px] text-center border border-dashed border-zinc-200 dark:border-zinc-800 rounded-xl bg-zinc-50/30 p-6 min-h-[360px]">
         <Receipt className="h-10 w-10 text-zinc-400 dark:text-zinc-600 mb-3 shrink-0" />
         <h4 className="text-sm font-bold text-zinc-900 dark:text-zinc-100 mb-1">No revenue data yet</h4>
         <p className="text-xs text-zinc-500 dark:text-zinc-400 max-w-[240px] mb-4">
-          Create your first invoice and mark it as paid to start tracking revenue.
+          Create your first invoice to start tracking revenue.
         </p>
         <Link href={`/${workspaceSlug}/invoices`}>
           <Button size="sm" className="bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-medium text-xs rounded-lg px-3.5 h-8 cursor-pointer">
@@ -53,7 +53,7 @@ export function RevenueChart({ data }: RevenueChartProps) {
   }
 
   return (
-    <div className="h-[300px] w-full">
+    <div className="h-[360px] w-full">
       <ResponsiveContainer width="100%" height="100%">
         <AreaChart
           data={data}
