@@ -63,7 +63,7 @@ export class WorkspaceRepository {
     });
   }
 
-  async update(id: string, data: { name?: string; logoUrl?: string | null }): Promise<Workspace> {
+  async update(id: string, data: { name?: string; logoUrl?: string | null; plan?: any }): Promise<Workspace> {
     return prisma.workspace.update({
       where: { id },
       data,

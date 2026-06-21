@@ -3,6 +3,7 @@
 import { auth } from '@/auth';
 import { WorkspaceService } from '../services/workspace-service';
 import { CreateWorkspaceInput, UpdateWorkspaceInput } from '../schemas/workspace';
+import { revalidatePath } from 'next/cache';
 
 const workspaceService = new WorkspaceService();
 
@@ -45,5 +46,21 @@ export async function deleteWorkspaceAction(workspaceId: string) {
     return { success: true };
   } catch (error: any) {
     return { success: false, error: error.message || 'Failed to delete workspace' };
+  }
+}
+
+export async function updateWorkspacePlanAction(workspaceId: string, plan: 'FREE' | 'PRO') {
+  try {
+    const session = await auth();
+    if (!session?.user?.id) {
+      return { success: false, error: 'Unauthorized' };
+    }
+
+    const workspace = await workspaceService.updateWorkspacePlan(workspaceId, session.user.id, plan);
+    revalidatePath(`/${workspace.slug}/settings`);
+    revalidatePath(`/`);
+    return { success: true, data: workspace };
+  } catch (error: any) {
+    return { success: false, error: error.message || 'Failed to update workspace plan' };
   }
 }

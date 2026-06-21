@@ -1,6 +1,7 @@
 import { WorkspaceRepository } from '../repositories/workspace-repository';
 import { CreateWorkspaceInput, UpdateWorkspaceInput } from '../schemas/workspace';
 import { Workspace, WorkspaceMember, Role } from '@prisma/client';
+import prisma from '@/lib/prisma';
 
 export class WorkspaceService {
   private workspaceRepository: WorkspaceRepository;
@@ -10,6 +11,17 @@ export class WorkspaceService {
   }
 
   async createWorkspace(userId: string, input: CreateWorkspaceInput): Promise<Workspace> {
+    // Plan limit check: Free plan users can only own 1 workspace
+    const ownedWorkspaces = await prisma.workspace.findMany({
+      where: { ownerId: userId },
+    });
+    const hasFreeWorkspace = ownedWorkspaces.some((w) => w.plan === 'FREE');
+    if (hasFreeWorkspace || (ownedWorkspaces.length >= 1 && ownedWorkspaces.every((w) => w.plan === 'FREE'))) {
+      throw new Error(
+        'Workspace limit reached. You can only own 1 workspace on the Free plan. Please upgrade your existing workspace to Pro to create more.'
+      );
+    }
+
     const slugBase = input.slug || this.slugify(input.name);
     let slug = slugBase;
     let counter = 1;
@@ -69,6 +81,15 @@ export class WorkspaceService {
       name: input.name,
       logoUrl: input.logoUrl,
     });
+  }
+
+  async updateWorkspacePlan(
+    workspaceId: string,
+    userId: string,
+    plan: 'FREE' | 'PRO',
+  ): Promise<Workspace> {
+    await this.validateWorkspaceAccess(workspaceId, userId, [Role.OWNER]);
+    return this.workspaceRepository.update(workspaceId, { plan });
   }
 
   async deleteWorkspace(workspaceId: string, userId: string): Promise<Workspace> {
