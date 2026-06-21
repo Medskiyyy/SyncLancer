@@ -54,6 +54,7 @@ import { createMilestoneAction, updateMilestoneAction, deleteMilestoneAction } f
 import { TaskKanbanBoard } from '@/features/tasks/components/task-kanban-board';
 import { TimeTracker } from '@/features/time-tracking/components/time-tracker';
 import { FileManager } from '@/features/files/components/file-manager';
+import { InvoiceManager } from '@/features/invoices/components/invoice-manager';
 import { TimeEntry } from '@prisma/client';
 
 interface ExtendedMilestone extends Milestone {
@@ -66,6 +67,7 @@ interface ExtendedProject extends Project {
   tasks?: Task[];
   timeEntries?: (TimeEntry & { task?: Task | null })[];
   files?: (Omit<PrismaFile, 'fileSize'> & { fileSize: number; uploader?: { fullName: string } | null })[];
+  invoices?: any[];
 }
 
 interface ProjectDetailProps {
@@ -550,23 +552,13 @@ export function ProjectDetail({ project, workspaceSlug }: ProjectDetailProps) {
       )}
 
       {activeTab === 'Invoices' && (
-        <Card className="border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 rounded-xl shadow-sm">
-          <CardHeader className="border-b border-slate-100 dark:border-slate-850 pb-4">
-            <CardTitle className="text-base font-bold text-slate-900 dark:text-slate-50 flex items-center gap-2">
-              <DollarSign className="h-5 w-5 text-indigo-500" /> Invoices
-            </CardTitle>
-            <CardDescription className="text-xs">
-              Project milestones billing and PDF export features will go live in Phase 12.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="py-12 text-center text-slate-500 dark:text-slate-400">
-            <FileText className="h-10 w-10 mx-auto text-slate-300 dark:text-slate-600 mb-3" />
-            <h3 className="text-sm font-bold text-slate-800 dark:text-slate-350">Billing Module Offline</h3>
-            <p className="text-xs max-w-sm mx-auto mt-1.5">
-              Create professional invoices, calculate tax rates, and export PDFs during Phase 12.
-            </p>
-          </CardContent>
-        </Card>
+        <InvoiceManager
+          projectId={project.id}
+          workspaceId={project.workspaceId}
+          clientId={project.clientId}
+          initialInvoices={project.invoices || []}
+          workspaceSlug={workspaceSlug}
+        />
       )}
 
       {/* Add Milestone Dialog */}

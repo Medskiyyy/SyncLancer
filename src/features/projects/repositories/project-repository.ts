@@ -51,6 +51,18 @@ export class ProjectRepository {
             uploader: true,
           },
         },
+        invoices: {
+          where: {
+            deletedAt: null,
+          },
+          orderBy: {
+            createdAt: 'desc',
+          },
+          include: {
+            items: true,
+            client: true,
+          },
+        },
       },
     });
 
@@ -61,6 +73,17 @@ export class ProjectRepository {
       files: project.files?.map((file) => ({
         ...file,
         fileSize: Number(file.fileSize),
+      })) || [],
+      invoices: (project as any).invoices?.map((invoice: any) => ({
+        ...invoice,
+        subtotal: Number(invoice.subtotal),
+        taxAmount: Number(invoice.taxAmount),
+        totalAmount: Number(invoice.totalAmount),
+        items: invoice.items?.map((item: any) => ({
+          ...item,
+          unitPrice: Number(item.unitPrice),
+          totalPrice: Number(item.totalPrice),
+        })) || [],
       })) || [],
     };
   }
