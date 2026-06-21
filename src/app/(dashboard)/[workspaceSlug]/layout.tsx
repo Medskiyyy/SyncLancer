@@ -3,6 +3,7 @@ import { redirect, notFound } from 'next/navigation';
 import Link from 'next/link';
 import { WorkspaceService } from '@/features/workspace/services/workspace-service';
 import { WorkspaceSwitcher } from '@/features/workspace/components/workspace-switcher';
+import { ClientPortalRedirect } from '@/components/client-portal-redirect';
 import {
   LayoutDashboard,
   Users,
@@ -40,16 +41,22 @@ export default async function DashboardLayout({
     notFound();
   }
 
+  let membership;
   try {
     // Validate if the logged-in user is a member of this workspace
-    await workspaceService.validateWorkspaceAccess(currentWorkspace.id, session.user.id);
+    membership = await workspaceService.validateWorkspaceAccess(currentWorkspace.id, session.user.id);
   } catch (error) {
     redirect('/');
   }
 
+  const isClient = membership.role === 'CLIENT';
   const workspaces = await workspaceService.getUserWorkspaces(session.user.id);
 
-  const navItems = [
+  const navItems = isClient ? [
+    { name: 'Dashboard', href: `/${workspaceSlug}/portal`, icon: LayoutDashboard },
+    { name: 'Invoices', href: `/${workspaceSlug}/portal/invoices`, icon: Receipt },
+    { name: 'Files', href: `/${workspaceSlug}/portal/files`, icon: FolderOpen },
+  ] : [
     { name: 'Dashboard', href: `/${workspaceSlug}`, icon: LayoutDashboard },
     { name: 'CRM', href: `/${workspaceSlug}/crm`, icon: Workflow },
     { name: 'Clients', href: `/${workspaceSlug}/clients`, icon: Users },
@@ -63,10 +70,24 @@ export default async function DashboardLayout({
 
   return (
     <div className="flex min-h-screen bg-zinc-50 dark:bg-zinc-950">
+      {isClient && (
+        <ClientPortalRedirect
+          workspaceSlug={workspaceSlug}
+          role="CLIENT"
+        />
+      )}
       {/* Sidebar Desktop */}
       <aside className="fixed inset-y-0 left-0 z-20 hidden w-64 border-r border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900 md:flex md:flex-col">
         <div className="border-b border-zinc-200 p-4 dark:border-zinc-800">
-          <WorkspaceSwitcher currentWorkspace={currentWorkspace} workspaces={workspaces} />
+          {isClient ? (
+            <div className="flex h-9 items-center px-2">
+              <span className="text-sm font-black tracking-wider uppercase text-indigo-650 dark:text-indigo-400">
+                Client Portal
+              </span>
+            </div>
+          ) : (
+            <WorkspaceSwitcher currentWorkspace={currentWorkspace} workspaces={workspaces} />
+          )}
         </div>
         <nav className="flex-1 space-y-1 px-3 py-4">
           {navItems.map((item) => {
@@ -112,7 +133,9 @@ export default async function DashboardLayout({
             <div className="flex items-center gap-2">
               <span className="text-sm font-medium text-zinc-500 dark:text-zinc-400">SyncLancer</span>
               <span className="text-zinc-300 dark:text-zinc-700">/</span>
-              <span className="text-sm font-semibold text-zinc-900 dark:text-zinc-50">Workspace</span>
+              <span className="text-sm font-semibold text-zinc-900 dark:text-zinc-50">
+                {isClient ? 'Client Portal' : 'Workspace'}
+              </span>
             </div>
 
             {/* Right section: Actions */}

@@ -58,7 +58,30 @@ export class FileService {
     fileSize: number
   ) {
     // 1. Check workspace membership
-    await this.workspaceService.validateWorkspaceAccess(workspaceId, userId);
+    const membership = await this.workspaceService.validateWorkspaceAccess(workspaceId, userId);
+
+    if (membership.role === Role.CLIENT) {
+      const clientUser = await prisma.clientUser.findFirst({
+        where: { userId },
+      });
+      if (!clientUser) {
+        throw new Error('Access denied: Client profile not found for this user.');
+      }
+      if (!projectId) {
+        throw new Error('Access denied: Project ID is required for client uploads.');
+      }
+      const project = await prisma.project.findFirst({
+        where: {
+          id: projectId,
+          clientId: clientUser.clientId,
+          workspaceId,
+          deletedAt: null,
+        },
+      });
+      if (!project) {
+        throw new Error('Access denied: You can only upload files to your own projects.');
+      }
+    }
 
     // 2. Validate file size and type constraints
     validateFile(fileName, fileSize, fileType);
@@ -125,11 +148,34 @@ export class FileService {
   }
 
   async getFileDownloadUrl(id: string, workspaceId: string, userId: string) {
-    await this.workspaceService.validateWorkspaceAccess(workspaceId, userId);
+    const membership = await this.workspaceService.validateWorkspaceAccess(workspaceId, userId);
 
     const file = await this.fileRepository.findById(id);
     if (!file || file.workspaceId !== workspaceId || file.deletedAt) {
       throw new Error('File not found or does not belong to this workspace.');
+    }
+
+    if (membership.role === Role.CLIENT) {
+      const clientUser = await prisma.clientUser.findFirst({
+        where: { userId },
+      });
+      if (!clientUser) {
+        throw new Error('Access denied: Client profile not found for this user.');
+      }
+      if (!file.projectId) {
+        throw new Error('Access denied: You do not have permission to view global workspace files.');
+      }
+      const project = await prisma.project.findFirst({
+        where: {
+          id: file.projectId,
+          clientId: clientUser.clientId,
+          workspaceId,
+          deletedAt: null,
+        },
+      });
+      if (!project) {
+        throw new Error('Access denied: You do not have permission to access files from this project.');
+      }
     }
 
     // Generate signed URL (expires in 1 hour)
