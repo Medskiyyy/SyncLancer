@@ -5,7 +5,7 @@ import { Decimal } from '@prisma/client/runtime/library';
 
 export class ProjectRepository {
   async findById(id: string) {
-    return prisma.project.findFirst({
+    const project = await prisma.project.findFirst({
       where: {
         id,
         deletedAt: null,
@@ -40,8 +40,29 @@ export class ProjectRepository {
             task: true,
           },
         },
+        files: {
+          where: {
+            deletedAt: null,
+          },
+          orderBy: {
+            createdAt: 'desc',
+          },
+          include: {
+            uploader: true,
+          },
+        },
       },
     });
+
+    if (!project) return null;
+
+    return {
+      ...project,
+      files: project.files?.map((file) => ({
+        ...file,
+        fileSize: Number(file.fileSize),
+      })) || [],
+    };
   }
 
   async listByWorkspaceId(workspaceId: string) {

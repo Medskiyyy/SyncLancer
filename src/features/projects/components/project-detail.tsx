@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Project, Client, Milestone, Task, MilestoneStatus } from '@prisma/client';
+import { Project, Client, Milestone, Task, MilestoneStatus, File as PrismaFile } from '@prisma/client';
 import { 
   Briefcase, 
   Calendar, 
@@ -53,6 +53,7 @@ import { createMilestoneSchema, updateMilestoneSchema } from '@/features/milesto
 import { createMilestoneAction, updateMilestoneAction, deleteMilestoneAction } from '@/features/milestones/actions/milestone-actions';
 import { TaskKanbanBoard } from '@/features/tasks/components/task-kanban-board';
 import { TimeTracker } from '@/features/time-tracking/components/time-tracker';
+import { FileManager } from '@/features/files/components/file-manager';
 import { TimeEntry } from '@prisma/client';
 
 interface ExtendedMilestone extends Milestone {
@@ -64,6 +65,7 @@ interface ExtendedProject extends Project {
   milestones?: ExtendedMilestone[];
   tasks?: Task[];
   timeEntries?: (TimeEntry & { task?: Task | null })[];
+  files?: (Omit<PrismaFile, 'fileSize'> & { fileSize: number; uploader?: { fullName: string } | null })[];
 }
 
 interface ProjectDetailProps {
@@ -531,23 +533,12 @@ export function ProjectDetail({ project, workspaceSlug }: ProjectDetailProps) {
       )}
 
       {activeTab === 'Files' && (
-        <Card className="border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 rounded-xl shadow-sm">
-          <CardHeader className="border-b border-slate-100 dark:border-slate-850 pb-4">
-            <CardTitle className="text-base font-bold text-slate-900 dark:text-slate-50 flex items-center gap-2">
-              <FileCheck className="h-5 w-5 text-indigo-500" /> Shared Files & Handover
-            </CardTitle>
-            <CardDescription className="text-xs">
-              Storage features powered by Supabase client will go live in Phase 11.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="py-12 text-center text-slate-500 dark:text-slate-400">
-            <FileText className="h-10 w-10 mx-auto text-slate-300 dark:text-slate-600 mb-3" />
-            <h3 className="text-sm font-bold text-slate-800 dark:text-slate-350">Storage Module Offline</h3>
-            <p className="text-xs max-w-sm mx-auto mt-1.5">
-              Supabase Storage client and file upload mechanisms will be connected during Phase 11.
-            </p>
-          </CardContent>
-        </Card>
+        <FileManager
+          projectId={project.id}
+          workspaceId={project.workspaceId}
+          initialFiles={project.files || []}
+          workspaceSlug={workspaceSlug}
+        />
       )}
 
       {activeTab === 'Time Tracking' && (
