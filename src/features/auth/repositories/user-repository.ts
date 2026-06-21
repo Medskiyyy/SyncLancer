@@ -36,4 +36,18 @@ export class UserRepository {
       data: { passwordHash },
     });
   }
+
+  async updateProfile(
+    id: string,
+    data: { fullName: string; passwordHash: string; emailVerified?: boolean }
+  ): Promise<User> {
+    return prisma.user.update({
+      where: { id },
+      data: {
+        fullName: data.fullName,
+        passwordHash: data.passwordHash,
+        emailVerified: data.emailVerified ?? true,
+      },
+    });
+  }
 }

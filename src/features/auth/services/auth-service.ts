@@ -13,7 +13,16 @@ export class AuthService {
   async register(input: RegisterInput): Promise<User> {
     const existingUser = await this.userRepository.findByEmail(input.email);
     if (existingUser) {
-      throw new Error('User with this email already exists');
+      if (existingUser.passwordHash) {
+        throw new Error('User with this email already exists');
+      }
+      
+      const passwordHash = await argon2.hash(input.password);
+      return this.userRepository.updateProfile(existingUser.id, {
+        fullName: input.name,
+        passwordHash,
+        emailVerified: true,
+      });
     }
 
     const passwordHash = await argon2.hash(input.password);
