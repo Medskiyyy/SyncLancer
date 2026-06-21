@@ -51,6 +51,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 
 import { createMilestoneSchema, updateMilestoneSchema } from '@/features/milestones/schemas/milestone';
 import { createMilestoneAction, updateMilestoneAction, deleteMilestoneAction } from '@/features/milestones/actions/milestone-actions';
+import { TaskKanbanBoard } from '@/features/tasks/components/task-kanban-board';
 
 interface ExtendedMilestone extends Milestone {
   tasks?: Task[];
@@ -517,38 +518,13 @@ export function ProjectDetail({ project, workspaceSlug }: ProjectDetailProps) {
       )}
 
       {activeTab === 'Tasks' && (
-        <Card className="border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 rounded-xl shadow-sm">
-          <CardHeader className="border-b border-slate-100 dark:border-slate-850 pb-4">
-            <CardTitle className="text-base font-bold text-slate-900 dark:text-slate-50 flex items-center gap-2">
-              <CheckSquare className="h-5 w-5 text-indigo-500" /> Tasks Checklist
-            </CardTitle>
-            <CardDescription className="text-xs">
-              Directly manage workspace items inside the Kanban board in Phase 9.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="pt-6">
-            {!project.tasks || project.tasks.length === 0 ? (
-              <div className="text-center py-8 text-slate-500 dark:text-slate-400 space-y-2">
-                <AlertCircle className="h-8 w-8 mx-auto text-slate-400" />
-                <p className="text-sm font-semibold">No tasks available for this project</p>
-              </div>
-            ) : (
-              <div className="border border-slate-100 dark:border-slate-800 rounded-lg overflow-hidden divide-y divide-slate-100 dark:divide-slate-800 bg-slate-50/50 dark:bg-slate-950/20">
-                {project.tasks.map((task) => (
-                  <div key={task.id} className="flex items-center justify-between p-3.5">
-                    <div className="space-y-0.5">
-                      <p className="text-sm font-bold text-slate-800 dark:text-slate-200">{task.title}</p>
-                      <p className="text-xs text-slate-400 dark:text-slate-500">Status: <span className="font-semibold text-indigo-500 uppercase">{task.status}</span></p>
-                    </div>
-                    <Badge variant="outline" className={`text-[9px] tracking-wide uppercase font-semibold border ${TASK_PRIORITY_COLORS[task.priority]}`}>
-                      {task.priority}
-                    </Badge>
-                  </div>
-                ))}
-              </div>
-            )}
-          </CardContent>
-        </Card>
+        <TaskKanbanBoard
+          initialTasks={project.tasks || []}
+          milestones={project.milestones || []}
+          projectId={project.id}
+          workspaceId={project.workspaceId}
+          workspaceSlug={workspaceSlug}
+        />
       )}
 
       {activeTab === 'Files' && (

@@ -26,7 +26,10 @@ export class ProjectRepository {
         },
         tasks: {
           orderBy: {
-            dueDate: 'asc',
+            createdAt: 'asc',
+          },
+          include: {
+            milestone: true,
           },
         },
       },
