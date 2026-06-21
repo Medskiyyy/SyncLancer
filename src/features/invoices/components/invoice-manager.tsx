@@ -47,6 +47,10 @@ import {
   sendInvoiceAction, 
   markAsPaidAction 
 } from '../actions/invoice-actions';
+import {
+  getRecurringInvoiceAction,
+  saveRecurringInvoiceAction
+} from '../actions/recurring-invoice-actions';
 
 interface ExtendedInvoice extends Invoice {
   items: InvoiceItem[];
@@ -100,6 +104,68 @@ export function InvoiceManager({ projectId, workspaceId, clientId, initialInvoic
   useEffect(() => {
     setInvoices(initialInvoices);
   }, [initialInvoices]);
+
+  // Recurring Invoice states
+  const [isRecurringActive, setIsRecurringActive] = useState<boolean>(false);
+  const [recurringFrequency, setRecurringFrequency] = useState<string>('MONTHLY');
+  const [recurringNextRun, setRecurringNextRun] = useState<string>(
+    new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0] // Default 7 days from now
+  );
+  const [isRecurringLoading, setIsRecurringLoading] = useState<boolean>(false);
+
+  // Fetch Recurring Configuration on mount
+  useEffect(() => {
+    async function loadRecurringConfig() {
+      setIsRecurringLoading(true);
+      try {
+        const res = await getRecurringInvoiceAction(workspaceId, clientId);
+        if (res.success && res.data) {
+          setIsRecurringActive(res.data.active);
+          setRecurringFrequency(res.data.frequency);
+          setRecurringNextRun(new Date(res.data.nextRunAt).toISOString().split('T')[0]);
+        }
+      } catch (err: any) {
+        console.error('Failed to load recurring invoice config:', err);
+      } finally {
+        setIsRecurringLoading(false);
+      }
+    }
+    loadRecurringConfig();
+  }, [workspaceId, clientId]);
+
+  const handleSaveRecurringSettings = async () => {
+    // Check if client has invoices
+    if (invoices.length === 0) {
+      toast.error('You must create at least one manual invoice before enabling recurring billing.');
+      return;
+    }
+
+    setIsRecurringLoading(true);
+    try {
+      const res = await saveRecurringInvoiceAction(
+        workspaceId,
+        clientId,
+        {
+          clientId,
+          frequency: recurringFrequency as any,
+          nextRunAt: new Date(recurringNextRun),
+          active: isRecurringActive,
+        },
+        projectId
+      );
+
+      if (res.success) {
+        toast.success('Recurring billing settings updated successfully');
+        router.refresh();
+      } else {
+        toast.error(res.error || 'Failed to update recurring settings');
+      }
+    } catch (err: any) {
+      toast.error(err.message || 'An error occurred while saving recurring settings');
+    } finally {
+      setIsRecurringLoading(false);
+    }
+  };
 
   const handleAddItem = () => {
     setItems([...items, { name: '', description: '', quantity: 1, unitPrice: 0 }]);
@@ -322,6 +388,98 @@ export function InvoiceManager({ projectId, workspaceId, clientId, initialInvoic
           </CardContent>
         </Card>
       </div>
+
+      {/* Recurring Invoice settings card */}
+      <Card className="border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 rounded-xl shadow-sm overflow-hidden">
+        <CardHeader className="border-b border-slate-100 dark:border-slate-850 pb-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle className="text-sm font-bold text-slate-900 dark:text-slate-50 flex items-center gap-2">
+                <Calendar className="h-4.5 w-4.5 text-indigo-500" /> Recurring Invoice Automation
+              </CardTitle>
+              <CardDescription className="text-xs mt-0.5 text-slate-500 dark:text-slate-400">
+                Automatically clone and email the latest invoice for this client on a recurring schedule.
+              </CardDescription>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent className="pt-5 space-y-4">
+          {invoices.length === 0 ? (
+            <div className="flex items-start gap-2.5 p-3.5 bg-amber-50 dark:bg-amber-950/20 text-amber-850 dark:text-amber-300 rounded-lg border border-amber-100 dark:border-amber-900/60 text-xs">
+              <AlertCircle className="h-4.5 w-4.5 shrink-0 mt-0.5 text-amber-600 dark:text-amber-450" />
+              <div className="space-y-1">
+                <p className="font-bold">Manual Invoice Required</p>
+                <p className="text-slate-650 dark:text-slate-350">
+                  Recurring billing requires at least one manual invoice for this client to act as a template. Please create an invoice first.
+                </p>
+              </div>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              <div className="flex items-center justify-between p-3.5 bg-slate-50/50 dark:bg-slate-950/20 rounded-lg border border-slate-100 dark:border-slate-900">
+                <div className="space-y-0.5">
+                  <label className="text-xs font-bold text-slate-800 dark:text-slate-200">
+                    Enable Automatic Recurring Billing
+                  </label>
+                  <p className="text-[10px] text-slate-450 dark:text-slate-500">
+                    If active, the system will process schedules automatically on the designated run dates.
+                  </p>
+                </div>
+                <input
+                  type="checkbox"
+                  checked={isRecurringActive}
+                  onChange={(e) => setIsRecurringActive(e.target.checked)}
+                  disabled={isRecurringLoading}
+                  className="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer dark:border-slate-800 dark:bg-slate-900"
+                />
+              </div>
+
+              {isRecurringActive && (
+                <div className="grid gap-4 sm:grid-cols-2 p-4 bg-slate-50/30 dark:bg-slate-950/10 rounded-lg border border-slate-100/60 dark:border-slate-900/50">
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">Billing Frequency</label>
+                    <Select
+                      value={recurringFrequency}
+                      onValueChange={(val) => setRecurringFrequency(val || 'MONTHLY')}
+                      disabled={isRecurringLoading}
+                    >
+                      <SelectTrigger className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 h-9 text-xs">
+                        <SelectValue placeholder="Select Frequency" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-white dark:bg-slate-955 border-slate-250 dark:border-slate-800">
+                        <SelectItem value="WEEKLY">Weekly</SelectItem>
+                        <SelectItem value="MONTHLY">Monthly</SelectItem>
+                        <SelectItem value="QUARTERLY">Quarterly</SelectItem>
+                        <SelectItem value="YEARLY">Yearly</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">Next Scheduled Run Date</label>
+                    <Input
+                      type="date"
+                      value={recurringNextRun}
+                      onChange={(e) => setRecurringNextRun(e.target.value)}
+                      disabled={isRecurringLoading}
+                      className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-xs h-9"
+                    />
+                  </div>
+                </div>
+              )}
+
+              <div className="flex justify-end pt-1">
+                <Button
+                  onClick={handleSaveRecurringSettings}
+                  disabled={isRecurringLoading}
+                  className="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-md shadow-indigo-500/10 h-8 animate-none"
+                >
+                  {isRecurringLoading ? 'Saving Settings...' : 'Save Automation Settings'}
+                </Button>
+              </div>
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
       {/* Action Header bar */}
       <div className="flex items-center justify-between">
