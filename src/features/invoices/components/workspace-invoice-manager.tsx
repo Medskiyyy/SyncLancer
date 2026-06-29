@@ -763,12 +763,12 @@ export function WorkspaceInvoiceManager({
                 disabled={isLoading}
                 className="bg-amber-600 hover:bg-amber-700 text-white font-semibold text-xs rounded-lg px-4 h-9 shadow-sm"
               >
-                Create Draft Invoice
-              </Button>
-            </DialogFooter>
-          </form>
+              {isLoading ? 'Creating...' : 'Create Draft Invoice'}
+            </Button>
+          </DialogFooter>
+        </form>
         </DialogContent>
       </Dialog>
-    </div>
+    </FadeIn>
   );
 }
