@@ -19,10 +19,13 @@ import {
   List,
   X,
   User as UserIcon,
+  Square,
 } from '@phosphor-icons/react';
 import { WorkspaceSwitcher } from './workspace-switcher';
 import { CommandPalette } from './command-palette';
 import { cn } from '@/lib/utils';
+import { toast } from 'sonner';
+import { createTimeEntryAction } from '@/features/time-tracking/actions/time-entry-actions';
 
 interface SidebarNavProps {
   currentWorkspace: Workspace;
@@ -50,6 +53,84 @@ export function SidebarNav({
   const pathname = usePathname();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
   const [isSearchOpen, setIsSearchOpen] = React.useState(false);
+  const [activeTimer, setActiveTimer] = React.useState<any>(null);
+  const [elapsed, setElapsed] = React.useState(0);
+
+  React.useEffect(() => {
+    const timerStorageKey = `@synclancer/active-timer-${currentWorkspace.id}`;
+    
+    const checkTimer = () => {
+      const stored = localStorage.getItem(timerStorageKey);
+      if (stored) {
+        try {
+          const parsed = JSON.parse(stored);
+          setActiveTimer(parsed);
+          const start = new Date(parsed.startTime).getTime();
+          setElapsed(Math.floor((Date.now() - start) / 1000));
+        } catch (e) {
+          console.error(e);
+        }
+      } else {
+        setActiveTimer(null);
+      }
+    };
+
+    checkTimer();
+
+    // Sync from local storage change events or regular 1s interval
+    const interval = setInterval(checkTimer, 1000);
+    window.addEventListener('storage', checkTimer);
+
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('storage', checkTimer);
+    };
+  }, [currentWorkspace.id]);
+
+  const handleStopFloatingTimer = async () => {
+    if (!activeTimer) return;
+    const timerStorageKey = `@synclancer/active-timer-${currentWorkspace.id}`;
+    try {
+      const endTime = new Date();
+      const startTime = new Date(activeTimer.startTime);
+      const diffMs = endTime.getTime() - startTime.getTime();
+      const durationMinutes = Math.max(1, Math.round(diffMs / 60000));
+
+      const res = await createTimeEntryAction(currentWorkspace.id, {
+        projectId: activeTimer.projectId,
+        taskId: activeTimer.taskId,
+        startTime,
+        endTime,
+        durationMinutes,
+        billable: activeTimer.billable,
+        notes: activeTimer.notes || 'Timer log (floating)',
+      });
+
+      if (res.success) {
+        toast.success('Time entry logged successfully');
+        localStorage.removeItem(timerStorageKey);
+        setActiveTimer(null);
+        window.dispatchEvent(new Event('storage'));
+      } else {
+        toast.error(res.error || 'Failed to save time entry');
+      }
+    } catch (e: any) {
+      toast.error('Failed to stop timer');
+    }
+  };
+
+  const formatTime = (totalSeconds: number) => {
+    const hrs = Math.floor(totalSeconds / 3600);
+    const mins = Math.floor((totalSeconds % 3600) / 60);
+    const secs = totalSeconds % 60;
+    return [
+      hrs > 0 ? String(hrs).padStart(2, '0') : null,
+      String(mins).padStart(2, '0'),
+      String(secs).padStart(2, '0'),
+    ]
+      .filter(Boolean)
+      .join(':');
+  };
 
   // Close mobile menu on route change
   React.useEffect(() => {
@@ -82,7 +163,6 @@ export function SidebarNav({
       title: 'Workspace',
       items: [
         { name: 'Dashboard', href: `/${workspaceSlug}`, icon: SquaresFour },
-        { name: 'CRM', href: `/${workspaceSlug}/crm`, icon: GitBranch },
         { name: 'Clients', href: `/${workspaceSlug}/clients`, icon: Users },
         { name: 'Proposals', href: `/${workspaceSlug}/proposals`, icon: FileText },
         { name: 'Projects', href: `/${workspaceSlug}/projects`, icon: Kanban },
@@ -324,6 +404,33 @@ export function SidebarNav({
         workspaceSlug={workspaceSlug}
         isClient={isClient}
       />
+
+      {/* Floating Active Timer Panel */}
+      {activeTimer && (
+        <div className="fixed bottom-6 right-6 z-50 flex items-center gap-4 rounded-2xl border border-primary/30 bg-zinc-900/95 dark:bg-zinc-950/95 text-white p-4 shadow-2xl animate-in slide-in-from-bottom duration-300 max-w-sm">
+          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary/10 border border-primary/20 shrink-0">
+            <span className="relative flex h-3.5 w-3.5">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-3.5 w-3.5 bg-primary"></span>
+            </span>
+          </div>
+          <div className="flex flex-col min-w-0">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-primary">Active Timer</span>
+            <span className="text-xs font-semibold truncate text-zinc-100">{activeTimer.projectName}</span>
+            <span className="text-[10px] text-zinc-450 truncate mt-0.5">{activeTimer.notes || 'No description'}</span>
+          </div>
+          <div className="flex items-center gap-3 pl-2 border-l border-zinc-800">
+            <span className="text-sm font-mono font-bold tracking-tight text-white">{formatTime(elapsed)}</span>
+            <button
+              onClick={handleStopFloatingTimer}
+              className="flex h-8 w-8 items-center justify-center rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 cursor-pointer transition-colors"
+              title="Stop Timer"
+            >
+              <Square weight="fill" className="h-3.5 w-3.5" />
+            </button>
+          </div>
+        </div>
+      )}
     </>
   );
 }

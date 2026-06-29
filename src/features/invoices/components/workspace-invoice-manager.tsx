@@ -578,7 +578,9 @@ export function WorkspaceInvoiceManager({
                 <label className="font-bold text-zinc-700 dark:text-zinc-400">Select Client *</label>
                 <Select value={selectedClientId} onValueChange={(val) => setSelectedClientId(val || '')}>
                   <SelectTrigger className="h-9 text-xs">
-                    <SelectValue placeholder="Choose a client..." />
+                    <SelectValue placeholder="Choose a client...">
+                      {selectedClientId ? (clients.find(c => c.id === selectedClientId)?.companyName || selectedClientId) : undefined}
+                    </SelectValue>
                   </SelectTrigger>
                   <SelectContent className="text-xs">
                     {clients.map(c => (
@@ -596,7 +598,11 @@ export function WorkspaceInvoiceManager({
                   disabled={!selectedClientId}
                 >
                   <SelectTrigger className="h-9 text-xs">
-                    <SelectValue placeholder={selectedClientId ? "Choose a project..." : "Select client first"} />
+                    <SelectValue placeholder={selectedClientId ? "Choose a project..." : "Select client first"}>
+                      {selectedProjectId && selectedProjectId !== 'none' 
+                        ? (filteredProjects.find(p => p.id === selectedProjectId)?.name || selectedProjectId) 
+                        : selectedProjectId === 'none' ? "No Project (General Billing)" : undefined}
+                    </SelectValue>
                   </SelectTrigger>
                   <SelectContent className="text-xs">
                     <SelectItem value="none">No Project (General Billing)</SelectItem>
@@ -698,7 +704,7 @@ export function WorkspaceInvoiceManager({
                           placeholder="Unit Price" 
                           min="0"
                           step="0.01"
-                          value={item.unitPrice}
+                          value={item.unitPrice === 0 ? '' : item.unitPrice}
                           onChange={(e) => handleItemChange(idx, 'unitPrice', e.target.value)}
                           className="h-9 text-xs"
                           required

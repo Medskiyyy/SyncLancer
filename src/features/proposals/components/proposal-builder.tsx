@@ -192,7 +192,9 @@ export function ProposalBuilder({
                             <Select onValueChange={field.onChange} defaultValue={field.value}>
                               <FormControl>
                                 <SelectTrigger className="text-xs h-9 rounded-lg bg-white dark:bg-zinc-900">
-                                  <SelectValue placeholder="Select a client..." />
+                                  <SelectValue placeholder="Select a client...">
+                                    {field.value ? (clients.find(c => c.id === field.value)?.companyName || field.value) : undefined}
+                                  </SelectValue>
                                 </SelectTrigger>
                               </FormControl>
                               <SelectContent className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-xs">
@@ -361,7 +363,7 @@ export function ProposalBuilder({
                                     step="0.01"
                                     className="pl-7 text-xs h-9 rounded-lg bg-white dark:bg-zinc-900"
                                     onChange={e => field.onChange(parseFloat(e.target.value) || 0)}
-                                    value={field.value} 
+                                    value={field.value === 0 ? '' : field.value} 
                                   />
                                 </div>
                               </FormControl>

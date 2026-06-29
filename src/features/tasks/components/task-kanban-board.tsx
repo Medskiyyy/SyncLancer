@@ -519,14 +519,14 @@ export function TaskKanbanBoard({ initialTasks, milestones, projectId, workspace
 
       {/* Kanban Board */}
       <DndContext sensors={sensors} collisionDetection={closestCorners} onDragStart={onDragStart} onDragEnd={onDragEnd}>
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-5 overflow-x-auto pb-4">
+        <div className="flex gap-4 overflow-x-auto pb-4 w-full scrollbar-thin">
           {COLUMNS.map((col) => {
             const columnTasks = tasks.filter((t) => t.status === col.status);
             return (
               <DroppableColumn
                 key={col.status}
                 id={col.status}
-                className={`flex flex-col rounded-xl border p-3 min-h-[420px] w-full ${col.color}`}
+                className={`flex flex-col rounded-xl border p-3.5 min-h-[480px] w-[280px] shrink-0 ${col.color}`}
               >
                 <div className="flex items-center justify-between mb-3 px-1">
                   <div className="flex items-center gap-2">

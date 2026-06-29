@@ -555,7 +555,9 @@ export function TimeTracker({ project, initialTimeEntries, workspaceSlug }: Time
                   <label className="text-xs font-semibold text-slate-600 dark:text-slate-400">Select Task (Optional)</label>
                   <Select value={timerTaskId} onValueChange={(val) => setTimerTaskId(val ?? 'none')}>
                     <SelectTrigger className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 h-9 text-xs">
-                      <SelectValue placeholder="No Task Linked" />
+                      <SelectValue placeholder="No Task Linked">
+                        {timerTaskId && timerTaskId !== 'none' ? (project.tasks?.find(t => t.id === timerTaskId)?.title || timerTaskId) : undefined}
+                      </SelectValue>
                     </SelectTrigger>
                     <SelectContent className="bg-white dark:bg-slate-950 border-slate-250 dark:border-slate-800">
                       <SelectItem value="none">No Task Linked</SelectItem>
@@ -743,7 +745,9 @@ export function TimeTracker({ project, initialTimeEntries, workspaceSlug }: Time
               <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">Task (Optional)</label>
               <Select value={manualTaskId} onValueChange={(val) => setManualTaskId(val ?? 'none')}>
                 <SelectTrigger className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-xs">
-                  <SelectValue placeholder="No Task Linked" />
+                  <SelectValue placeholder="No Task Linked">
+                    {manualTaskId && manualTaskId !== 'none' ? (project.tasks?.find(t => t.id === manualTaskId)?.title || manualTaskId) : undefined}
+                  </SelectValue>
                 </SelectTrigger>
                 <SelectContent className="bg-white dark:bg-slate-950 border-slate-250 dark:border-slate-800">
                   <SelectItem value="none">No Task Linked</SelectItem>
@@ -851,7 +855,9 @@ export function TimeTracker({ project, initialTimeEntries, workspaceSlug }: Time
               <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">Task (Optional)</label>
               <Select value={editTaskId} onValueChange={(val) => setEditTaskId(val ?? 'none')}>
                 <SelectTrigger className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-xs">
-                  <SelectValue placeholder="No Task Linked" />
+                  <SelectValue placeholder="No Task Linked">
+                    {editTaskId && editTaskId !== 'none' ? (project.tasks?.find(t => t.id === editTaskId)?.title || editTaskId) : undefined}
+                  </SelectValue>
                 </SelectTrigger>
                 <SelectContent className="bg-white dark:bg-slate-950 border-slate-250 dark:border-slate-800">
                   <SelectItem value="none">No Task Linked</SelectItem>

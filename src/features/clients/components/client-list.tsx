@@ -212,28 +212,28 @@ export function ClientList({ initialClients, workspaceId, workspaceSlug }: Clien
   };
 
   return (
-    <div className="space-y-6 animate-in fade-in-50 duration-300">
+    <div className="space-y-6">
       {/* Page Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-6 border-b border-slate-100">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-6 border-b border-border/80">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-slate-900">Clients</h1>
-          <p className="text-sm text-slate-500 mt-1">Manage client profiles, projects, billing records, and access keys.</p>
+          <h1 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50 font-heading">Clients</h1>
+          <p className="text-sm text-zinc-500 dark:text-zinc-450 mt-1">Manage client profiles, projects, billing records, and access keys.</p>
         </div>
-        <Button onClick={() => setIsAddOpen(true)} className="cursor-pointer font-medium text-sm h-10 px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow-sm">
+        <Button onClick={() => setIsAddOpen(true)} className="cursor-pointer font-medium text-sm h-10 px-4 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg shadow-sm shrink-0 self-start sm:self-auto">
           <Plus className="mr-2 h-4 w-4" /> Add Client
         </Button>
       </div>
 
       {/* Tabs and Search Bar */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex bg-slate-100 p-1 rounded-lg border border-slate-200/50 self-start">
+        <div className="flex bg-zinc-100 dark:bg-zinc-900/60 p-1 rounded-lg border border-border/60 self-start">
           <button
             onClick={() => setActiveTab('active')}
             className={cn(
               "px-4 py-1.5 text-xs font-semibold rounded-md transition-all cursor-pointer",
               activeTab === 'active'
-                ? "bg-white text-blue-700 shadow-xs"
-                : "text-slate-500 hover:text-slate-900"
+                ? "bg-white dark:bg-zinc-800 text-primary shadow-xs"
+                : "text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
             )}
           >
             Active Clients
@@ -243,8 +243,8 @@ export function ClientList({ initialClients, workspaceId, workspaceSlug }: Clien
             className={cn(
               "px-4 py-1.5 text-xs font-semibold rounded-md transition-all cursor-pointer",
               activeTab === 'archived'
-                ? "bg-white text-blue-700 shadow-xs"
-                : "text-slate-500 hover:text-slate-900"
+                ? "bg-white dark:bg-zinc-800 text-primary shadow-xs"
+                : "text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
             )}
           >
             Archived
@@ -252,26 +252,26 @@ export function ClientList({ initialClients, workspaceId, workspaceSlug }: Clien
         </div>
 
         <div className="relative w-full max-w-sm">
-          <Search className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
+          <Search className="absolute left-3 top-3 h-4 w-4 text-zinc-400 dark:text-zinc-500" />
           <Input
             placeholder="Search clients..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-9 bg-white text-sm h-10 rounded-lg border-slate-250"
+            className="pl-9 bg-white dark:bg-zinc-900/40 text-sm h-10 rounded-lg border-zinc-200/60 dark:border-zinc-800/60"
           />
         </div>
       </div>
 
       {/* Clients List */}
       {filteredClients.length === 0 ? (
-        <Card className="flex flex-col items-center justify-center p-12 text-center border-dashed border-slate-200">
-          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-slate-50 text-slate-450 mb-4 border border-slate-100">
-            <Users className="h-6 w-6 text-slate-500" />
+        <Card variant="elevated" className="flex flex-col items-center justify-center p-12 text-center border-dashed border-zinc-200/60 dark:border-zinc-800/60 bg-white dark:bg-zinc-900/40">
+          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-zinc-50 dark:bg-zinc-950/60 text-zinc-450 dark:text-zinc-500 mb-4 border border-zinc-200/40 dark:border-zinc-800/60">
+            <Users className="h-6 w-6 text-zinc-500 dark:text-zinc-450" />
           </div>
-          <CardTitle className="text-base font-bold text-slate-900">
+          <CardTitle className="text-base font-bold text-zinc-900 dark:text-zinc-50">
             {searchQuery ? 'No matching clients found' : `No ${activeTab} clients yet`}
           </CardTitle>
-          <CardDescription className="max-w-sm mt-2 text-sm text-slate-500">
+          <CardDescription className="max-w-sm mt-2 text-sm text-zinc-500 dark:text-zinc-400">
             {searchQuery 
               ? 'Try refining your search terms or filters.'
               : activeTab === 'active' 
@@ -280,18 +280,18 @@ export function ClientList({ initialClients, workspaceId, workspaceSlug }: Clien
             }
           </CardDescription>
           {!searchQuery && activeTab === 'active' && (
-            <Button onClick={() => setIsAddOpen(true)} className="mt-5 flex items-center gap-2 cursor-pointer font-medium text-sm h-10 bg-blue-600 hover:bg-blue-700 text-white px-4 rounded-lg shadow-sm">
+            <Button onClick={() => setIsAddOpen(true)} className="mt-5 flex items-center gap-2 cursor-pointer font-medium text-sm h-10 bg-primary hover:bg-primary/90 text-primary-foreground px-4 rounded-lg shadow-sm">
               <Plus className="h-4 w-4" />
               <span>Add Client</span>
             </Button>
           )}
         </Card>
       ) : (
-        <Card className="overflow-hidden border border-slate-200 rounded-xl shadow-sm bg-white">
+        <Card variant="elevated" className="overflow-hidden border border-zinc-200/60 dark:border-zinc-800/60 rounded-xl bg-white dark:bg-zinc-900/40">
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse text-sm">
               <thead>
-                <tr className="border-b border-slate-200 text-xs font-semibold text-slate-500 bg-slate-50/50 h-[48px]">
+                <tr className="border-b border-border/80 text-xs font-semibold text-zinc-500 dark:text-zinc-400 bg-zinc-50/50 dark:bg-zinc-900/50 h-[48px]">
                   <th className="px-6 align-middle font-medium">Client</th>
                   <th className="px-6 align-middle font-medium">Email</th>
                   <th className="px-6 align-middle font-medium">Projects</th>
@@ -301,36 +301,36 @@ export function ClientList({ initialClients, workspaceId, workspaceSlug }: Clien
                   <th className="px-6 align-middle font-medium text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100 bg-white">
+              <tbody className="divide-y divide-zinc-200/40 dark:divide-zinc-800/40 bg-transparent">
                 {filteredClients.map((client) => {
                   const projectCount = client.projects?.length || 0;
                   const revenue = getClientRevenue(client);
                   const lastActivity = getClientLastActivity(client);
                   return (
-                    <tr key={client.id} className="hover:bg-slate-50/50 transition-colors h-[60px]">
+                    <tr key={client.id} className="hover:bg-zinc-55/40 dark:hover:bg-zinc-850/30 transition-colors h-[60px]">
                       <td className="px-6 align-middle">
                         <div className="flex items-center gap-3">
-                          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-blue-600 font-bold border border-blue-100 text-xs">
+                          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary font-bold border border-primary/20 text-xs">
                             {client.companyName.substring(0, 2).toUpperCase()}
                           </div>
                           <div className="flex flex-col min-w-0">
-                            <Link href={`/${workspaceSlug}/clients/${client.id}`} className="font-semibold text-slate-900 hover:text-blue-600 hover:underline truncate">
+                            <Link href={`/${workspaceSlug}/clients/${client.id}`} className="font-semibold text-zinc-900 dark:text-zinc-50 hover:text-primary hover:underline truncate">
                               {client.companyName}
                             </Link>
                           </div>
                         </div>
                       </td>
-                      <td className="px-6 align-middle text-slate-600">
-                        <a href={`mailto:${client.primaryEmail}`} className="hover:underline hover:text-blue-600">
+                      <td className="px-6 align-middle text-zinc-650 dark:text-zinc-400">
+                        <a href={`mailto:${client.primaryEmail}`} className="hover:underline hover:text-primary">
                           {client.primaryEmail}
                         </a>
                       </td>
                       <td className="px-6 align-middle">
-                        <span className="font-medium text-slate-700">
+                        <span className="font-medium text-zinc-700 dark:text-zinc-350">
                           {projectCount} {projectCount === 1 ? 'project' : 'projects'}
                         </span>
                       </td>
-                      <td className="px-6 align-middle font-mono font-medium text-slate-900">
+                      <td className="px-6 align-middle font-mono font-medium text-zinc-900 dark:text-zinc-50">
                         ${revenue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                       </td>
                       <td className="px-6 align-middle">
@@ -338,21 +338,21 @@ export function ClientList({ initialClients, workspaceId, workspaceSlug }: Clien
                           className={cn(
                             "text-[10px] font-medium px-2 py-0.5 rounded-full border shadow-none",
                             client.archived 
-                              ? "bg-slate-105 text-slate-600 border-slate-200"
-                              : "bg-emerald-50 text-emerald-700 border-emerald-150"
+                              ? "bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400 border-border/80"
+                              : "bg-emerald-50 text-emerald-700 border-emerald-150 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20"
                           )}
                           variant="secondary"
                         >
                           {client.archived ? 'Archived' : 'Active'}
                         </Badge>
                       </td>
-                      <td className="px-6 align-middle text-slate-500 text-xs">
+                      <td className="px-6 align-middle text-zinc-500 dark:text-zinc-450 text-xs">
                         {lastActivity}
                       </td>
                       <td className="px-6 align-middle text-right">
                         <div className="flex items-center justify-end gap-1">
                           <Link href={`/${workspaceSlug}/clients/${client.id}`}>
-                            <Button variant="ghost" size="icon" title="View Profile" className="h-8 w-8 text-slate-400 hover:text-slate-900 rounded-md cursor-pointer">
+                            <Button variant="ghost" size="icon" title="View Profile" className="h-8 w-8 text-zinc-450 hover:text-zinc-900 dark:hover:text-zinc-50 rounded-md cursor-pointer">
                               <Eye className="h-4 w-4" />
                             </Button>
                           </Link>
@@ -364,7 +364,7 @@ export function ClientList({ initialClients, workspaceId, workspaceSlug }: Clien
                               setEditingClient(client);
                               setIsEditOpen(true);
                             }}
-                            className="h-8 w-8 text-slate-400 hover:text-slate-900 rounded-md cursor-pointer"
+                            className="h-8 w-8 text-zinc-450 hover:text-zinc-900 dark:hover:text-zinc-50 rounded-md cursor-pointer"
                           >
                             <Edit className="h-4 w-4" />
                           </Button>
@@ -373,7 +373,7 @@ export function ClientList({ initialClients, workspaceId, workspaceSlug }: Clien
                             size="icon" 
                             title={client.archived ? 'Restore Client' : 'Archive Client'} 
                             onClick={() => handleArchiveClient(client)}
-                            className="h-8 w-8 text-slate-400 hover:text-slate-900 rounded-md cursor-pointer"
+                            className="h-8 w-8 text-zinc-450 hover:text-zinc-900 dark:hover:text-zinc-50 rounded-md cursor-pointer"
                           >
                             {client.archived ? <RotateCcw className="h-4 w-4 text-amber-500" /> : <Archive className="h-4 w-4" />}
                           </Button>
@@ -382,7 +382,7 @@ export function ClientList({ initialClients, workspaceId, workspaceSlug }: Clien
                             size="icon" 
                             title="Delete Client" 
                             onClick={() => handleDeleteClient(client.id)}
-                            className="h-8 w-8 text-slate-400 hover:bg-red-50 hover:text-red-650 rounded-md cursor-pointer"
+                            className="h-8 w-8 text-zinc-450 hover:bg-red-500/10 hover:text-red-500 rounded-md cursor-pointer"
                           >
                             <Trash2 className="h-4 w-4" />
                           </Button>
