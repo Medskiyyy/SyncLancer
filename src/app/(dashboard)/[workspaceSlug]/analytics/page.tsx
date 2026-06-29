@@ -42,27 +42,27 @@ export default async function WorkspaceAnalyticsPage({ params }: PageProps) {
       title: 'Total Revenue', 
       value: data.totalRevenue, 
       description: `${data.revenueChangePercent >= 0 ? '+' : ''}${data.revenueChangePercent}% from last month`, 
-      icon: DollarSign,
+      icon: 'revenue',
       prefix: '$',
     },
     { 
       title: 'Pending Invoices', 
       value: data.pendingAmount, 
       description: `${data.pendingCount} outstanding invoices`, 
-      icon: Receipt,
+      icon: 'invoices',
       prefix: '$',
     },
     { 
       title: 'Active Projects', 
       value: data.activeProjectsCount, 
       description: `${data.projectsChangeCount >= 0 ? '+' : ''}${data.projectsChangeCount} since last month`, 
-      icon: FolderKanban,
+      icon: 'projects',
     },
     { 
       title: 'Active Clients', 
       value: data.activeClientsCount, 
       description: `${data.clientsChangeCount >= 0 ? '+' : ''}${data.clientsChangeCount} since last month`, 
-      icon: Users,
+      icon: 'clients',
     },
   ];
 

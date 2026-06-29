@@ -58,7 +58,7 @@ export default async function WorkspaceDashboardPage({ params }: PageProps) {
       title: 'Revenue', 
       value: data.totalRevenue, 
       description: `${data.revenueChangePercent >= 0 ? '+' : ''}${data.revenueChangePercent}% from last month`, 
-      icon: CurrencyDollar,
+      icon: 'revenue',
       trendUp: data.revenueChangePercent >= 0,
       prefix: '$',
     },
@@ -66,31 +66,31 @@ export default async function WorkspaceDashboardPage({ params }: PageProps) {
       title: 'Active Projects', 
       value: data.activeProjectsCount, 
       description: `${data.projectsChangeCount >= 0 ? '+' : ''}${data.projectsChangeCount} since last month`, 
-      icon: Folder,
+      icon: 'projects',
       trendUp: data.projectsChangeCount >= 0,
     },
     { 
       title: 'Active Clients', 
       value: data.activeClientsCount, 
       description: `${data.clientsChangeCount >= 0 ? '+' : ''}${data.clientsChangeCount} since last month`, 
-      icon: Users,
+      icon: 'clients',
       trendUp: data.clientsChangeCount >= 0,
     },
     { 
       title: 'Pending Invoices', 
       value: data.pendingAmount, 
       description: `${data.pendingCount} outstanding invoices`, 
-      icon: Receipt,
+      icon: 'invoices',
       trendUp: false,
       prefix: '$',
     },
   ];
 
   const quickActions = [
-    { title: 'New Client', href: `/${workspaceSlug}/clients?add=true`, desc: 'Add client contact card', icon: Users, color: 'text-blue-600 bg-blue-500/10 border-blue-500/20 dark:bg-blue-500/15 dark:text-blue-400 dark:border-blue-500/20' },
-    { title: 'New Proposal', href: `/${workspaceSlug}/proposals/new`, desc: 'Draft freelancer pitch', icon: FileText, color: 'text-violet-600 bg-violet-500/10 border-violet-500/20 dark:bg-violet-500/15 dark:text-violet-400 dark:border-violet-500/20' },
-    { title: 'New Project', href: `/${workspaceSlug}/projects/new`, desc: 'Launch project dashboard', icon: Folder, color: 'text-emerald-600 bg-emerald-500/10 border-emerald-500/20 dark:bg-emerald-500/15 dark:text-emerald-450 dark:border-emerald-500/20' },
-    { title: 'New Invoice', href: `/${workspaceSlug}/invoices?create=true`, desc: 'Generate billing statement', icon: Receipt, color: 'text-amber-600 bg-amber-500/10 border-amber-500/20 dark:bg-amber-500/15 dark:text-amber-450 dark:border-amber-500/20' },
+    { title: 'New Client', href: `/${workspaceSlug}/clients?add=true`, desc: 'Add client contact card', icon: 'clients', color: 'text-blue-600 bg-blue-500/10 border-blue-500/20 dark:bg-blue-500/15 dark:text-blue-400 dark:border-blue-500/20' },
+    { title: 'New Proposal', href: `/${workspaceSlug}/proposals/new`, desc: 'Draft freelancer pitch', icon: 'proposals', color: 'text-violet-600 bg-violet-500/10 border-violet-500/20 dark:bg-violet-500/15 dark:text-violet-400 dark:border-violet-500/20' },
+    { title: 'New Project', href: `/${workspaceSlug}/projects/new`, desc: 'Launch project dashboard', icon: 'projects', color: 'text-emerald-600 bg-emerald-500/10 border-emerald-500/20 dark:bg-emerald-500/15 dark:text-emerald-450 dark:border-emerald-500/20' },
+    { title: 'New Invoice', href: `/${workspaceSlug}/invoices?create=true`, desc: 'Generate billing statement', icon: 'invoices', color: 'text-amber-600 bg-amber-500/10 border-amber-500/20 dark:bg-amber-500/15 dark:text-amber-450 dark:border-amber-500/20' },
   ];
 
   const targetHours = 40;

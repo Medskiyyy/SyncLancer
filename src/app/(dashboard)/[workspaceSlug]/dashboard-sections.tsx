@@ -5,8 +5,22 @@ import { StaggerContainer, StaggerItem, AnimatedNumber, FadeIn } from '@/compone
 import { Card } from '@/components/ui/card';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
-import { TrendUp, Sparkle, Clock, CheckSquare, Calendar } from '@phosphor-icons/react';
+import { TrendUp, Sparkle, Clock, CheckSquare, Calendar, CurrencyDollar, Folder, Users, Receipt, FileText } from '@phosphor-icons/react';
 import { format } from 'date-fns';
+
+const KPI_ICONS = {
+  revenue: CurrencyDollar,
+  projects: Folder,
+  clients: Users,
+  invoices: Receipt,
+};
+
+const ACTION_ICONS = {
+  clients: Users,
+  proposals: FileText,
+  projects: Folder,
+  invoices: Receipt,
+};
 
 interface AnimatedGreetingProps {
   userName: string;
@@ -47,7 +61,7 @@ interface AnimatedKPIGridProps {
     title: string;
     value: number;
     description: string;
-    icon: any;
+    icon: string;
     trendUp?: boolean;
     prefix?: string;
   }>;
@@ -65,7 +79,7 @@ export function AnimatedKPIGrid({ kpis }: AnimatedKPIGridProps) {
   return (
     <StaggerContainer className="grid gap-6 md:grid-cols-2 lg:grid-cols-4" staggerChildren={0.06} delayChildren={0.1}>
       {kpis.map((kpi, idx) => {
-        const Icon = kpi.icon;
+        const Icon = KPI_ICONS[kpi.icon as keyof typeof KPI_ICONS] || Folder;
         return (
           <StaggerItem key={kpi.title}>
             <Card 
@@ -93,7 +107,7 @@ export function AnimatedKPIGrid({ kpis }: AnimatedKPIGridProps) {
                 </span>
                 {kpi.title !== 'Pending Invoices' && (
                   <div className="flex items-center gap-1">
-                    <TrendUp className={cn("h-4 w-4", kpi.trendUp ? 'text-emerald-500' : 'text-zinc-450 rotate-180')} />
+                    <TrendUp className={cn("h-4 w-4", kpi.trendUp ? 'text-emerald-500' : 'text-zinc-455 rotate-180')} />
                     <span className="text-[10px] font-medium text-zinc-500">{kpi.description.split(' ')[0]}</span>
                   </div>
                 )}
@@ -111,7 +125,7 @@ interface AnimatedQuickActionsProps {
     title: string;
     href: string;
     desc: string;
-    icon: any;
+    icon: string;
     color: string;
   }>;
 }
@@ -120,7 +134,7 @@ export function AnimatedQuickActions({ quickActions, workspaceSlug }: AnimatedQu
   return (
     <StaggerContainer className="grid gap-6 md:grid-cols-2 lg:grid-cols-4" staggerChildren={0.04} delayChildren={0.25}>
       {quickActions.map((action) => {
-        const Icon = action.icon;
+        const Icon = ACTION_ICONS[action.icon as keyof typeof ACTION_ICONS] || Folder;
         return (
           <StaggerItem key={action.title}>
             <Link href={action.href} className="w-full">

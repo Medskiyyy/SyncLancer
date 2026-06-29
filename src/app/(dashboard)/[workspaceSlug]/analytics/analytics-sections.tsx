@@ -4,13 +4,21 @@ import * as React from 'react';
 import { StaggerContainer, StaggerItem, AnimatedNumber, FadeIn } from '@/components/ui/motion';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
+import { DollarSign, FolderKanban, Users, Receipt } from 'lucide-react';
+
+const ANALYTICS_ICONS = {
+  revenue: DollarSign,
+  invoices: Receipt,
+  projects: FolderKanban,
+  clients: Users,
+};
 
 interface AnimatedAnalyticsGridProps {
   metrics: Array<{
     title: string;
     value: number;
     description: string;
-    icon: any;
+    icon: string;
     prefix?: string;
   }>;
 }
@@ -26,7 +34,7 @@ export function AnimatedAnalyticsGrid({ metrics }: AnimatedAnalyticsGridProps) {
   return (
     <StaggerContainer className="grid gap-6 md:grid-cols-2 lg:grid-cols-4" staggerChildren={0.06} delayChildren={0.05}>
       {metrics.map((kpi, idx) => {
-        const Icon = kpi.icon;
+        const Icon = ANALYTICS_ICONS[kpi.icon as keyof typeof ANALYTICS_ICONS] || DollarSign;
         return (
           <StaggerItem key={kpi.title}>
             <Card 
