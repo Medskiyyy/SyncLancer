@@ -3,6 +3,7 @@
 import * as React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { motion } from 'framer-motion';
 import { Workspace } from '@prisma/client';
 import {
   SquaresFour,
@@ -127,12 +128,19 @@ export function SidebarNav({
                 className={cn(
                   "relative flex h-10 items-center gap-3 rounded-lg px-3 text-sm font-medium transition-all duration-200 cursor-pointer outline-none",
                   active
-                    ? "bg-primary/10 text-primary dark:bg-primary/15 font-semibold"
+                    ? "text-primary font-semibold"
                     : "text-zinc-600 hover:bg-zinc-100/70 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-900/50 dark:hover:text-zinc-100"
                 )}
               >
-                <Icon weight={active ? "fill" : "regular"} className={cn("h-5 w-5 shrink-0 transition-transform duration-200", active ? "text-primary" : "text-zinc-400 dark:text-zinc-500")} />
-                <span>{item.name}</span>
+                {active && (
+                  <motion.div
+                    layoutId="sidebar-indicator"
+                    className="absolute inset-0 rounded-lg bg-primary/8 dark:bg-primary/10 border-l-[3px] border-primary"
+                    transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                  />
+                )}
+                <Icon weight={active ? "fill" : "regular"} className={cn("h-5 w-5 shrink-0 transition-transform duration-200 relative z-10", active ? "text-primary" : "text-zinc-400 dark:text-zinc-500")} />
+                <span className="relative z-10">{item.name}</span>
               </Link>
             );
           })}
@@ -158,12 +166,19 @@ export function SidebarNav({
                     className={cn(
                       "relative flex h-10 items-center gap-3 rounded-lg px-3 text-sm font-medium transition-all duration-200 cursor-pointer outline-none",
                       active
-                        ? "bg-primary/10 text-primary dark:bg-primary/15 font-semibold"
+                        ? "text-primary font-semibold"
                         : "text-zinc-650 hover:bg-zinc-100/70 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-900/50 dark:hover:text-zinc-100"
                     )}
                   >
-                    <Icon weight={active ? "fill" : "regular"} className={cn("h-5 w-5 shrink-0 transition-transform duration-200", active ? "text-primary" : "text-zinc-450 dark:text-zinc-500")} />
-                    <span>{item.name}</span>
+                    {active && (
+                      <motion.div
+                        layoutId="sidebar-indicator"
+                        className="absolute inset-0 rounded-lg bg-primary/8 dark:bg-primary/10 border-l-[3px] border-primary"
+                        transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                      />
+                    )}
+                    <Icon weight={active ? "fill" : "regular"} className={cn("h-5 w-5 shrink-0 transition-transform duration-200 relative z-10", active ? "text-primary" : "text-zinc-450 dark:text-zinc-500")} />
+                    <span className="relative z-10">{item.name}</span>
                   </Link>
                 );
               })}
@@ -195,8 +210,8 @@ export function SidebarNav({
       {/* User profile & Logout */}
       <div className="border-t border-zinc-200/60 dark:border-zinc-800/60 p-4">
         <div className="flex items-center gap-3 px-2 py-2 mb-3">
-          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-zinc-150 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
-            <UserIcon className="h-4 w-4" />
+          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary border border-primary/20 text-xs font-bold font-heading">
+            {userName ? userName.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase() : 'U'}
           </div>
           <div className="flex flex-col overflow-hidden text-xs">
             <span className="font-semibold truncate text-zinc-900 dark:text-zinc-50">
@@ -243,8 +258,8 @@ export function SidebarNav({
 
       {/* Main Content Area Wrapper - 272px offset for floating sidebar */}
       <div className="flex flex-1 flex-col md:pl-[272px] min-h-screen">
-        {/* Top Header - exactly 64px height (h-16) */}
-        <header className="sticky top-0 z-10 flex h-16 border-b border-border/40 bg-background/60 backdrop-blur-md px-6 items-center justify-between w-full">
+        {/* Top Header - exactly 64px height (h-16) with subtle bottom glow */}
+        <header className="sticky top-0 z-10 flex h-16 border-b border-border/40 bg-background/60 backdrop-blur-md px-6 items-center justify-between w-full after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[1px] after:bg-gradient-to-r after:from-transparent after:via-primary/5 after:to-transparent">
           <div className="flex flex-1 items-center justify-between">
             {/* Left section: Hamburger (mobile) + Page Title */}
             <div className="flex items-center gap-3">

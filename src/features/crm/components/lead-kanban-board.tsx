@@ -41,6 +41,7 @@ import { createLeadSchema, CreateLeadInput } from '../schemas/lead';
 import { toast } from 'sonner';
 import { Plus, Edit2, Trash2, ArrowRightLeft, User, Phone, Briefcase, Mail, GripVertical, Sparkles, Filter, Search } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { FadeIn } from '@/components/ui/motion';
 
 interface LeadKanbanBoardProps {
   initialLeads: Lead[];
@@ -49,11 +50,11 @@ interface LeadKanbanBoardProps {
 
 const COLUMNS = [
   { label: 'Lead', status: LeadStatus.NEW, theme: 'border-zinc-200/60 dark:border-zinc-800/60 bg-zinc-50/40 dark:bg-zinc-900/10' },
-  { label: 'Contacted', status: LeadStatus.CONTACTED, theme: 'border-blue-200/50 dark:border-blue-900/30 bg-blue-50/20 dark:bg-blue-900/5' },
-  { label: 'Proposal Sent', status: LeadStatus.PROPOSAL_SENT, theme: 'border-violet-200/50 dark:border-violet-900/30 bg-violet-50/20 dark:bg-violet-900/5' },
-  { label: 'Negotiation', status: LeadStatus.NEGOTIATION, theme: 'border-amber-200/50 dark:border-amber-900/30 bg-amber-50/20 dark:bg-amber-900/5' },
-  { label: 'Won', status: LeadStatus.WON, theme: 'border-green-200/50 dark:border-green-900/30 bg-green-50/20 dark:bg-green-900/5' },
-  { label: 'Lost', status: LeadStatus.LOST, theme: 'border-red-200/50 dark:border-red-900/30 bg-red-50/20 dark:bg-red-900/5' },
+  { label: 'Contacted', status: LeadStatus.CONTACTED, theme: 'border-blue-200/40 dark:border-blue-900/10 bg-blue-500/3 dark:bg-blue-950/5' },
+  { label: 'Proposal Sent', status: LeadStatus.PROPOSAL_SENT, theme: 'border-violet-200/40 dark:border-violet-900/10 bg-violet-500/3 dark:bg-violet-955/5' },
+  { label: 'Negotiation', status: LeadStatus.NEGOTIATION, theme: 'border-amber-200/40 dark:border-amber-900/10 bg-amber-500/3 dark:bg-amber-955/5' },
+  { label: 'Won', status: LeadStatus.WON, theme: 'border-green-200/40 dark:border-green-900/10 bg-green-500/3 dark:bg-green-955/5' },
+  { label: 'Lost', status: LeadStatus.LOST, theme: 'border-red-200/40 dark:border-red-900/10 bg-red-500/3 dark:bg-red-955/5' },
 ];
 
 // Droppable Column Component
@@ -99,8 +100,8 @@ function KanbanCard({ lead, onEdit, onDelete, onConvert }: any) {
       ref={setNodeRef}
       style={style}
       className={cn(
-        "group relative rounded-lg border border-zinc-200/60 bg-white p-3.5 shadow-xs hover:shadow-sm dark:border-zinc-800/80 dark:bg-zinc-900/90 transition-all",
-        isDragging ? "cursor-grabbing shadow-lg scale-[1.02] border-primary/30" : "cursor-grab"
+        "group relative rounded-xl border border-zinc-200/60 bg-white p-3.5 shadow-xs hover-lift dark:border-zinc-850 dark:bg-zinc-900/60 transition-all",
+        isDragging ? "cursor-grabbing shadow-premium-lg scale-[1.02] border-primary/30" : "cursor-grab"
       )}
     >
       <div className="space-y-3">
@@ -355,32 +356,34 @@ export function LeadKanbanBoard({ initialLeads, workspaceId }: LeadKanbanBoardPr
   if (!isMounted) return null;
 
   return (
-    <div className="space-y-6 animate-in fade-in-50 duration-300">
-      {/* Board Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-zinc-200/60 dark:border-zinc-800/80 pb-5">
-        <div>
-          <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight text-zinc-900 dark:text-zinc-50">CRM Leads</h1>
-          <p className="text-sm text-zinc-500 dark:text-zinc-400">Track and manage your client pipeline stages interactively.</p>
-        </div>
-        
-        <div className="flex items-center gap-3">
-          {/* Search bar inside header */}
-          <div className="relative">
-            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-zinc-400" />
-            <input
-              type="text"
-              placeholder="Search leads..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="h-9 w-48 sm:w-56 rounded-lg border border-zinc-200 bg-white pl-8 pr-3 text-xs outline-none focus:border-primary dark:border-zinc-800 dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100"
-            />
+    <div className="space-y-6">
+      {/* Board Header with Animation */}
+      <FadeIn direction="up" delay={0.02} duration={0.35}>
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-zinc-200/60 dark:border-zinc-800/80 pb-5">
+          <div>
+            <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight text-zinc-900 dark:text-zinc-50 font-heading">CRM Leads</h1>
+            <p className="text-sm text-zinc-500 dark:text-zinc-400">Track and manage your client pipeline stages interactively.</p>
           </div>
+          
+          <div className="flex items-center gap-3">
+            {/* Search bar inside header */}
+            <div className="relative">
+              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-zinc-400" />
+              <input
+                type="text"
+                placeholder="Search leads..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="h-9 w-48 sm:w-56 rounded-lg border border-zinc-200 bg-white pl-8 pr-3 text-xs outline-none focus:border-primary dark:border-zinc-800 dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100"
+              />
+            </div>
 
-          <Button onClick={() => setIsAddOpen(true)} className="cursor-pointer font-semibold text-xs h-9">
-            <Plus className="mr-1.5 h-4 w-4" /> Add Lead
-          </Button>
+            <Button onClick={() => setIsAddOpen(true)} className="cursor-pointer font-semibold text-xs h-9">
+              <Plus className="mr-1.5 h-4 w-4" /> Add Lead
+            </Button>
+          </div>
         </div>
-      </div>
+      </FadeIn>
 
       {/* Kanban Pipeline */}
       <DndContext sensors={sensors} collisionDetection={closestCorners} onDragEnd={onDragEnd}>

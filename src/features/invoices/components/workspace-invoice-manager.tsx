@@ -24,6 +24,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
+import { FadeIn } from '@/components/ui/motion';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import {
@@ -91,11 +92,11 @@ interface BuilderItem {
 }
 
 const STATUS_COLORS: Record<string, string> = {
-  DRAFT: 'bg-slate-100 text-slate-655 border-slate-200 shadow-none',
-  SENT: 'bg-blue-50 text-blue-700 border-blue-150 shadow-none',
-  PAID: 'bg-emerald-50 text-emerald-700 border-emerald-150 shadow-none',
-  OVERDUE: 'bg-rose-50 text-rose-700 border-rose-150 shadow-none',
-  CANCELLED: 'bg-slate-105 text-slate-500 border-slate-200 shadow-none',
+  DRAFT: 'bg-zinc-100/80 text-zinc-650 border-zinc-200/50 dark:bg-zinc-800/40 dark:text-zinc-400 dark:border-zinc-800 shadow-none',
+  SENT: 'bg-blue-500/10 text-blue-600 dark:text-blue-450 border-blue-500/20 shadow-none',
+  PAID: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-450 border-emerald-500/20 shadow-none',
+  OVERDUE: 'bg-red-500/10 text-red-600 dark:text-red-450 border-red-500/20 shadow-none',
+  CANCELLED: 'bg-zinc-200/50 text-zinc-500 border-zinc-200 shadow-none dark:bg-zinc-800/20 dark:text-zinc-550 dark:border-zinc-800',
 };
 
 export function WorkspaceInvoiceManager({ 
@@ -298,66 +299,66 @@ export function WorkspaceInvoiceManager({
   const draftInvoices = invoices.filter(inv => inv.status === 'DRAFT').reduce((sum, inv) => sum + inv.totalAmount, 0);
 
   return (
-    <div className="space-y-6">
+    <FadeIn direction="up" delay={0.02} duration={0.35} className="space-y-6">
       {/* KPI Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <Card className="bg-white border-slate-200 p-5 h-[120px] flex flex-col justify-between shadow-sm rounded-xl">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+        <Card variant="elevated" className="bg-white dark:bg-zinc-900/40 border-zinc-200/60 dark:border-zinc-800/60 border-l-[3px] border-l-zinc-500/70 p-5 h-[120px] flex flex-col justify-between shadow-xs rounded-2xl">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-slate-505 uppercase tracking-wider">Total Invoiced</span>
-            <div className="p-1.5 bg-slate-50 rounded-lg border border-slate-100">
-              <Receipt className="h-4 w-4 text-slate-450" />
+            <span className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Total Invoiced</span>
+            <div className="p-1.5 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/50 dark:border-zinc-850 rounded-lg">
+              <Receipt className="h-4 w-4 text-zinc-500" />
             </div>
           </div>
           <div className="flex flex-col">
-            <span className="text-2xl font-bold tracking-tight text-slate-900 font-mono">
+            <span className="text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50 font-mono">
               {formatCurrency(totalInvoiced, 'USD')}
             </span>
-            <span className="text-[10px] text-slate-450 mt-0.5">Cumulative billing volume</span>
+            <span className="text-[10px] text-zinc-450 dark:text-zinc-500 mt-0.5">Cumulative billing volume</span>
           </div>
         </Card>
 
-        <Card className="bg-white border-slate-200 p-5 h-[120px] flex flex-col justify-between shadow-sm rounded-xl">
+        <Card variant="elevated" className="bg-white dark:bg-zinc-900/40 border-zinc-200/60 dark:border-zinc-800/60 border-l-[3px] border-l-emerald-500/70 p-5 h-[120px] flex flex-col justify-between shadow-xs rounded-2xl">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-slate-505 uppercase tracking-wider">Paid Amount</span>
-            <div className="p-1.5 bg-emerald-50 rounded-lg border border-emerald-100">
-              <CheckCircle className="h-4 w-4 text-emerald-600" />
+            <span className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Paid Amount</span>
+            <div className="p-1.5 bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-100 dark:border-emerald-900/20 rounded-lg">
+              <CheckCircle className="h-4 w-4 text-emerald-500" />
             </div>
           </div>
           <div className="flex flex-col">
-            <span className="text-2xl font-bold tracking-tight text-slate-900 font-mono">
+            <span className="text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50 font-mono">
               {formatCurrency(paidInvoices, 'USD')}
             </span>
-            <span className="text-[10px] text-emerald-600 mt-0.5">Received payments</span>
+            <span className="text-[10px] text-emerald-500 mt-0.5">Received payments</span>
           </div>
         </Card>
 
-        <Card className="bg-white border-slate-200 p-5 h-[120px] flex flex-col justify-between shadow-sm rounded-xl">
+        <Card variant="elevated" className="bg-white dark:bg-zinc-900/40 border-zinc-200/60 dark:border-zinc-800/60 border-l-[3px] border-l-amber-500/70 p-5 h-[120px] flex flex-col justify-between shadow-xs rounded-2xl">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-slate-505 uppercase tracking-wider">Outstanding</span>
-            <div className="p-1.5 bg-amber-50 rounded-lg border border-amber-100">
-              <AlertCircle className="h-4 w-4 text-amber-600" />
+            <span className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Outstanding</span>
+            <div className="p-1.5 bg-amber-50 dark:bg-amber-955/20 border border-amber-100 dark:border-amber-900/20 rounded-lg">
+              <AlertCircle className="h-4 w-4 text-amber-500" />
             </div>
           </div>
           <div className="flex flex-col">
-            <span className="text-2xl font-bold tracking-tight text-slate-900 font-mono">
+            <span className="text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50 font-mono">
               {formatCurrency(outstandingInvoices, 'USD')}
             </span>
-            <span className="text-[10px] text-amber-600 mt-0.5">Awaiting settlement</span>
+            <span className="text-[10px] text-amber-500 mt-0.5">Awaiting settlement</span>
           </div>
         </Card>
 
-        <Card className="bg-white border-slate-200 p-5 h-[120px] flex flex-col justify-between shadow-sm rounded-xl">
+        <Card variant="elevated" className="bg-white dark:bg-zinc-900/40 border-zinc-200/60 dark:border-zinc-800/60 border-l-[3px] border-l-blue-500/70 p-5 h-[120px] flex flex-col justify-between shadow-xs rounded-2xl">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-slate-550 uppercase tracking-wider">Drafts</span>
-            <div className="p-1.5 bg-blue-50 rounded-lg border border-blue-100">
-              <FileText className="h-4 w-4 text-blue-600" />
+            <span className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Drafts</span>
+            <div className="p-1.5 bg-blue-50 dark:bg-blue-955/20 border border-blue-100 dark:border-blue-900/20 rounded-lg">
+              <FileText className="h-4 w-4 text-blue-500" />
             </div>
           </div>
           <div className="flex flex-col">
-            <span className="text-2xl font-bold tracking-tight text-slate-900 font-mono">
+            <span className="text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50 font-mono">
               {formatCurrency(draftInvoices, 'USD')}
             </span>
-            <span className="text-[10px] text-blue-600 mt-0.5">Unsent invoices</span>
+            <span className="text-[10px] text-blue-500 mt-0.5">Unsent invoices</span>
           </div>
         </Card>
       </div>
@@ -367,20 +368,20 @@ export function WorkspaceInvoiceManager({
         {/* Filters */}
         <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto">
           <div className="relative flex-1 sm:flex-initial min-w-[240px]">
-            <Search className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
+            <Search className="absolute left-3 top-3 h-4 w-4 text-zinc-400" />
             <Input 
               type="text" 
               placeholder="Search invoices..." 
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-9 h-10 text-sm border-slate-250 bg-white"
+              className="pl-9 h-10 text-sm border-border/60 bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-150"
             />
           </div>
           
           <Select value={statusFilter} onValueChange={(val) => setStatusFilter(val || 'ALL')}>
-            <SelectTrigger className="w-[150px] h-10 text-sm border-slate-255 bg-white">
+            <SelectTrigger className="w-[150px] h-10 text-sm border-border/60 bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100">
               <div className="flex items-center gap-2">
-                <Filter className="h-4 w-4 text-slate-400" />
+                <Filter className="h-4 w-4 text-zinc-400" />
                 <SelectValue placeholder="All Status" />
               </div>
             </SelectTrigger>
@@ -398,22 +399,23 @@ export function WorkspaceInvoiceManager({
         {/* Action buttons */}
         <Button 
           onClick={() => setIsCreateOpen(true)}
-          className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-4 h-10 font-medium text-sm flex items-center gap-2 shadow-sm"
+          variant="default"
+          className="w-full sm:w-auto h-10 px-4 font-semibold text-sm flex items-center gap-2 shadow-xs cursor-pointer"
         >
           <Plus className="h-4 w-4" /> Create Invoice
         </Button>
       </div>
 
       {/* Invoices List Card */}
-      <Card className="border-slate-200 bg-white rounded-xl shadow-sm overflow-hidden">
+      <Card variant="elevated" className="border-zinc-200/60 dark:border-zinc-800/60 bg-white dark:bg-zinc-900/40 rounded-2xl shadow-xs overflow-hidden backdrop-blur-md">
         <CardContent className="p-0">
           {filteredInvoices.length === 0 ? (
-            <div className="text-center py-16 text-slate-400 text-sm flex flex-col items-center justify-center">
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-slate-50 text-slate-450 mb-4 border border-slate-100">
-                <Receipt className="h-6 w-6 text-slate-550" />
+            <div className="text-center py-16 text-zinc-450 dark:text-zinc-500 text-sm flex flex-col items-center justify-center">
+              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-zinc-50 dark:bg-zinc-900 text-zinc-450 mb-4 border border-border/60">
+                <Receipt className="h-6 w-6 text-primary" />
               </div>
-              <CardTitle className="text-base font-bold text-slate-900">No invoices found</CardTitle>
-              <CardDescription className="max-w-sm mt-2 text-sm text-slate-500">
+              <CardTitle className="text-base font-bold text-zinc-900 dark:text-zinc-50 font-heading">No invoices found</CardTitle>
+              <CardDescription className="max-w-sm mt-2 text-sm text-zinc-500 dark:text-zinc-400">
                 {searchTerm || statusFilter !== 'ALL'
                   ? 'Try adjusting your search query or status filter.'
                   : 'Generate billing drafts and send payment invoices to your clients.'}
@@ -423,7 +425,7 @@ export function WorkspaceInvoiceManager({
             <div className="overflow-x-auto">
               <table className="w-full border-collapse text-left text-sm">
                 <thead>
-                  <tr className="border-b border-slate-200 text-xs font-semibold text-slate-500 bg-slate-50/50 h-[48px]">
+                  <tr className="border-b border-border/40 text-xs font-semibold text-zinc-500 dark:text-zinc-400 bg-zinc-50/30 dark:bg-zinc-950/20 h-[48px]">
                     <th className="px-6 align-middle font-medium">Invoice No</th>
                     <th className="px-6 align-middle font-medium">Client</th>
                     <th className="px-6 align-middle font-medium">Project</th>
@@ -433,19 +435,19 @@ export function WorkspaceInvoiceManager({
                     <th className="px-6 align-middle font-medium text-right">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100 bg-white">
+                <tbody className="divide-y divide-border/40 bg-transparent">
                   {filteredInvoices.map((invoice) => (
-                    <tr key={invoice.id} className="hover:bg-slate-50/50 transition-colors h-[60px]">
-                      <td className="px-6 align-middle font-semibold text-slate-900">
+                    <tr key={invoice.id} className="hover:bg-zinc-50/50 dark:hover:bg-zinc-900/20 transition-colors h-[60px]">
+                      <td className="px-6 align-middle font-semibold text-zinc-900 dark:text-zinc-550">
                         {invoice.invoiceNumber}
                       </td>
-                      <td className="px-6 align-middle font-medium text-slate-750">
+                      <td className="px-6 align-middle font-semibold text-zinc-800 dark:text-zinc-350">
                         {invoice.client.companyName}
                       </td>
-                      <td className="px-6 align-middle text-slate-600 font-medium">
-                        {invoice.project?.name || <span className="text-xs text-slate-400">General Billing</span>}
+                      <td className="px-6 align-middle text-zinc-650 dark:text-zinc-400 font-medium">
+                        {invoice.project?.name || <span className="text-xs text-zinc-500 dark:text-zinc-550">General Billing</span>}
                       </td>
-                      <td className="px-6 align-middle text-slate-505 text-xs">
+                      <td className="px-6 align-middle text-zinc-500 dark:text-zinc-450 text-xs">
                         {new Date(invoice.dueDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                       </td>
                       <td className="px-6 align-middle">
