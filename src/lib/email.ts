@@ -1,6 +1,6 @@
 export async function sendEmail({ to, subject, html }: { to: string; subject: string; html: string }) {
   const apiKey = process.env.RESEND_API_KEY;
-  const from = process.env.EMAIL_FROM || 'SyncLancer <onboarding@resend.dev>';
+  const from = process.env.EMAIL_FROM || 'SyncLancer <noreply@mail.synclancer.web.id>';
 
   if (!apiKey || apiKey.startsWith('re_your') || apiKey === 'your-api-key') {
     console.log('-----------------------------------------');
