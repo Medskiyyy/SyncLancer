@@ -62,23 +62,23 @@ function LoginForm() {
   };
 
   return (
-    <Card className="w-full max-w-md shadow-lg">
-      <CardHeader className="space-y-1 text-center">
-        <CardTitle className="text-2xl font-bold tracking-tight">Sign in to SyncLancer</CardTitle>
+    <Card className="w-full max-w-md glass-card shadow-lg relative border-none">
+      <CardHeader className="space-y-1.5 text-center">
+        <CardTitle className="text-2xl font-bold tracking-tight font-heading">Sign in to SyncLancer</CardTitle>
         <CardDescription>
           Enter your email and password to access your dashboard
         </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-5">
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             {error && (
-              <div className="rounded-md bg-destructive/15 p-3 text-sm text-destructive">
+              <div className="rounded-lg bg-destructive/10 border border-destructive/20 p-3 text-sm text-destructive font-medium">
                 {error}
               </div>
             )}
             {success && (
-              <div className="rounded-md bg-green-500/15 p-3 text-sm text-green-600 dark:text-green-400">
+              <div className="rounded-lg bg-green-500/10 border border-green-500/20 p-3 text-sm text-green-600 dark:text-green-400 font-medium">
                 {success}
               </div>
             )}
@@ -106,7 +106,7 @@ function LoginForm() {
                     <FormLabel>Password</FormLabel>
                     <Link
                       href="/forgot-password"
-                      className="text-xs text-primary hover:underline"
+                      className="text-xs text-primary hover:underline font-semibold"
                     >
                       Forgot password?
                     </Link>
@@ -119,18 +119,18 @@ function LoginForm() {
               )}
             />
 
-            <Button type="submit" className="w-full" disabled={isLoading}>
+            <Button type="submit" className="w-full mt-2" disabled={isLoading}>
               {isLoading ? 'Signing in...' : 'Sign In'}
             </Button>
           </form>
         </Form>
 
-        <div className="relative">
+        <div className="relative py-2">
           <div className="absolute inset-0 flex items-center">
-            <span className="w-full border-t border-zinc-200 dark:border-zinc-800" />
+            <span className="w-full border-t border-border/60" />
           </div>
           <div className="relative flex justify-center text-xs uppercase">
-            <span className="bg-white px-2 text-muted-foreground dark:bg-zinc-900">
+            <span className="bg-[#fcfbf9] px-3 text-muted-foreground dark:bg-[#12100e] rounded-md border border-border/40">
               Or continue with
             </span>
           </div>
@@ -154,9 +154,9 @@ function LoginForm() {
           </Button>
         </div>
       </CardContent>
-      <CardFooter className="flex flex-wrap items-center justify-center gap-1 text-center text-sm text-muted-foreground">
+      <CardFooter className="flex flex-wrap items-center justify-center gap-1 text-center text-sm text-muted-foreground border-t border-border/40 mt-4 pt-4">
         Don&apos;t have an account?{' '}
-        <Link href="/register" className="font-medium text-primary hover:underline">
+        <Link href="/register" className="font-semibold text-primary hover:underline">
           Sign up
         </Link>
       </CardFooter>
@@ -166,11 +166,14 @@ function LoginForm() {
 
 export default function LoginPage() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 p-4 dark:bg-zinc-950">
+    <div className="relative flex min-h-screen items-center justify-center bg-background p-4 overflow-hidden">
+      {/* Premium ambient Liquid Glass gold mesh glows */}
+      <div className="absolute -left-20 -top-20 h-96 w-96 rounded-full bg-primary/5 dark:bg-primary/10 blur-3xl pointer-events-none" />
+      <div className="absolute -right-20 -bottom-20 h-96 w-96 rounded-full bg-primary/5 dark:bg-primary/10 blur-3xl pointer-events-none" />
       <Suspense fallback={
-        <Card className="w-full max-w-md shadow-lg">
-          <CardHeader className="space-y-1 text-center">
-            <CardTitle className="text-2xl font-bold tracking-tight">Loading...</CardTitle>
+        <Card className="w-full max-w-md glass-card shadow-lg relative border-none">
+          <CardHeader className="space-y-1.5 text-center">
+            <CardTitle className="text-2xl font-bold tracking-tight font-heading">Loading...</CardTitle>
           </CardHeader>
         </Card>
       }>

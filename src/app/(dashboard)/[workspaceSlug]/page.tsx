@@ -6,18 +6,18 @@ import { ProjectStatusChart } from '@/features/analytics/components/project-stat
 import { WorkspaceService } from '@/features/workspace/services/workspace-service';
 import { AnalyticsService } from '@/features/analytics/services/analytics-service';
 import { 
-  DollarSign, 
-  FolderKanban, 
+  CurrencyDollar, 
+  Folder, 
   Users, 
   Receipt, 
   Calendar, 
   Clock, 
   CheckSquare,
   FileText,
-  Workflow,
-  Sparkles,
-  TrendingUp,
-} from 'lucide-react';
+  GitBranch, 
+  Sparkle,
+  TrendUp,
+} from '@phosphor-icons/react/dist/ssr';
 import Link from 'next/link';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
@@ -57,14 +57,14 @@ export default async function WorkspaceDashboardPage({ params }: PageProps) {
       title: 'Revenue', 
       value: formatCurrency(data.totalRevenue), 
       description: `${data.revenueChangePercent >= 0 ? '+' : ''}${data.revenueChangePercent}% from last month`, 
-      icon: DollarSign,
+      icon: CurrencyDollar,
       trendUp: data.revenueChangePercent >= 0,
     },
     { 
       title: 'Active Projects', 
       value: String(data.activeProjectsCount), 
       description: `${data.projectsChangeCount >= 0 ? '+' : ''}${data.projectsChangeCount} since last month`, 
-      icon: FolderKanban,
+      icon: Folder,
       trendUp: data.projectsChangeCount >= 0,
     },
     { 
@@ -84,10 +84,10 @@ export default async function WorkspaceDashboardPage({ params }: PageProps) {
   ];
 
   const quickActions = [
-    { title: 'New Client', href: `/${workspaceSlug}/clients?add=true`, desc: 'Add client contact card', icon: Users, color: 'text-blue-600 bg-blue-50 border-blue-100 dark:bg-blue-950/20 dark:text-blue-400 dark:border-blue-900/30' },
-    { title: 'New Proposal', href: `/${workspaceSlug}/proposals/new`, desc: 'Draft freelancer pitch', icon: FileText, color: 'text-cyan-600 bg-cyan-50 border-cyan-100 dark:bg-cyan-950/20 dark:text-cyan-400 dark:border-cyan-900/30' },
-    { title: 'New Project', href: `/${workspaceSlug}/projects/new`, desc: 'Launch project dashboard', icon: FolderKanban, color: 'text-indigo-600 bg-indigo-50 border-indigo-100 dark:bg-indigo-950/20 dark:text-indigo-400 dark:border-indigo-900/30' },
-    { title: 'New Invoice', href: `/${workspaceSlug}/invoices?create=true`, desc: 'Generate billing statement', icon: Receipt, color: 'text-emerald-600 bg-emerald-50 border-emerald-100 dark:bg-emerald-950/20 dark:text-emerald-400 dark:border-emerald-900/30' },
+    { title: 'New Client', href: `/${workspaceSlug}/clients?add=true`, desc: 'Add client contact card', icon: Users, color: 'text-amber-600 bg-amber-500/10 border-amber-500/20 dark:bg-amber-500/15 dark:text-amber-400 dark:border-amber-500/20' },
+    { title: 'New Proposal', href: `/${workspaceSlug}/proposals/new`, desc: 'Draft freelancer pitch', icon: FileText, color: 'text-amber-600 bg-amber-500/10 border-amber-500/20 dark:bg-amber-500/15 dark:text-amber-400 dark:border-amber-500/20' },
+    { title: 'New Project', href: `/${workspaceSlug}/projects/new`, desc: 'Launch project dashboard', icon: Folder, color: 'text-amber-600 bg-amber-500/10 border-amber-500/20 dark:bg-amber-500/15 dark:text-amber-400 dark:border-amber-500/20' },
+    { title: 'New Invoice', href: `/${workspaceSlug}/invoices?create=true`, desc: 'Generate billing statement', icon: Receipt, color: 'text-amber-600 bg-amber-500/10 border-amber-500/20 dark:bg-amber-500/15 dark:text-amber-400 dark:border-amber-500/20' },
   ];
 
   const targetHours = 40;
@@ -96,23 +96,24 @@ export default async function WorkspaceDashboardPage({ params }: PageProps) {
   const activityIcons: Record<string, any> = {
     invoice: Receipt,
     proposal: FileText,
-    lead: Workflow,
+    lead: GitBranch,
     milestone: Calendar,
   };
 
   return (
     <div className="space-y-6">
       {/* Greeting Card - exactly 160px height, full width */}
-      <div className="relative overflow-hidden rounded-xl border border-zinc-200 bg-white px-6 py-5 h-40 flex items-center justify-between dark:border-zinc-800 dark:bg-zinc-900 shadow-sm w-full">
-        <div className="absolute right-0 top-0 h-40 w-40 translate-x-10 -translate-y-10 rounded-full bg-blue-500/5 blur-3xl" />
-        <div className="relative flex flex-col justify-center space-y-1">
+      <div className="relative overflow-hidden rounded-2xl border border-border/80 bg-white dark:bg-zinc-900 px-8 py-6 h-40 flex items-center justify-between shadow-xs w-full">
+        {/* Liquid Glass ambient mesh gold glow */}
+        <div className="absolute right-0 top-0 h-40 w-60 translate-x-10 -translate-y-5 rounded-full bg-primary/5 dark:bg-primary/10 blur-3xl pointer-events-none" />
+        <div className="relative flex flex-col justify-center space-y-1.5">
           <div className="flex items-center gap-2">
-            <span className="inline-flex items-center gap-1 rounded bg-blue-50 px-1.5 py-0.5 text-[10px] font-bold text-blue-600 border border-blue-100 dark:bg-zinc-800/40 dark:text-blue-400 dark:border-zinc-700">
-              <Sparkles className="h-3 w-3 shrink-0" />
+            <span className="inline-flex items-center gap-1 rounded bg-primary/10 px-2 py-0.5 text-[10px] font-semibold text-primary border border-primary/20">
+              <Sparkle className="h-3 w-3 shrink-0" weight="fill" />
               <span>Live Workspace</span>
             </span>
           </div>
-          <h1 className="text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-55">
+          <h1 className="text-2xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50 font-heading">
             Welcome back, {session.user.name?.split(' ')[0] || 'Freelancer'}
           </h1>
           <p className="text-sm text-zinc-500 dark:text-zinc-400 leading-normal">
@@ -131,14 +132,14 @@ export default async function WorkspaceDashboardPage({ params }: PageProps) {
           return (
             <Card 
               key={kpi.title} 
-              className="border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 rounded-2xl overflow-hidden hover:scale-102 transition-all duration-150 relative h-[120px] p-5 flex flex-col justify-between shadow-xs cursor-pointer"
+              className="hover-lift border-zinc-200/60 dark:border-zinc-800/60 bg-white dark:bg-zinc-900 rounded-2xl overflow-hidden relative h-[120px] p-5 flex flex-col justify-between shadow-xs cursor-pointer"
             >
               <div className="flex items-center justify-between">
                 <span className="text-xs font-semibold tracking-wider text-zinc-500 dark:text-zinc-400 uppercase">
                   {kpi.title}
                 </span>
                 <div className="p-1.5 rounded-lg bg-zinc-50 text-zinc-450 dark:bg-zinc-950 dark:text-zinc-500 border border-zinc-200/50 dark:border-zinc-800">
-                  <Icon className="h-4 w-4 shrink-0" />
+                  <Icon className="h-5 w-5 shrink-0" />
                 </div>
               </div>
               <div className="flex items-baseline justify-between mt-2">
@@ -147,7 +148,7 @@ export default async function WorkspaceDashboardPage({ params }: PageProps) {
                 </span>
                 {kpi.title !== 'Pending Invoices' && (
                   <div className="flex items-center gap-1">
-                    <TrendingUp className={`h-3 w-3 ${kpi.trendUp ? 'text-green-600' : 'text-zinc-450 rotate-180'}`} />
+                    <TrendUp className={`h-4 w-4 ${kpi.trendUp ? 'text-green-600' : 'text-zinc-450 rotate-180'}`} />
                     <span className="text-[10px] font-medium text-zinc-500">{kpi.description.split(' ')[0]}</span>
                   </div>
                 )}
@@ -163,15 +164,15 @@ export default async function WorkspaceDashboardPage({ params }: PageProps) {
           const Icon = action.icon;
           return (
             <Link key={action.title} href={action.href} className="w-full">
-              <div className="border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 rounded-xl p-4 h-[88px] flex items-center gap-4 hover:scale-102 transition-all duration-150 shadow-xs cursor-pointer w-full">
+              <div className="hover-lift border border-zinc-200/60 dark:border-zinc-800/60 bg-white dark:bg-zinc-900 rounded-2xl p-4 h-[88px] flex items-center gap-4 shadow-xs cursor-pointer w-full">
                 <div className={cn("p-2 rounded-lg border shrink-0", action.color)}>
                   <Icon className="h-5 w-5 shrink-0" />
                 </div>
                 <div className="flex flex-col min-w-0">
-                  <span className="text-sm font-bold text-zinc-905 dark:text-zinc-50 leading-tight">
+                  <span className="text-sm font-bold text-zinc-900 dark:text-zinc-50 leading-tight">
                     {action.title}
                   </span>
-                  <span className="text-xs text-zinc-400 truncate dark:text-zinc-550 mt-1 font-medium">
+                  <span className="text-xs text-zinc-400 truncate dark:text-zinc-500 mt-1 font-medium">
                     {action.desc}
                   </span>
                 </div>
@@ -183,11 +184,11 @@ export default async function WorkspaceDashboardPage({ params }: PageProps) {
 
       {/* Analytics Charts Grid */}
       <div className="grid gap-6 md:grid-cols-2">
-        {/* Revenue Trend Chart Card - padding 24px (p-6), radius 16px (rounded-2xl) */}
-        <Card className="border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 rounded-2xl overflow-hidden shadow-xs p-6 flex flex-col">
+        {/* Revenue Trend Chart Card */}
+        <Card className="border-zinc-200/60 dark:border-zinc-800/60 bg-white dark:bg-zinc-900 rounded-2xl overflow-hidden shadow-xs p-6 flex flex-col">
           <div className="border-b border-zinc-100 dark:border-zinc-800/60 pb-3 mb-5">
-            <h3 className="text-base font-bold text-zinc-900 dark:text-zinc-50 leading-tight">Revenue Over Time</h3>
-            <p className="text-zinc-550 dark:text-zinc-400 text-xs mt-0.5 leading-normal">Monthly rolling billing totals (last 12 months)</p>
+            <h3 className="text-base font-bold text-zinc-900 dark:text-zinc-50 leading-tight font-heading">Revenue Over Time</h3>
+            <p className="text-zinc-400 dark:text-zinc-500 text-xs mt-0.5 leading-normal">Monthly rolling billing totals (last 12 months)</p>
           </div>
           <div className="flex-1">
             <RevenueChart data={data.monthlyRevenueTrend} />
@@ -195,10 +196,10 @@ export default async function WorkspaceDashboardPage({ params }: PageProps) {
         </Card>
 
         {/* Project Statistics Chart Card */}
-        <Card className="border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 rounded-2xl overflow-hidden shadow-xs p-6 flex flex-col">
+        <Card className="border-zinc-200/60 dark:border-zinc-800/60 bg-white dark:bg-zinc-900 rounded-2xl overflow-hidden shadow-xs p-6 flex flex-col">
           <div className="border-b border-zinc-100 dark:border-zinc-800/60 pb-3 mb-5">
-            <h3 className="text-base font-bold text-zinc-900 dark:text-zinc-50 leading-tight">Projects by Status</h3>
-            <p className="text-zinc-550 dark:text-zinc-400 text-xs mt-0.5 leading-normal">Total projects count distribution across statuses</p>
+            <h3 className="text-base font-bold text-zinc-900 dark:text-zinc-50 leading-tight font-heading">Projects by Status</h3>
+            <p className="text-zinc-400 dark:text-zinc-500 text-xs mt-0.5 leading-normal">Total projects count distribution across statuses</p>
           </div>
           <div className="flex-1">
             <ProjectStatusChart data={data.projectStatusDistribution} />
@@ -209,15 +210,15 @@ export default async function WorkspaceDashboardPage({ params }: PageProps) {
       {/* Workload & Recent Activity */}
       <div className="grid gap-6 md:grid-cols-7">
         {/* Workload Card */}
-        <Card className="md:col-span-3 border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 rounded-2xl overflow-hidden shadow-xs p-6">
+        <Card className="md:col-span-3 border-zinc-200/60 dark:border-zinc-800/60 bg-white dark:bg-zinc-900 rounded-2xl overflow-hidden shadow-xs p-6">
           <div className="border-b border-zinc-100 dark:border-zinc-800/60 pb-3 mb-5">
-            <h3 className="text-base font-bold text-zinc-900 dark:text-zinc-50 leading-tight">Workload & Progress</h3>
-            <p className="text-zinc-550 dark:text-zinc-400 text-xs mt-0.5 leading-normal">Weekly tracked targets and upcoming tasks</p>
+            <h3 className="text-base font-bold text-zinc-900 dark:text-zinc-50 leading-tight font-heading">Workload & Progress</h3>
+            <p className="text-zinc-400 dark:text-zinc-500 text-xs mt-0.5 leading-normal">Weekly tracked targets and upcoming tasks</p>
           </div>
           <div className="space-y-5">
             <div className="flex items-center gap-3">
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-blue-600 border border-blue-100 dark:bg-zinc-800 dark:text-blue-400 dark:border-zinc-750">
-                <Clock className="h-4.5 w-4.5" />
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-amber-500/10 text-primary border border-primary/20 dark:bg-zinc-800">
+                <Clock className="h-5 w-5" />
               </div>
               <div className="flex-1 min-w-0">
                 <div className="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">Hours Logged</div>
@@ -226,7 +227,7 @@ export default async function WorkspaceDashboardPage({ params }: PageProps) {
                 </div>
                 <div className="mt-2 h-1.5 w-full rounded-full bg-zinc-100 dark:bg-zinc-800 overflow-hidden">
                   <div 
-                    className="h-full rounded-full bg-blue-600 animate-pulse-once" 
+                    className="h-full rounded-full bg-primary" 
                     style={{ width: `${loggedProgressPercent}%` }} 
                   />
                 </div>
@@ -234,8 +235,8 @@ export default async function WorkspaceDashboardPage({ params }: PageProps) {
             </div>
 
             <div className="flex items-center gap-3">
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-emerald-50 text-emerald-600 border border-emerald-100 dark:bg-zinc-800 dark:text-emerald-400 dark:border-zinc-750">
-                <CheckSquare className="h-4.5 w-4.5" />
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-emerald-500/10 text-emerald-600 border border-emerald-500/20 dark:bg-zinc-800 dark:text-emerald-450">
+                <CheckSquare className="h-5 w-5" />
               </div>
               <div className="flex-1 min-w-0">
                 <div className="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">Active Tasks</div>
@@ -247,8 +248,8 @@ export default async function WorkspaceDashboardPage({ params }: PageProps) {
             </div>
 
             <div className="flex items-center gap-3">
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-slate-100 text-slate-600 border border-slate-200 dark:bg-zinc-800 dark:text-slate-400 dark:border-zinc-750">
-                <Calendar className="h-4.5 w-4.5" />
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-stone-100 text-stone-600 border border-stone-200 dark:bg-zinc-800 dark:text-stone-400">
+                <Calendar className="h-5 w-5" />
               </div>
               <div className="flex-1 min-w-0">
                 <div className="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">Upcoming Milestone</div>
@@ -267,10 +268,10 @@ export default async function WorkspaceDashboardPage({ params }: PageProps) {
         </Card>
 
         {/* Recent Activity Card */}
-        <Card className="md:col-span-4 border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 rounded-2xl overflow-hidden shadow-xs p-6">
+        <Card className="md:col-span-4 border-zinc-200/60 dark:border-zinc-800/60 bg-white dark:bg-zinc-900 rounded-2xl overflow-hidden shadow-xs p-6">
           <div className="border-b border-zinc-100 dark:border-zinc-800/60 pb-3 mb-5">
-            <h3 className="text-base font-bold text-zinc-900 dark:text-zinc-50 leading-tight">Recent Activity</h3>
-            <p className="text-zinc-550 dark:text-zinc-400 text-xs mt-0.5 leading-normal">Recent events across CRM, Proposals, Invoices, and Milestones</p>
+            <h3 className="text-base font-bold text-zinc-900 dark:text-zinc-50 leading-tight font-heading">Recent Activity</h3>
+            <p className="text-zinc-400 dark:text-zinc-500 text-xs mt-0.5 leading-normal">Recent events across CRM, Proposals, Invoices, and Milestones</p>
           </div>
           <div>
             {data.recentActivities.length === 0 ? (
@@ -278,17 +279,17 @@ export default async function WorkspaceDashboardPage({ params }: PageProps) {
                 No recent activity logged in this workspace yet.
               </div>
             ) : (
-              <div className="relative border-l border-zinc-200 dark:border-zinc-800 pl-4 ml-2 space-y-6">
+              <div className="relative border-l border-zinc-200 dark:border-zinc-800/60 pl-4 ml-2 space-y-6">
                 {data.recentActivities.map((act, idx) => {
                   const Icon = activityIcons[act.type];
                   return (
                     <div key={idx} className="relative">
                       {/* Timeline dot with icon */}
-                      <span className="absolute -left-[27px] top-0.5 flex h-[20px] w-[20px] items-center justify-center rounded-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-xs text-zinc-400 dark:text-zinc-550">
-                        {Icon ? <Icon className="h-3 w-3 text-blue-600 dark:text-blue-400" /> : <Clock className="h-3 w-3" />}
+                      <span className="absolute -left-[27px] top-0.5 flex h-[20px] w-[20px] items-center justify-center rounded-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-xs text-zinc-400 dark:text-zinc-500">
+                        {Icon ? <Icon className="h-3.5 w-3.5 text-primary" /> : <Clock className="h-3.5 w-3.5" />}
                       </span>
                       <div className="text-xs font-semibold text-zinc-800 dark:text-zinc-200 leading-normal">{act.text}</div>
-                      <div className="text-[10px] text-zinc-400 dark:text-zinc-550 mt-0.5 font-semibold uppercase tracking-wider">{act.time}</div>
+                      <div className="text-[10px] text-zinc-400 dark:text-zinc-500 mt-0.5 font-semibold uppercase tracking-wider">{act.time}</div>
                     </div>
                   );
                 })}

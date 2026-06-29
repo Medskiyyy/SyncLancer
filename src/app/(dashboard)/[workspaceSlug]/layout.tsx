@@ -6,7 +6,7 @@ import { ClientPortalRedirect } from '@/components/client-portal-redirect';
 import { NotificationCenter } from '@/features/notifications/components/notification-center';
 import { PageTransitionProvider } from '@/app/providers/page-transition-provider';
 import { Button } from '@/components/ui/button';
-import { LogOut } from 'lucide-react';
+import { SignOut } from '@phosphor-icons/react/dist/ssr';
 
 const workspaceService = new WorkspaceService();
 
@@ -49,16 +49,16 @@ export default async function DashboardLayout({
         type="submit"
         variant="ghost"
         size="sm"
-        className="flex w-full items-center justify-start gap-3 text-destructive hover:bg-destructive/10 hover:text-destructive cursor-pointer"
+        className="flex w-full items-center justify-start gap-3 text-destructive hover:bg-destructive/10 hover:text-destructive cursor-pointer font-semibold"
       >
-        <LogOut className="h-4 w-4" />
+        <SignOut className="h-4 w-4" />
         <span>Log Out</span>
       </Button>
     </form>
   );
 
   return (
-    <div className="flex min-h-screen bg-zinc-50 dark:bg-zinc-950 font-sans">
+    <div className="flex min-h-screen bg-background font-sans">
       {isClient && (
         <ClientPortalRedirect
           workspaceSlug={workspaceSlug}
