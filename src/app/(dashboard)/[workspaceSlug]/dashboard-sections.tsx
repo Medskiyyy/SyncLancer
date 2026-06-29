@@ -5,7 +5,7 @@ import { StaggerContainer, StaggerItem, AnimatedNumber, FadeIn } from '@/compone
 import { Card } from '@/components/ui/card';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
-import { TrendUp, Sparkle, Clock, CheckSquare, Calendar, CurrencyDollar, Folder, Users, Receipt, FileText } from '@phosphor-icons/react';
+import { TrendUp, Sparkle, Clock, CheckSquare, Calendar, CurrencyDollar, Folder, Users, Receipt, FileText, GitBranch } from '@phosphor-icons/react';
 import { format } from 'date-fns';
 
 const KPI_ICONS = {
@@ -20,6 +20,13 @@ const ACTION_ICONS = {
   proposals: FileText,
   projects: Folder,
   invoices: Receipt,
+};
+
+const ACTIVITY_ICONS: Record<string, any> = {
+  invoice: Receipt,
+  proposal: FileText,
+  lead: GitBranch,
+  milestone: Calendar,
 };
 
 interface AnimatedGreetingProps {
@@ -170,7 +177,6 @@ interface AnimatedWorkloadActivityProps {
     text: string;
     time: string;
   }>;
-  activityIcons: Record<string, any>;
 }
 
 export function AnimatedWorkloadActivity({
@@ -180,7 +186,6 @@ export function AnimatedWorkloadActivity({
   activeTasksCount,
   upcomingMilestone,
   recentActivities,
-  activityIcons,
 }: AnimatedWorkloadActivityProps) {
   return (
     <div className="grid gap-6 md:grid-cols-7">
@@ -259,7 +264,7 @@ export function AnimatedWorkloadActivity({
             ) : (
               <div className="relative border-l border-zinc-200 dark:border-zinc-850 pl-4 ml-2 space-y-6">
                 {recentActivities.map((act, idx) => {
-                  const Icon = activityIcons[act.type];
+                  const Icon = ACTIVITY_ICONS[act.type];
                   return (
                     <div key={idx} className="relative">
                       {/* Timeline dot with icon */}

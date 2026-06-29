@@ -6,19 +6,7 @@ import { ProjectStatusChart } from '@/features/analytics/components/project-stat
 import { AnimatedGreeting, AnimatedKPIGrid, AnimatedQuickActions, AnimatedWorkloadActivity } from './dashboard-sections';
 import { WorkspaceService } from '@/features/workspace/services/workspace-service';
 import { AnalyticsService } from '@/features/analytics/services/analytics-service';
-import { 
-  CurrencyDollar, 
-  Folder, 
-  Users, 
-  Receipt, 
-  Calendar, 
-  Clock, 
-  CheckSquare,
-  FileText,
-  GitBranch, 
-  Sparkle,
-  TrendUp,
-} from '@phosphor-icons/react/dist/ssr';
+
 import Link from 'next/link';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
@@ -96,13 +84,6 @@ export default async function WorkspaceDashboardPage({ params }: PageProps) {
   const targetHours = 40;
   const loggedProgressPercent = Math.min((data.hoursLogged / targetHours) * 100, 100);
 
-  const activityIcons: Record<string, any> = {
-    invoice: Receipt,
-    proposal: FileText,
-    lead: GitBranch,
-    milestone: Calendar,
-  };
-
   return (
     <div className="space-y-6">
       {/* Greeting Card with Entrance Animation */}
@@ -151,7 +132,6 @@ export default async function WorkspaceDashboardPage({ params }: PageProps) {
         activeTasksCount={data.activeTasksCount}
         upcomingMilestone={data.upcomingMilestone}
         recentActivities={data.recentActivities}
-        activityIcons={activityIcons}
       />
     </div>
   );
