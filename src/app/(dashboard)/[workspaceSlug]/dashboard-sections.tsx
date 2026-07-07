@@ -110,22 +110,24 @@ export function AnimatedKPIGrid({ kpis }: AnimatedKPIGridProps) {
           <StaggerItem key={kpi.title}>
             <Card
               className={cn(
-                'h-[112px] justify-between border-l-2 p-4',
+                'min-h-[148px] justify-between gap-4 border-l-2 p-5',
                 borderColors[idx] || 'border-l-primary',
               )}
             >
               <div className="flex items-center justify-between gap-3">
-                <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{kpi.title}</span>
+                <span className="min-w-0 truncate text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                  {kpi.title}
+                </span>
                 <div className="flex h-8 w-8 items-center justify-center rounded-md border border-border bg-muted text-muted-foreground">
                   <Icon className="h-4 w-4" />
                 </div>
               </div>
-              <div className="flex items-end justify-between gap-3">
+              <div className="flex min-w-0 items-end justify-between gap-3">
                 <div className="min-w-0">
-                  <div className="font-mono text-2xl font-semibold tracking-tight text-foreground">
+                  <div className="font-mono text-2xl font-semibold leading-none tracking-tight text-foreground">
                     <AnimatedNumber value={kpi.value} prefix={kpi.prefix} delay={0.16 + idx * 0.04} />
                   </div>
-                  <p className="mt-1 truncate text-xs text-muted-foreground">{kpi.description}</p>
+                  <p className="mt-3 line-clamp-2 text-xs leading-5 text-muted-foreground">{kpi.description}</p>
                 </div>
                 {kpi.title !== 'Pending Invoices' && (
                   <TrendIcon
