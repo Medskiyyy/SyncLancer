@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { 
   Plus, 
   Trash2, 
@@ -8,9 +8,7 @@ import {
   Send, 
   CheckCircle, 
   FileText, 
-  DollarSign, 
   Receipt, 
-  Calendar,
   AlertCircle,
   PlusCircle,
   MinusCircle,
@@ -20,7 +18,7 @@ import {
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
@@ -91,6 +89,16 @@ interface BuilderItem {
   unitPrice: number;
 }
 
+const toDateInputValue = (offsetDays: number) => {
+  const date = new Date();
+  date.setDate(date.getDate() + offsetDays);
+  return date.toISOString().split('T')[0];
+};
+
+const getErrorMessage = (error: unknown, fallback = 'An error occurred') => {
+  return error instanceof Error ? error.message : fallback;
+};
+
 const STATUS_COLORS: Record<string, string> = {
   DRAFT: 'bg-zinc-100/80 text-zinc-650 border-zinc-200/50 dark:bg-zinc-800/40 dark:text-zinc-400 dark:border-zinc-800 shadow-none',
   SENT: 'bg-blue-500/10 text-blue-600 dark:text-blue-450 border-blue-500/20 shadow-none',
@@ -101,13 +109,12 @@ const STATUS_COLORS: Record<string, string> = {
 
 export function WorkspaceInvoiceManager({ 
   workspaceId, 
-  workspaceSlug, 
   initialInvoices, 
   clients, 
   projects 
 }: WorkspaceInvoiceManagerProps) {
   const router = useRouter();
-  const [invoices, setInvoices] = useState<MappedInvoice[]>(initialInvoices);
+  const [invoices] = useState<MappedInvoice[]>(initialInvoices);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -118,9 +125,7 @@ export function WorkspaceInvoiceManager({
   // Form states
   const [selectedClientId, setSelectedClientId] = useState<string>('');
   const [selectedProjectId, setSelectedProjectId] = useState<string>('none');
-  const [dueDate, setDueDate] = useState<string>(
-    new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
-  );
+  const [dueDate, setDueDate] = useState<string>(() => toDateInputValue(14));
   const [currency, setCurrency] = useState<string>('USD');
   const [taxRate, setTaxRate] = useState<number>(0);
   const [items, setItems] = useState<BuilderItem[]>([
@@ -130,16 +135,6 @@ export function WorkspaceInvoiceManager({
   // Delete modal state
   const [invoiceToDelete, setInvoiceToDelete] = useState<MappedInvoice | null>(null);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
-
-  // Sync initialInvoices prop with local state when it updates
-  useEffect(() => {
-    setInvoices(initialInvoices);
-  }, [initialInvoices]);
-
-  // Reset project when client changes
-  useEffect(() => {
-    setSelectedProjectId('none');
-  }, [selectedClientId]);
 
   // Filter projects by selected client
   const filteredProjects = selectedClientId 
@@ -156,14 +151,14 @@ export function WorkspaceInvoiceManager({
     setItems(newItems);
   };
 
-  const handleItemChange = (index: number, field: keyof BuilderItem, value: any) => {
+  const handleItemChange = (index: number, field: keyof BuilderItem, value: string) => {
     const newItems = [...items];
     if (field === 'quantity') {
       newItems[index].quantity = parseInt(value) || 0;
     } else if (field === 'unitPrice') {
       newItems[index].unitPrice = parseFloat(value) || 0;
     } else {
-      newItems[index][field] = value as never;
+      newItems[index][field] = value;
     }
     setItems(newItems);
   };
@@ -212,8 +207,8 @@ export function WorkspaceInvoiceManager({
       } else {
         toast.error(res.error || 'Failed to create invoice');
       }
-    } catch (e: any) {
-      toast.error(e.message || 'An error occurred');
+    } catch (e: unknown) {
+      toast.error(getErrorMessage(e));
     } finally {
       setIsLoading(false);
     }
@@ -229,8 +224,8 @@ export function WorkspaceInvoiceManager({
       } else {
         toast.error(res.error || 'Failed to send invoice');
       }
-    } catch (e: any) {
-      toast.error(e.message || 'An error occurred');
+    } catch (e: unknown) {
+      toast.error(getErrorMessage(e));
     } finally {
       setIsLoading(false);
     }
@@ -246,8 +241,8 @@ export function WorkspaceInvoiceManager({
       } else {
         toast.error(res.error || 'Failed to mark invoice as paid');
       }
-    } catch (e: any) {
-      toast.error(e.message || 'An error occurred');
+    } catch (e: unknown) {
+      toast.error(getErrorMessage(e));
     } finally {
       setIsLoading(false);
     }
@@ -266,8 +261,8 @@ export function WorkspaceInvoiceManager({
       } else {
         toast.error(res.error || 'Failed to delete invoice');
       }
-    } catch (e: any) {
-      toast.error(e.message || 'An error occurred');
+    } catch (e: unknown) {
+      toast.error(getErrorMessage(e));
     } finally {
       setIsLoading(false);
     }
@@ -302,7 +297,7 @@ export function WorkspaceInvoiceManager({
     <FadeIn direction="up" delay={0.02} duration={0.35} className="space-y-6">
       {/* KPI Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-        <Card variant="elevated" className="bg-white dark:bg-zinc-900/40 border-zinc-200/60 dark:border-zinc-800/60 border-l-[3px] border-l-zinc-500/70 p-5 h-[120px] flex flex-col justify-between shadow-xs rounded-2xl">
+        <Card variant="elevated" className="border-l-[3px] border-l-zinc-500/70 p-5 h-[120px] flex flex-col justify-between">
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Total Invoiced</span>
             <div className="p-1.5 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/50 dark:border-zinc-850 rounded-lg">
@@ -317,7 +312,7 @@ export function WorkspaceInvoiceManager({
           </div>
         </Card>
 
-        <Card variant="elevated" className="bg-white dark:bg-zinc-900/40 border-zinc-200/60 dark:border-zinc-800/60 border-l-[3px] border-l-emerald-500/70 p-5 h-[120px] flex flex-col justify-between shadow-xs rounded-2xl">
+        <Card variant="elevated" className="border-l-[3px] border-l-emerald-500/70 p-5 h-[120px] flex flex-col justify-between">
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Paid Amount</span>
             <div className="p-1.5 bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-100 dark:border-emerald-900/20 rounded-lg">
@@ -332,7 +327,7 @@ export function WorkspaceInvoiceManager({
           </div>
         </Card>
 
-        <Card variant="elevated" className="bg-white dark:bg-zinc-900/40 border-zinc-200/60 dark:border-zinc-800/60 border-l-[3px] border-l-amber-500/70 p-5 h-[120px] flex flex-col justify-between shadow-xs rounded-2xl">
+        <Card variant="elevated" className="border-l-[3px] border-l-amber-500/70 p-5 h-[120px] flex flex-col justify-between">
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Outstanding</span>
             <div className="p-1.5 bg-amber-50 dark:bg-amber-955/20 border border-amber-100 dark:border-amber-900/20 rounded-lg">
@@ -347,7 +342,7 @@ export function WorkspaceInvoiceManager({
           </div>
         </Card>
 
-        <Card variant="elevated" className="bg-white dark:bg-zinc-900/40 border-zinc-200/60 dark:border-zinc-800/60 border-l-[3px] border-l-blue-500/70 p-5 h-[120px] flex flex-col justify-between shadow-xs rounded-2xl">
+        <Card variant="elevated" className="border-l-[3px] border-l-blue-500/70 p-5 h-[120px] flex flex-col justify-between">
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Drafts</span>
             <div className="p-1.5 bg-blue-50 dark:bg-blue-955/20 border border-blue-100 dark:border-blue-900/20 rounded-lg">
@@ -407,7 +402,7 @@ export function WorkspaceInvoiceManager({
       </div>
 
       {/* Invoices List Card */}
-      <Card variant="elevated" className="border-zinc-200/60 dark:border-zinc-800/60 bg-white dark:bg-zinc-900/40 rounded-2xl shadow-xs overflow-hidden backdrop-blur-md">
+      <Card variant="elevated" className="overflow-hidden">
         <CardContent className="p-0">
           {filteredInvoices.length === 0 ? (
             <div className="text-center py-16 text-zinc-450 dark:text-zinc-500 text-sm flex flex-col items-center justify-center">
@@ -576,7 +571,13 @@ export function WorkspaceInvoiceManager({
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-1.5">
                 <label className="font-bold text-zinc-700 dark:text-zinc-400">Select Client *</label>
-                <Select value={selectedClientId} onValueChange={(val) => setSelectedClientId(val || '')}>
+                <Select
+                  value={selectedClientId}
+                  onValueChange={(val) => {
+                    setSelectedClientId(val || '');
+                    setSelectedProjectId('none');
+                  }}
+                >
                   <SelectTrigger className="h-9 text-xs">
                     <SelectValue placeholder="Choose a client...">
                       {selectedClientId ? (clients.find(c => c.id === selectedClientId)?.companyName || selectedClientId) : undefined}
@@ -767,7 +768,7 @@ export function WorkspaceInvoiceManager({
               <Button
                 type="submit"
                 disabled={isLoading}
-                className="bg-amber-600 hover:bg-amber-700 text-white font-semibold text-xs rounded-lg px-4 h-9 shadow-sm"
+                className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold text-xs rounded-lg px-4 h-9 shadow-sm"
               >
               {isLoading ? 'Creating...' : 'Create Draft Invoice'}
             </Button>

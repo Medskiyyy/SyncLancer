@@ -15,22 +15,19 @@ import {
 import { useDroppable, useDraggable } from '@dnd-kit/core';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
-import { useForm } from 'react-hook-form';
+import { useForm, type Resolver } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
   Plus,
   Edit2,
   Trash2,
   Calendar,
-  Flag,
   Layers,
   GripVertical,
-  AlertCircle,
 } from 'lucide-react';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import {
@@ -50,7 +47,7 @@ import {
 } from '@/components/ui/select';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 
-import { createTaskSchema, updateTaskSchema } from '@/features/tasks/schemas/task';
+import { createTaskSchema, updateTaskSchema, type CreateTaskInput, type UpdateTaskInput } from '@/features/tasks/schemas/task';
 import {
   createTaskAction,
   updateTaskAction,
@@ -70,6 +67,20 @@ interface TaskKanbanBoardProps {
   workspaceId: string;
   workspaceSlug: string;
 }
+
+interface TaskFormValues {
+  projectId?: string;
+  milestoneId: string;
+  title: string;
+  description: string;
+  status: TaskStatus;
+  priority: Priority;
+  dueDate: Date | string;
+}
+
+const getErrorMessage = (error: unknown, fallback = 'An error occurred') => {
+  return error instanceof Error ? error.message : fallback;
+};
 
 // Column definitions
 const COLUMNS: { label: string; status: TaskStatus; color: string; dotColor: string }[] = [
@@ -197,10 +208,9 @@ function DraggableTaskCard({
 }
 
 // Main Kanban Board Component
-export function TaskKanbanBoard({ initialTasks, milestones, projectId, workspaceId, workspaceSlug }: TaskKanbanBoardProps) {
+export function TaskKanbanBoard({ initialTasks, milestones, projectId, workspaceId }: TaskKanbanBoardProps) {
   const router = useRouter();
   const [tasks, setTasks] = useState<ExtendedTask[]>(initialTasks);
-  const [isMounted, setIsMounted] = useState(false);
   const [activeTask, setActiveTask] = useState<ExtendedTask | null>(null);
 
   const [isAddOpen, setIsAddOpen] = useState(false);
@@ -210,21 +220,18 @@ export function TaskKanbanBoard({ initialTasks, milestones, projectId, workspace
   const [deletingTaskId, setDeletingTaskId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  useEffect(() => { setIsMounted(true); }, []);
-  useEffect(() => { setTasks(initialTasks); }, [initialTasks]);
-
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
   );
 
-  const formatDateForInput = (date: any) => {
+  const formatDateForInput = (date: Date | string | null | undefined) => {
     if (!date) return '';
     const d = new Date(date);
     return d.toISOString().split('T')[0];
   };
 
-  const addForm = useForm({
-    resolver: zodResolver(createTaskSchema),
+  const addForm = useForm<TaskFormValues>({
+    resolver: zodResolver(createTaskSchema) as unknown as Resolver<TaskFormValues>,
     defaultValues: {
       projectId,
       milestoneId: '',
@@ -236,8 +243,8 @@ export function TaskKanbanBoard({ initialTasks, milestones, projectId, workspace
     },
   });
 
-  const editForm = useForm({
-    resolver: zodResolver(updateTaskSchema),
+  const editForm = useForm<TaskFormValues>({
+    resolver: zodResolver(updateTaskSchema) as unknown as Resolver<TaskFormValues>,
     defaultValues: {
       title: '',
       description: '',
@@ -297,18 +304,20 @@ export function TaskKanbanBoard({ initialTasks, milestones, projectId, workspace
     }
   };
 
-  const handleCreateTask = async (values: any) => {
+  const handleCreateTask = async (values: TaskFormValues) => {
+    const input: CreateTaskInput = {
+      projectId,
+      milestoneId: values.milestoneId === 'none' ? null : values.milestoneId || null,
+      title: values.title,
+      description: values.description,
+      status: values.status,
+      priority: values.priority,
+      dueDate: new Date(values.dueDate),
+    };
+
     setIsLoading(true);
     try {
-      const res = await createTaskAction(workspaceId, {
-        projectId,
-        milestoneId: values.milestoneId || null,
-        title: values.title,
-        description: values.description,
-        status: values.status,
-        priority: values.priority,
-        dueDate: new Date(values.dueDate),
-      });
+      const res = await createTaskAction(workspaceId, input);
 
       if (res.success) {
         toast.success('Task created successfully');
@@ -318,25 +327,27 @@ export function TaskKanbanBoard({ initialTasks, milestones, projectId, workspace
       } else {
         toast.error(res.error || 'Failed to create task');
       }
-    } catch (err: any) {
-      toast.error(err.message || 'An error occurred');
+    } catch (err: unknown) {
+      toast.error(getErrorMessage(err));
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleUpdateTask = async (values: any) => {
+  const handleUpdateTask = async (values: TaskFormValues) => {
     if (!editingTask) return;
+    const input: UpdateTaskInput = {
+      title: values.title,
+      description: values.description,
+      milestoneId: values.milestoneId === 'none' ? null : values.milestoneId || null,
+      status: values.status,
+      priority: values.priority,
+      dueDate: new Date(values.dueDate),
+    };
+
     setIsLoading(true);
     try {
-      const res = await updateTaskAction(editingTask.id, workspaceId, projectId, {
-        title: values.title,
-        description: values.description,
-        milestoneId: values.milestoneId || null,
-        status: values.status,
-        priority: values.priority,
-        dueDate: new Date(values.dueDate),
-      });
+      const res = await updateTaskAction(editingTask.id, workspaceId, projectId, input);
 
       if (res.success) {
         toast.success('Task updated successfully');
@@ -346,8 +357,8 @@ export function TaskKanbanBoard({ initialTasks, milestones, projectId, workspace
       } else {
         toast.error(res.error || 'Failed to update task');
       }
-    } catch (err: any) {
-      toast.error(err.message || 'An error occurred');
+    } catch (err: unknown) {
+      toast.error(getErrorMessage(err));
     } finally {
       setIsLoading(false);
     }
@@ -366,8 +377,8 @@ export function TaskKanbanBoard({ initialTasks, milestones, projectId, workspace
       } else {
         toast.error(res.error || 'Failed to delete task');
       }
-    } catch (err: any) {
-      toast.error(err.message || 'An error occurred');
+    } catch (err: unknown) {
+      toast.error(getErrorMessage(err));
     } finally {
       setIsLoading(false);
     }
@@ -378,17 +389,15 @@ export function TaskKanbanBoard({ initialTasks, milestones, projectId, workspace
     setIsDeleteOpen(true);
   };
 
-  if (!isMounted) return null;
-
   const deletingTask = tasks.find((t) => t.id === deletingTaskId);
 
   // Task form fields used by both Add and Edit dialogs
-  const renderTaskFormFields = (form: any, isEdit: boolean) => (
+  const renderTaskFormFields = (form: typeof addForm, isEdit: boolean) => (
     <>
       <FormField
         control={form.control}
         name="title"
-        render={({ field }: any) => (
+        render={({ field }) => (
           <FormItem>
             <FormLabel className="text-slate-700 dark:text-slate-300 font-medium">Title</FormLabel>
             <FormControl>
@@ -401,7 +410,7 @@ export function TaskKanbanBoard({ initialTasks, milestones, projectId, workspace
       <FormField
         control={form.control}
         name="description"
-        render={({ field }: any) => (
+        render={({ field }) => (
           <FormItem>
             <FormLabel className="text-slate-700 dark:text-slate-300 font-medium">Description</FormLabel>
             <FormControl>
@@ -415,7 +424,7 @@ export function TaskKanbanBoard({ initialTasks, milestones, projectId, workspace
         <FormField
           control={form.control}
           name="priority"
-          render={({ field }: any) => (
+          render={({ field }) => (
             <FormItem>
               <FormLabel className="text-slate-700 dark:text-slate-300 font-medium">Priority</FormLabel>
               <Select onValueChange={field.onChange} value={field.value}>
@@ -437,7 +446,7 @@ export function TaskKanbanBoard({ initialTasks, milestones, projectId, workspace
         <FormField
           control={form.control}
           name="dueDate"
-          render={({ field }: any) => (
+          render={({ field }) => (
             <FormItem>
               <FormLabel className="text-slate-700 dark:text-slate-300 font-medium">Due Date</FormLabel>
               <FormControl>
@@ -453,7 +462,7 @@ export function TaskKanbanBoard({ initialTasks, milestones, projectId, workspace
           <FormField
             control={form.control}
             name="status"
-            render={({ field }: any) => (
+            render={({ field }) => (
               <FormItem>
                 <FormLabel className="text-slate-700 dark:text-slate-300 font-medium">Status</FormLabel>
                 <Select onValueChange={field.onChange} value={field.value}>
@@ -476,7 +485,7 @@ export function TaskKanbanBoard({ initialTasks, milestones, projectId, workspace
         <FormField
           control={form.control}
           name="milestoneId"
-          render={({ field }: any) => (
+          render={({ field }) => (
             <FormItem className={!isEdit ? 'col-span-2' : ''}>
               <FormLabel className="text-slate-700 dark:text-slate-300 font-medium">Milestone</FormLabel>
               <Select onValueChange={field.onChange} value={field.value || ''}>
@@ -511,7 +520,7 @@ export function TaskKanbanBoard({ initialTasks, milestones, projectId, workspace
         </div>
         <Button
           onClick={() => setIsAddOpen(true)}
-          className="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold shadow-md shadow-indigo-500/10"
+          className="bg-primary hover:bg-primary/90 text-primary-foreground text-xs font-semibold shadow-sm"
         >
           <Plus className="mr-1.5 h-3.5 w-3.5" /> Add Task
         </Button>

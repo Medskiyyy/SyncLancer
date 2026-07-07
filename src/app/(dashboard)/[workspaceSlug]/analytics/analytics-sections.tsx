@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { StaggerContainer, StaggerItem, AnimatedNumber, FadeIn } from '@/components/ui/motion';
+import { StaggerContainer, StaggerItem, AnimatedNumber } from '@/components/ui/motion';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import { DollarSign, FolderKanban, Users, Receipt } from 'lucide-react';
@@ -40,7 +40,7 @@ export function AnimatedAnalyticsGrid({ metrics }: AnimatedAnalyticsGridProps) {
             <Card 
               variant="elevated"
               className={cn(
-                "hover-lift border-zinc-200/60 dark:border-zinc-800/60 bg-white dark:bg-zinc-900/40 border-l-[3px] rounded-2xl overflow-hidden shadow-xs",
+                "border-l-[3px] overflow-hidden",
                 borders[idx]
               )}
             >

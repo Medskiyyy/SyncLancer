@@ -7,13 +7,7 @@ import { WorkspaceService } from '@/features/workspace/services/workspace-servic
 import { AnalyticsService } from '@/features/analytics/services/analytics-service';
 import { AnimatedAnalyticsGrid } from './analytics-sections';
 import { FadeIn } from '@/components/ui/motion';
-import { 
-   DollarSign, 
-   FolderKanban, 
-   Users, 
-   Receipt,
-   TrendingUp
-} from 'lucide-react';
+import { FolderKanban, TrendingUp } from 'lucide-react';
 
 const workspaceService = new WorkspaceService();
 const analyticsService = new AnalyticsService();
@@ -73,7 +67,7 @@ export default async function WorkspaceAnalyticsPage({ params }: PageProps) {
         <div className="pb-6 border-b border-border/60">
           <h1 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50 font-heading">Analytics</h1>
           <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1">
-            Analyze financial trend matrices, active projects statuses, and workload metrics.
+            Review revenue, outstanding invoices, client activity, and project distribution.
           </p>
         </div>
       </FadeIn>
@@ -85,7 +79,7 @@ export default async function WorkspaceAnalyticsPage({ params }: PageProps) {
       <div className="grid gap-6 md:grid-cols-2">
         {/* Revenue Trend Line Chart */}
         <FadeIn direction="up" delay={0.2} duration={0.4}>
-          <Card className="border-zinc-200/60 dark:border-zinc-800/60 bg-white dark:bg-zinc-900/40 rounded-2xl overflow-hidden shadow-xs">
+          <Card className="overflow-hidden">
             <CardHeader className="border-b border-border/40 pb-4">
               <CardTitle className="text-sm font-bold text-zinc-900 dark:text-zinc-50 flex items-center gap-2 font-heading">
                 <TrendingUp className="h-4.5 w-4.5 text-primary" /> Revenue Over Time
@@ -102,7 +96,7 @@ export default async function WorkspaceAnalyticsPage({ params }: PageProps) {
 
         {/* Project status bar/pie chart */}
         <FadeIn direction="up" delay={0.25} duration={0.4}>
-          <Card className="border-zinc-200/60 dark:border-zinc-800/60 bg-white dark:bg-zinc-900/40 rounded-2xl overflow-hidden shadow-xs">
+          <Card className="overflow-hidden">
             <CardHeader className="border-b border-border/40 pb-4">
               <CardTitle className="text-sm font-bold text-zinc-900 dark:text-zinc-50 flex items-center gap-2 font-heading">
                 <FolderKanban className="h-4.5 w-4.5 text-primary" /> Projects by Status

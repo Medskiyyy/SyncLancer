@@ -14,12 +14,11 @@ import {
   Calendar,
   AlertCircle,
   Tag,
-  CheckCircle2
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -54,7 +53,7 @@ interface TimeTrackerProps {
     id: string;
     name: string;
     workspaceId: string;
-    budget: any;
+    budget: number | string | { toString(): string };
     currency: string;
     tasks?: Task[];
   };
@@ -72,9 +71,13 @@ interface ActiveTimer {
   billable: boolean;
 }
 
-export function TimeTracker({ project, initialTimeEntries, workspaceSlug }: TimeTrackerProps) {
+const getErrorMessage = (error: unknown, fallback = 'An error occurred') => {
+  return error instanceof Error ? error.message : fallback;
+};
+
+export function TimeTracker({ project, initialTimeEntries }: TimeTrackerProps) {
   const router = useRouter();
-  const [timeEntries, setTimeEntries] = useState<ExtendedTimeEntry[]>(initialTimeEntries);
+  const [timeEntries] = useState<ExtendedTimeEntry[]>(initialTimeEntries);
   const [activeTimer, setActiveTimer] = useState<ActiveTimer | null>(null);
   const [otherTimerRunning, setOtherTimerRunning] = useState<{ projectName: string; projectId: string } | null>(null);
   
@@ -114,31 +117,30 @@ export function TimeTracker({ project, initialTimeEntries, workspaceSlug }: Time
 
   const timerStorageKey = `@synclancer/active-timer-${project.workspaceId}`;
 
-  // Sync initialTimeEntries prop with local state when it updates
-  useEffect(() => {
-    setTimeEntries(initialTimeEntries);
-  }, [initialTimeEntries]);
-
   // Load active timer from localStorage
   useEffect(() => {
-    const stored = localStorage.getItem(timerStorageKey);
-    if (stored) {
-      try {
-        const parsed: ActiveTimer = JSON.parse(stored);
-        if (parsed.projectId === project.id) {
-          setActiveTimer(parsed);
-          const start = new Date(parsed.startTime).getTime();
-          setElapsedSeconds(Math.floor((Date.now() - start) / 1000));
-        } else {
-          setOtherTimerRunning({
-            projectName: parsed.projectName,
-            projectId: parsed.projectId,
-          });
+    const timeoutId = window.setTimeout(() => {
+      const stored = localStorage.getItem(timerStorageKey);
+      if (stored) {
+        try {
+          const parsed = JSON.parse(stored) as ActiveTimer;
+          if (parsed.projectId === project.id) {
+            setActiveTimer(parsed);
+            const start = new Date(parsed.startTime).getTime();
+            setElapsedSeconds(Math.floor((Date.now() - start) / 1000));
+          } else {
+            setOtherTimerRunning({
+              projectName: parsed.projectName,
+              projectId: parsed.projectId,
+            });
+          }
+        } catch (e) {
+          console.error('Failed to parse active timer', e);
         }
-      } catch (e) {
-        console.error('Failed to parse active timer', e);
       }
-    }
+    }, 0);
+
+    return () => window.clearTimeout(timeoutId);
   }, [project.id, timerStorageKey]);
 
   // Handle active timer ticking
@@ -148,12 +150,9 @@ export function TimeTracker({ project, initialTimeEntries, workspaceSlug }: Time
         const start = new Date(activeTimer.startTime).getTime();
         setElapsedSeconds(Math.max(0, Math.floor((Date.now() - start) / 1000)));
       }, 1000);
-    } else {
-      if (tickingIntervalRef.current) {
-        clearInterval(tickingIntervalRef.current);
-        tickingIntervalRef.current = null;
-      }
-      setElapsedSeconds(0);
+    } else if (tickingIntervalRef.current) {
+      clearInterval(tickingIntervalRef.current);
+      tickingIntervalRef.current = null;
     }
 
     return () => {
@@ -209,14 +208,15 @@ export function TimeTracker({ project, initialTimeEntries, workspaceSlug }: Time
         toast.success('Time entry logged successfully');
         localStorage.removeItem(timerStorageKey);
         setActiveTimer(null);
+        setElapsedSeconds(0);
         setTimerNotes('');
         setTimerTaskId('none');
         router.refresh();
       } else {
         toast.error(res.error || 'Failed to save time entry');
       }
-    } catch (e: any) {
-      toast.error(e.message || 'An error occurred');
+    } catch (e: unknown) {
+      toast.error(getErrorMessage(e));
     } finally {
       setIsLoading(false);
     }
@@ -239,7 +239,7 @@ export function TimeTracker({ project, initialTimeEntries, workspaceSlug }: Time
       const startDateTimeStr = `${manualDate}T${manualStartTime}:00`;
       const endDateTimeStr = `${manualDate}T${manualEndTime}:00`;
       const startTime = new Date(startDateTimeStr);
-      let endTime = new Date(endDateTimeStr);
+      const endTime = new Date(endDateTimeStr);
 
       if (endTime < startTime) {
         // If end time is before start time, assume it spans to the next day
@@ -268,8 +268,8 @@ export function TimeTracker({ project, initialTimeEntries, workspaceSlug }: Time
       } else {
         toast.error(res.error || 'Failed to log time');
       }
-    } catch (err: any) {
-      toast.error(err.message || 'An error occurred');
+    } catch (err: unknown) {
+      toast.error(getErrorMessage(err));
     } finally {
       setIsLoading(false);
     }
@@ -307,7 +307,7 @@ export function TimeTracker({ project, initialTimeEntries, workspaceSlug }: Time
       const startDateTimeStr = `${editDate}T${editStartTime}:00`;
       const endDateTimeStr = `${editDate}T${editEndTime}:00`;
       const startTime = new Date(startDateTimeStr);
-      let endTime = new Date(endDateTimeStr);
+      const endTime = new Date(endDateTimeStr);
 
       if (endTime < startTime) {
         endTime.setDate(endTime.getDate() + 1);
@@ -338,8 +338,8 @@ export function TimeTracker({ project, initialTimeEntries, workspaceSlug }: Time
       } else {
         toast.error(res.error || 'Failed to update time entry');
       }
-    } catch (err: any) {
-      toast.error(err.message || 'An error occurred');
+    } catch (err: unknown) {
+      toast.error(getErrorMessage(err));
     } finally {
       setIsLoading(false);
     }
@@ -364,8 +364,8 @@ export function TimeTracker({ project, initialTimeEntries, workspaceSlug }: Time
       } else {
         toast.error(res.error || 'Failed to delete time entry');
       }
-    } catch (err: any) {
-      toast.error(err.message || 'An error occurred');
+    } catch (err: unknown) {
+      toast.error(getErrorMessage(err));
     } finally {
       setIsLoading(false);
     }
@@ -455,7 +455,7 @@ export function TimeTracker({ project, initialTimeEntries, workspaceSlug }: Time
         <Card className="border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 rounded-xl shadow-sm">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-xs font-semibold text-slate-500 dark:text-slate-400">Total Logs</CardTitle>
-            <FileText className="h-4 w-4 text-amber-500" />
+            <FileText className="h-4 w-4 text-primary" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-black text-slate-950 dark:text-slate-50">{totalEntriesCount}</div>
@@ -466,10 +466,10 @@ export function TimeTracker({ project, initialTimeEntries, workspaceSlug }: Time
 
       {/* Other Timer Running Alert */}
       {otherTimerRunning && (
-        <div className="flex items-center gap-3 p-4 rounded-lg bg-amber-50 border border-amber-200 dark:bg-amber-950/30 dark:border-amber-900/50 text-amber-850 dark:text-amber-300 text-xs">
-          <AlertCircle className="h-5 w-5 text-amber-500 shrink-0" />
+        <div className="flex items-center gap-3 p-4 rounded-lg bg-blue-50 border border-blue-200 dark:bg-blue-950/30 dark:border-blue-900/50 text-blue-850 dark:text-blue-300 text-xs">
+          <AlertCircle className="h-5 w-5 text-blue-600 shrink-0" />
           <div>
-            <span className="font-bold">Timer Running Elsewhere:</span> A timer is currently running in this workspace for project <span className="font-semibold underline">"{otherTimerRunning.projectName}"</span>. 
+            <span className="font-bold">Timer Running Elsewhere:</span> A timer is currently running in this workspace for project <span className="font-semibold underline">&ldquo;{otherTimerRunning.projectName}&rdquo;</span>.
             You must stop it or discard it before starting a timer on this project.
           </div>
         </div>
@@ -503,7 +503,7 @@ export function TimeTracker({ project, initialTimeEntries, workspaceSlug }: Time
                   )}
                   {activeTimer.notes && (
                     <p className="text-sm text-slate-600 dark:text-slate-350 italic">
-                      "{activeTimer.notes}"
+                      &ldquo;{activeTimer.notes}&rdquo;
                     </p>
                   )}
                   <div className="flex items-center gap-1.5 pt-1">

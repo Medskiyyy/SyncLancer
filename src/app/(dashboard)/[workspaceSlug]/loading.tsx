@@ -4,7 +4,7 @@ export default function WorkspaceLoading() {
   return (
     <div className="space-y-6 p-1">
       {/* Greeting Card Skeleton - 160px / h-40 */}
-      <div className="relative overflow-hidden rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/40 p-8 h-40 flex items-center justify-between shadow-xs w-full">
+      <div className="relative overflow-hidden rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/40 p-8 h-40 flex items-center justify-between shadow-xs w-full">
         <div className="space-y-3 w-2/3">
           <div className="h-4 w-24 bg-zinc-200 dark:bg-zinc-800 animate-pulse rounded-md"></div>
           <div className="h-6 w-60 bg-zinc-200 dark:bg-zinc-800 animate-pulse rounded-md"></div>
@@ -12,12 +12,12 @@ export default function WorkspaceLoading() {
         </div>
       </div>
 
-      {/* KPI Grid Skeleton - 120px / rounded-2xl */}
+      {/* KPI Grid Skeleton - 120px */}
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
         {[...Array(4)].map((_, i) => (
           <div 
             key={i} 
-            className="border border-zinc-200/60 dark:border-zinc-800/60 bg-white dark:bg-zinc-900/40 rounded-2xl p-5 h-[120px] flex flex-col justify-between shadow-xs"
+            className="border border-zinc-200/60 dark:border-zinc-800/60 bg-white dark:bg-zinc-900/40 rounded-lg p-5 h-[120px] flex flex-col justify-between shadow-xs"
           >
             <div className="flex items-center justify-between">
               <div className="h-3 w-16 bg-zinc-150 dark:bg-zinc-800 animate-pulse rounded"></div>
@@ -33,7 +33,7 @@ export default function WorkspaceLoading() {
         {[...Array(4)].map((_, i) => (
           <div 
             key={i} 
-            className="border border-zinc-200/60 dark:border-zinc-800/60 bg-white dark:bg-zinc-900/40 rounded-2xl p-4 h-[88px] flex items-center gap-4 shadow-xs"
+            className="border border-zinc-200/60 dark:border-zinc-800/60 bg-white dark:bg-zinc-900/40 rounded-lg p-4 h-[88px] flex items-center gap-4 shadow-xs"
           >
             <div className="h-9 w-9 bg-zinc-150 dark:bg-zinc-800 animate-pulse rounded-lg"></div>
             <div className="flex-1 space-y-2">
@@ -46,7 +46,7 @@ export default function WorkspaceLoading() {
 
       {/* Analytics Charts Grid Skeleton */}
       <div className="grid gap-6 md:grid-cols-2">
-        <div className="border border-zinc-200/60 dark:border-zinc-800/60 bg-white dark:bg-zinc-900/40 rounded-2xl p-6 h-[380px] shadow-xs flex flex-col justify-between">
+        <div className="border border-zinc-200/60 dark:border-zinc-800/60 bg-white dark:bg-zinc-900/40 rounded-lg p-6 h-[380px] shadow-xs flex flex-col justify-between">
           <div className="space-y-2 pb-3 border-b border-zinc-100 dark:border-zinc-800/60">
             <div className="h-4 w-32 bg-zinc-200 dark:bg-zinc-800 animate-pulse rounded"></div>
             <div className="h-3 w-48 bg-zinc-150 dark:bg-zinc-850 animate-pulse rounded"></div>
@@ -61,7 +61,7 @@ export default function WorkspaceLoading() {
           </div>
         </div>
 
-        <div className="border border-zinc-200/60 dark:border-zinc-800/60 bg-white dark:bg-zinc-900/40 rounded-2xl p-6 h-[380px] shadow-xs flex flex-col justify-between">
+        <div className="border border-zinc-200/60 dark:border-zinc-800/60 bg-white dark:bg-zinc-900/40 rounded-lg p-6 h-[380px] shadow-xs flex flex-col justify-between">
           <div className="space-y-2 pb-3 border-b border-zinc-100 dark:border-zinc-800/60">
             <div className="h-4 w-32 bg-zinc-200 dark:bg-zinc-800 animate-pulse rounded"></div>
             <div className="h-3 w-48 bg-zinc-150 dark:bg-zinc-850 animate-pulse rounded"></div>
@@ -74,7 +74,7 @@ export default function WorkspaceLoading() {
 
       {/* Bottom List Skeleton - 3+4 split */}
       <div className="grid gap-6 md:grid-cols-7">
-        <div className="md:col-span-3 border border-zinc-200/60 dark:border-zinc-800/60 bg-white dark:bg-zinc-900/40 rounded-2xl p-6 shadow-xs space-y-5">
+        <div className="md:col-span-3 border border-zinc-200/60 dark:border-zinc-800/60 bg-white dark:bg-zinc-900/40 rounded-lg p-6 shadow-xs space-y-5">
           <div className="space-y-2 pb-3 border-b border-zinc-100 dark:border-zinc-800/60">
             <div className="h-4 w-32 bg-zinc-200 dark:bg-zinc-800 animate-pulse rounded"></div>
             <div className="h-3 w-48 bg-zinc-150 dark:bg-zinc-850 animate-pulse rounded"></div>
@@ -90,7 +90,7 @@ export default function WorkspaceLoading() {
           ))}
         </div>
 
-        <div className="md:col-span-4 border border-zinc-200/60 dark:border-zinc-800/60 bg-white dark:bg-zinc-900/40 rounded-2xl p-6 shadow-xs space-y-5">
+        <div className="md:col-span-4 border border-zinc-200/60 dark:border-zinc-800/60 bg-white dark:bg-zinc-900/40 rounded-lg p-6 shadow-xs space-y-5">
           <div className="space-y-2 pb-3 border-b border-zinc-100 dark:border-zinc-800/60">
             <div className="h-4 w-32 bg-zinc-200 dark:bg-zinc-800 animate-pulse rounded"></div>
             <div className="h-3 w-48 bg-zinc-150 dark:bg-zinc-850 animate-pulse rounded"></div>

@@ -1,13 +1,11 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Project, Client, Milestone, Task, MilestoneStatus, File as PrismaFile } from '@prisma/client';
+import { Project, Client, Milestone, Task, MilestoneStatus, File as PrismaFile, Invoice, InvoiceItem } from '@prisma/client';
 import { 
   Briefcase, 
   Calendar, 
   DollarSign, 
-  Clock, 
-  FileText, 
   Layers, 
   CheckSquare, 
   ArrowLeft, 
@@ -15,7 +13,6 @@ import {
   TrendingUp,
   Mail,
   Phone,
-  FileCheck,
   User,
   AlertCircle,
   Plus,
@@ -50,7 +47,7 @@ import {
 } from '@/components/ui/select';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 
-import { createMilestoneSchema, updateMilestoneSchema } from '@/features/milestones/schemas/milestone';
+import { createMilestoneSchema, updateMilestoneSchema, type CreateMilestoneInput, type UpdateMilestoneInput } from '@/features/milestones/schemas/milestone';
 import { createMilestoneAction, updateMilestoneAction, deleteMilestoneAction } from '@/features/milestones/actions/milestone-actions';
 import { TaskKanbanBoard } from '@/features/tasks/components/task-kanban-board';
 import { TimeTracker } from '@/features/time-tracking/components/time-tracker';
@@ -68,8 +65,14 @@ interface ExtendedProject extends Project {
   tasks?: Task[];
   timeEntries?: (TimeEntry & { task?: Task | null })[];
   files?: (Omit<PrismaFile, 'fileSize'> & { fileSize: number; uploader?: { fullName: string } | null })[];
-  invoices?: any[];
+  invoices?: (Invoice & { items: InvoiceItem[]; client: Client })[];
 }
+
+type CurrencyAmount = number | string | { toString(): string };
+
+const getErrorMessage = (error: unknown, fallback = 'An error occurred') => {
+  return error instanceof Error ? error.message : fallback;
+};
 
 interface ProjectDetailProps {
   project: ExtendedProject;
@@ -79,22 +82,22 @@ interface ProjectDetailProps {
 const STATUS_COLORS: Record<string, string> = {
   DRAFT: 'bg-zinc-50 dark:bg-zinc-950 text-zinc-400 dark:text-zinc-505 border border-zinc-200/60 dark:border-zinc-850',
   ACTIVE: 'bg-green-500/10 text-green-600 dark:text-green-400 border border-green-550/15',
-  ON_HOLD: 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/15',
+  ON_HOLD: 'bg-amber-500/10 text-amber-700 dark:text-amber-300 border border-amber-500/20',
   REVIEW: 'bg-stone-500/10 text-stone-650 dark:text-stone-400 border border-stone-550/15',
-  COMPLETED: 'bg-amber-550/10 text-amber-600 dark:text-amber-400 border border-amber-500/20',
+  COMPLETED: 'bg-primary/10 text-primary border border-primary/20',
   CANCELLED: 'bg-red-500/10 text-red-655 dark:text-red-400 border border-red-550/15',
 };
 
 const MILESTONE_STATUS_COLORS: Record<string, string> = {
   NOT_STARTED: 'bg-zinc-50 dark:bg-zinc-950 text-zinc-400 dark:text-zinc-505 border border-zinc-200/60 dark:border-zinc-850',
-  IN_PROGRESS: 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/15',
+  IN_PROGRESS: 'bg-blue-500/10 text-blue-700 dark:text-blue-300 border border-blue-500/20',
   COMPLETED: 'bg-green-500/10 text-green-600 dark:text-green-400 border border-green-550/15',
 };
 
 const TASK_PRIORITY_COLORS: Record<string, string> = {
   LOW: 'text-zinc-500 bg-zinc-50/50 border-zinc-200/60 dark:bg-zinc-950/20 dark:border-zinc-850',
   MEDIUM: 'text-blue-500 bg-blue-500/10 border-blue-500/15 dark:bg-blue-950/20 dark:border-blue-900/30',
-  HIGH: 'text-amber-600 bg-amber-500/10 border-amber-500/15 dark:bg-amber-950/20 dark:border-amber-900/30',
+  HIGH: 'text-amber-700 bg-amber-500/10 border-amber-500/20 dark:text-amber-300 dark:bg-amber-950/20 dark:border-amber-900/30',
   URGENT: 'text-red-600 bg-red-500/10 border-red-500/15 dark:bg-red-950/20 dark:border-red-900/30',
 };
 
@@ -109,7 +112,7 @@ export function ProjectDetail({ project, workspaceSlug }: ProjectDetailProps) {
   const [selectedMilestone, setSelectedMilestone] = useState<Milestone | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  const formatDateForInput = (date: any) => {
+  const formatDateForInput = (date: Date | string | null | undefined) => {
     if (!date) return '';
     const d = new Date(date);
     return d.toISOString().split('T')[0];
@@ -150,7 +153,7 @@ export function ProjectDetail({ project, workspaceSlug }: ProjectDetailProps) {
     }
   }, [selectedMilestone, editMilestoneForm]);
 
-  const handleCreateMilestone = async (values: any) => {
+  const handleCreateMilestone = async (values: CreateMilestoneInput) => {
     setIsLoading(true);
     try {
       const res = await createMilestoneAction(project.workspaceId, {
@@ -170,14 +173,14 @@ export function ProjectDetail({ project, workspaceSlug }: ProjectDetailProps) {
       } else {
         toast.error(res.error || 'Failed to create milestone');
       }
-    } catch (err: any) {
-      toast.error(err.message || 'An error occurred');
+    } catch (err: unknown) {
+      toast.error(getErrorMessage(err));
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleUpdateMilestone = async (values: any) => {
+  const handleUpdateMilestone = async (values: UpdateMilestoneInput) => {
     if (!selectedMilestone) return;
     setIsLoading(true);
     try {
@@ -188,7 +191,7 @@ export function ProjectDetail({ project, workspaceSlug }: ProjectDetailProps) {
         {
           title: values.title,
           description: values.description,
-          dueDate: new Date(values.dueDate),
+          dueDate: values.dueDate ? new Date(values.dueDate) : undefined,
           status: values.status,
           sortOrder: Number(values.sortOrder),
         }
@@ -202,8 +205,8 @@ export function ProjectDetail({ project, workspaceSlug }: ProjectDetailProps) {
       } else {
         toast.error(res.error || 'Failed to update milestone');
       }
-    } catch (err: any) {
-      toast.error(err.message || 'An error occurred');
+    } catch (err: unknown) {
+      toast.error(getErrorMessage(err));
     } finally {
       setIsLoading(false);
     }
@@ -227,8 +230,8 @@ export function ProjectDetail({ project, workspaceSlug }: ProjectDetailProps) {
       } else {
         toast.error(res.error || 'Failed to delete milestone');
       }
-    } catch (err: any) {
-      toast.error(err.message || 'An error occurred');
+    } catch (err: unknown) {
+      toast.error(getErrorMessage(err));
     } finally {
       setIsLoading(false);
     }
@@ -242,7 +245,7 @@ export function ProjectDetail({ project, workspaceSlug }: ProjectDetailProps) {
     });
   };
 
-  const formatCurrency = (amount: any, currency = 'USD') => {
+  const formatCurrency = (amount: CurrencyAmount, currency = 'USD') => {
     const num = parseFloat(amount.toString());
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
@@ -305,7 +308,7 @@ export function ProjectDetail({ project, workspaceSlug }: ProjectDetailProps) {
             <Card className="border-zinc-200/60 dark:border-zinc-800/80 bg-white dark:bg-slate-900 rounded-xl shadow-sm">
               <CardHeader className="border-b border-zinc-150 dark:border-zinc-800/50 pb-4">
                 <CardTitle className="text-base font-bold text-zinc-950 dark:text-zinc-50 flex items-center gap-2">
-                  <Briefcase className="h-5 w-5 text-amber-550" /> Description & Scope
+                  <Briefcase className="h-5 w-5 text-primary" /> Description & Scope
                 </CardTitle>
               </CardHeader>
               <CardContent className="pt-6">
@@ -319,7 +322,7 @@ export function ProjectDetail({ project, workspaceSlug }: ProjectDetailProps) {
               <Card className="border-zinc-200/60 dark:border-zinc-800/80 bg-white dark:bg-slate-900 rounded-xl shadow-sm">
                 <CardHeader className="border-b border-zinc-150 dark:border-zinc-800/50 pb-4">
                   <CardTitle className="text-base font-bold text-zinc-950 dark:text-zinc-50 flex items-center gap-2">
-                    <DollarSign className="h-5 w-5 text-amber-550" /> Budget Details
+                    <DollarSign className="h-5 w-5 text-primary" /> Budget Details
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="pt-6 space-y-3">
@@ -341,7 +344,7 @@ export function ProjectDetail({ project, workspaceSlug }: ProjectDetailProps) {
               <Card className="border-zinc-200/60 dark:border-zinc-800/80 bg-white dark:bg-slate-900 rounded-xl shadow-sm">
                 <CardHeader className="border-b border-zinc-150 dark:border-zinc-800/50 pb-4">
                   <CardTitle className="text-base font-bold text-zinc-950 dark:text-zinc-50 flex items-center gap-2">
-                    <Calendar className="h-5 w-5 text-amber-550" /> Key Dates
+                    <Calendar className="h-5 w-5 text-primary" /> Key Dates
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="pt-6 space-y-3">
@@ -367,7 +370,7 @@ export function ProjectDetail({ project, workspaceSlug }: ProjectDetailProps) {
             <Card className="border-zinc-200/60 dark:border-zinc-800/80 bg-white dark:bg-slate-900 rounded-xl shadow-sm">
               <CardHeader className="border-b border-zinc-150 dark:border-zinc-800/50 pb-4">
                 <CardTitle className="text-base font-bold text-zinc-950 dark:text-zinc-50 flex items-center gap-2">
-                  <User className="h-5 w-5 text-amber-550" /> Client Contact
+                  <User className="h-5 w-5 text-primary" /> Client Contact
                 </CardTitle>
               </CardHeader>
               <CardContent className="pt-6 space-y-4">
@@ -393,7 +396,7 @@ export function ProjectDetail({ project, workspaceSlug }: ProjectDetailProps) {
             <Card className="border-zinc-200/60 dark:border-zinc-800/80 bg-white dark:bg-slate-900 rounded-xl shadow-sm">
               <CardHeader className="border-b border-zinc-150 dark:border-zinc-800/50 pb-4">
                 <CardTitle className="text-base font-bold text-zinc-950 dark:text-zinc-50 flex items-center gap-2">
-                  <TrendingUp className="h-5 w-5 text-amber-550" /> Project Health
+                  <TrendingUp className="h-5 w-5 text-primary" /> Project Health
                 </CardTitle>
               </CardHeader>
               <CardContent className="pt-6 space-y-4">
@@ -404,7 +407,7 @@ export function ProjectDetail({ project, workspaceSlug }: ProjectDetailProps) {
                   </div>
                   <div className="w-full bg-zinc-100 dark:bg-zinc-800 rounded-full h-2 overflow-hidden">
                     <div 
-                      className="bg-amber-600 dark:bg-amber-500/100 h-2 rounded-full transition-all duration-500" 
+                      className="bg-primary h-2 rounded-full transition-all duration-500"
                       style={{ width: `${project.progress}%` }}
                     ></div>
                   </div>
@@ -431,7 +434,7 @@ export function ProjectDetail({ project, workspaceSlug }: ProjectDetailProps) {
           <CardHeader className="border-b border-zinc-150 dark:border-zinc-800/50 pb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
               <CardTitle className="text-base font-bold text-zinc-950 dark:text-zinc-50 flex items-center gap-2">
-                <Layers className="h-5 w-5 text-amber-550" /> Milestones Timeline
+                <Layers className="h-5 w-5 text-primary" /> Milestones Timeline
               </CardTitle>
               <CardDescription className="text-xs">
                 Project milestones mapped sequentially. Create, edit, and track progress.
@@ -439,7 +442,7 @@ export function ProjectDetail({ project, workspaceSlug }: ProjectDetailProps) {
             </div>
             <Button 
               onClick={() => setIsAddMilestoneOpen(true)}
-              className="bg-amber-600 hover:bg-amber-700 text-white text-xs font-semibold shadow-md shadow-amber-550/10"
+              className="bg-primary hover:bg-primary/90 text-primary-foreground text-xs font-semibold shadow-sm"
             >
               <Plus className="mr-1.5 h-3.5 w-3.5" /> Add Milestone
             </Button>
@@ -456,7 +459,7 @@ export function ProjectDetail({ project, workspaceSlug }: ProjectDetailProps) {
                   <div key={milestone.id} className="relative">
                     {/* Circle bullet on line */}
                     <span className="absolute -left-[31px] top-1 flex h-4.5 w-4.5 items-center justify-center rounded-full border border-slate-250 bg-white dark:border-slate-700 dark:bg-slate-900">
-                      <span className="h-2 w-2 rounded-full bg-amber-500/100"></span>
+                      <span className="h-2 w-2 rounded-full bg-primary"></span>
                     </span>
 
                     <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
@@ -508,7 +511,7 @@ export function ProjectDetail({ project, workspaceSlug }: ProjectDetailProps) {
                         {milestone.tasks.map((task) => (
                           <div key={task.id} className="flex items-center justify-between text-xs py-0.5">
                             <span className="flex items-center gap-2 font-medium text-zinc-700 dark:text-zinc-300">
-                              <CheckSquare className="h-3.5 w-3.5 text-amber-550" />
+                              <CheckSquare className="h-3.5 w-3.5 text-primary" />
                               {task.title}
                             </span>
                             <Badge variant="outline" className={`cursor-pointer text-[9px] px-1.5 border tracking-wide uppercase font-semibold ${TASK_PRIORITY_COLORS[task.priority]}`}>
@@ -656,7 +659,7 @@ export function ProjectDetail({ project, workspaceSlug }: ProjectDetailProps) {
                 <Button type="button" variant="outline" onClick={() => setIsAddMilestoneOpen(false)} className="cursor-pointer border-zinc-200/60 dark:border-zinc-800/80 text-zinc-700 dark:text-zinc-300 font-medium">
                   Cancel
                 </Button>
-                <Button type="submit" disabled={isLoading} className="bg-amber-600 hover:bg-amber-700 text-white font-semibold">
+                <Button type="submit" disabled={isLoading} className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold">
                   {isLoading ? 'Creating...' : 'Create Milestone'}
                 </Button>
               </DialogFooter>
@@ -758,7 +761,7 @@ export function ProjectDetail({ project, workspaceSlug }: ProjectDetailProps) {
                 <Button type="button" variant="outline" onClick={() => setIsEditMilestoneOpen(false)} className="cursor-pointer border-zinc-200/60 dark:border-zinc-800/80 text-zinc-700 dark:text-zinc-300 font-medium">
                   Cancel
                 </Button>
-                <Button type="submit" disabled={isLoading} className="bg-amber-600 hover:bg-amber-700 text-white font-semibold">
+                <Button type="submit" disabled={isLoading} className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold">
                   {isLoading ? 'Saving...' : 'Save Changes'}
                 </Button>
               </DialogFooter>
@@ -773,7 +776,7 @@ export function ProjectDetail({ project, workspaceSlug }: ProjectDetailProps) {
           <DialogHeader>
             <DialogTitle className="text-zinc-950 dark:text-zinc-100">Delete Milestone</DialogTitle>
             <DialogDescription className="text-zinc-500 dark:text-zinc-400">
-              Are you sure you want to delete milestone <strong className="text-zinc-950 dark:text-zinc-100">"{selectedMilestone?.title}"</strong>? 
+              Are you sure you want to delete milestone <strong className="text-zinc-950 dark:text-zinc-100">&ldquo;{selectedMilestone?.title}&rdquo;</strong>?
               This action is permanent and will delete all associated tasks under this milestone.
             </DialogDescription>
           </DialogHeader>

@@ -2,7 +2,8 @@
 
 import React, { useState } from 'react';
 import { Client, Proposal, ProposalItem } from '@prisma/client';
-import { useForm, useFieldArray } from 'react-hook-form';
+import { z } from 'zod';
+import { useForm, useFieldArray, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
@@ -16,7 +17,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 
-import { createProposalSchema, CreateProposalInput } from '../schemas/proposal';
+import { createProposalSchema, type CreateProposalInput, type UpdateProposalInput } from '../schemas/proposal';
 import { createProposalAction, updateProposalAction } from '../actions/proposal-actions';
 
 interface ProposalBuilderProps {
@@ -25,6 +26,43 @@ interface ProposalBuilderProps {
   workspaceId: string;
   workspaceSlug: string;
 }
+
+type ProposalFormValues = z.input<typeof createProposalSchema>;
+
+const toDateInputValue = (offsetDays: number) => {
+  const date = new Date();
+  date.setDate(date.getDate() + offsetDays);
+  return date.toISOString().split('T')[0];
+};
+
+const toCreateProposalInput = (data: ProposalFormValues): CreateProposalInput => ({
+  clientId: data.clientId,
+  title: data.title,
+  description: data.description ?? '',
+  currency: data.currency ?? 'USD',
+  taxRate: data.taxRate ?? 0,
+  expiresAt: new Date(data.expiresAt),
+  items: data.items.map((item) => ({
+    name: item.name,
+    description: item.description ?? '',
+    quantity: item.quantity,
+    unitPrice: item.unitPrice,
+  })),
+});
+
+const toUpdateProposalInput = (data: ProposalFormValues): UpdateProposalInput => ({
+  title: data.title,
+  description: data.description ?? '',
+  currency: data.currency ?? 'USD',
+  taxRate: data.taxRate ?? 0,
+  expiresAt: new Date(data.expiresAt),
+  items: data.items.map((item) => ({
+    name: item.name,
+    description: item.description ?? '',
+    quantity: item.quantity,
+    unitPrice: item.unitPrice,
+  })),
+});
 
 export function ProposalBuilder({ 
   initialProposal, 
@@ -45,7 +83,7 @@ export function ProposalBuilder({
     return (Number(initialProposal.taxAmount) / subtotal) * 100;
   };
 
-  const form = useForm<any>({
+  const form = useForm<ProposalFormValues>({
     resolver: zodResolver(createProposalSchema),
     defaultValues: {
       clientId: initialProposal?.clientId || clients[0]?.id || '',
@@ -55,7 +93,7 @@ export function ProposalBuilder({
       taxRate: getInitialTaxRate(),
       expiresAt: initialProposal 
         ? new Date(initialProposal.expiresAt).toISOString().split('T')[0]
-        : new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 14 days default
+        : toDateInputValue(14),
       items: initialProposal
         ? initialProposal.items.map(item => ({
             name: item.name,
@@ -67,7 +105,7 @@ export function ProposalBuilder({
     },
   });
 
-  const { control, handleSubmit, watch, setValue, formState: { errors } } = form;
+  const { control, handleSubmit, formState: { errors } } = form;
 
   const { fields, append, remove } = useFieldArray({
     control,
@@ -75,11 +113,11 @@ export function ProposalBuilder({
   });
 
   // Live calculations watch
-  const watchItems = watch('items') || [];
-  const watchTaxRate = watch('taxRate') || 0;
-  const watchCurrency = watch('currency') || 'USD';
+  const watchItems = useWatch({ control, name: 'items' }) || [];
+  const watchTaxRate = useWatch({ control, name: 'taxRate' }) || 0;
+  const watchCurrency = useWatch({ control, name: 'currency' }) || 'USD';
 
-  const subtotal = watchItems.reduce((acc: number, item: any) => {
+  const subtotal = watchItems.reduce((acc: number, item) => {
     const qty = Number(item?.quantity) || 0;
     const price = Number(item?.unitPrice) || 0;
     return acc + (qty * price);
@@ -97,11 +135,11 @@ export function ProposalBuilder({
 
   const currentSymbol = currencySymbols[watchCurrency] || watchCurrency;
 
-  const onSubmit = async (data: CreateProposalInput) => {
+  const onSubmit = async (data: ProposalFormValues) => {
     setIsLoading(true);
     try {
       if (isEditMode) {
-        const result = await updateProposalAction(initialProposal.id, workspaceId, data as any);
+        const result = await updateProposalAction(initialProposal.id, workspaceId, toUpdateProposalInput(data));
         if (result.success) {
           toast.success('Proposal updated successfully');
           router.push(`/${workspaceSlug}/proposals/${initialProposal.id}`);
@@ -110,7 +148,7 @@ export function ProposalBuilder({
           toast.error(result.error || 'Failed to update proposal');
         }
       } else {
-        const result = await createProposalAction(workspaceId, data);
+        const result = await createProposalAction(workspaceId, toCreateProposalInput(data));
         if (result.success && result.data) {
           toast.success('Proposal created successfully');
           router.push(`/${workspaceSlug}/proposals/${result.data.id}`);
@@ -119,7 +157,7 @@ export function ProposalBuilder({
           toast.error(result.error || 'Failed to create proposal');
         }
       }
-    } catch (err) {
+    } catch {
       toast.error('An error occurred');
     } finally {
       setIsLoading(false);
@@ -151,7 +189,7 @@ export function ProposalBuilder({
 
       {clients.length === 0 ? (
         <Card className="p-8 text-center border-dashed border-zinc-250 dark:border-zinc-800 bg-white dark:bg-zinc-900 rounded-xl shadow-xs">
-          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-amber-500/10 text-amber-600 border border-amber-500/15 mx-auto mb-4 animate-bounce">
+          <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 text-primary border border-primary/20 mx-auto mb-4">
             <AlertCircle className="h-6 w-6" />
           </div>
           <CardTitle className="text-sm font-bold text-zinc-900 dark:text-zinc-50">No clients available</CardTitle>
@@ -178,14 +216,14 @@ export function ProposalBuilder({
                 <CardContent className="space-y-4 pt-5">
                   <div className="grid gap-4 sm:grid-cols-2">
                     <FormField
-                      control={control as any}
+                      control={control}
                       name="clientId"
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel className="text-xs font-semibold text-zinc-700 dark:text-zinc-350">Recipient Client</FormLabel>
                           {isEditMode ? (
                             <div className="h-9 px-3 py-2 border border-zinc-200 bg-zinc-50 rounded-lg text-xs text-zinc-500 font-semibold select-none dark:bg-zinc-950 dark:border-zinc-800/80">
-                              {initialProposal.client ? (initialProposal as any).client.companyName : 'Selected Client'}
+                              {initialProposal.client ? initialProposal.client.companyName : 'Selected Client'}
                             </div>
                           ) : (
                             <Select onValueChange={field.onChange} defaultValue={field.value}>
@@ -211,13 +249,21 @@ export function ProposalBuilder({
                     />
 
                     <FormField
-                      control={control as any}
+                      control={control}
                       name="expiresAt"
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel className="text-xs font-semibold text-zinc-700 dark:text-zinc-350">Expiry Date</FormLabel>
                           <FormControl>
-                            <Input type="date" className="text-xs h-9 rounded-lg bg-white dark:bg-zinc-900" {...field} />
+                            <Input
+                              type="date"
+                              className="text-xs h-9 rounded-lg bg-white dark:bg-zinc-900"
+                              name={field.name}
+                              ref={field.ref}
+                              onBlur={field.onBlur}
+                              onChange={field.onChange}
+                              value={field.value instanceof Date ? field.value.toISOString().split('T')[0] : field.value}
+                            />
                           </FormControl>
                           <FormMessage className="text-[10px]" />
                         </FormItem>
@@ -226,7 +272,7 @@ export function ProposalBuilder({
                   </div>
 
                   <FormField
-                    control={control as any}
+                    control={control}
                     name="title"
                     render={({ field }) => (
                       <FormItem>
@@ -240,7 +286,7 @@ export function ProposalBuilder({
                   />
 
                   <FormField
-                    control={control as any}
+                    control={control}
                     name="description"
                     render={({ field }) => (
                       <FormItem>
@@ -285,7 +331,7 @@ export function ProposalBuilder({
                     >
                       <div className="flex justify-between items-start gap-4">
                         <FormField
-                          control={control as any}
+                          control={control}
                           name={`items.${index}.name`}
                           render={({ field }) => (
                             <FormItem className="flex-1">
@@ -310,7 +356,7 @@ export function ProposalBuilder({
                       </div>
 
                       <FormField
-                        control={control as any}
+                        control={control}
                         name={`items.${index}.description`}
                         render={({ field }) => (
                           <FormItem>
@@ -328,7 +374,7 @@ export function ProposalBuilder({
 
                       <div className="grid gap-4 grid-cols-3">
                         <FormField
-                          control={control as any}
+                          control={control}
                           name={`items.${index}.quantity`}
                           render={({ field }) => (
                             <FormItem>
@@ -348,7 +394,7 @@ export function ProposalBuilder({
                         />
 
                         <FormField
-                          control={control as any}
+                          control={control}
                           name={`items.${index}.unitPrice`}
                           render={({ field }) => (
                             <FormItem>
@@ -387,7 +433,7 @@ export function ProposalBuilder({
                   ))}
 
                   {errors.items?.root && (
-                    <p className="text-xs font-medium text-destructive">{(errors.items.root as any).message}</p>
+                    <p className="text-xs font-medium text-destructive">{errors.items.root.message}</p>
                   )}
                 </CardContent>
               </Card>
@@ -403,7 +449,7 @@ export function ProposalBuilder({
                 <CardContent className="space-y-4 pt-5 text-xs font-semibold">
                   {/* Currency settings */}
                   <FormField
-                    control={control as any}
+                    control={control}
                     name="currency"
                     render={({ field }) => (
                       <FormItem>
@@ -428,7 +474,7 @@ export function ProposalBuilder({
 
                   {/* Tax rate settings */}
                   <FormField
-                    control={control as any}
+                    control={control}
                     name="taxRate"
                     render={({ field }) => (
                       <FormItem>

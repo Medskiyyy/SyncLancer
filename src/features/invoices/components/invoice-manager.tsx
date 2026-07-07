@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Invoice, InvoiceItem, InvoiceStatus, Client } from '@prisma/client';
+import { Invoice, InvoiceItem, Client, Frequency } from '@prisma/client';
 import { 
   Plus, 
   Trash2, 
@@ -14,7 +14,6 @@ import {
   Calendar,
   AlertCircle,
   TrendingUp,
-  XCircle,
   PlusCircle,
   MinusCircle
 } from 'lucide-react';
@@ -24,7 +23,6 @@ import { toast } from 'sonner';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import {
   Dialog,
@@ -72,24 +70,32 @@ interface BuilderItem {
   unitPrice: number;
 }
 
+const toDateInputValue = (offsetDays: number) => {
+  const date = new Date();
+  date.setDate(date.getDate() + offsetDays);
+  return date.toISOString().split('T')[0];
+};
+
+const getErrorMessage = (error: unknown, fallback = 'An error occurred') => {
+  return error instanceof Error ? error.message : fallback;
+};
+
 const STATUS_COLORS: Record<string, string> = {
   DRAFT: 'bg-zinc-50 dark:bg-zinc-950 text-zinc-400 dark:text-zinc-55 border border-zinc-200/60 dark:border-zinc-850',
-  SENT: 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/15',
+  SENT: 'bg-blue-500/10 text-blue-700 dark:text-blue-300 border border-blue-500/20',
   PAID: 'bg-green-500/10 text-green-600 dark:text-green-400 border border-green-550/15',
   OVERDUE: 'bg-red-500/10 text-red-655 dark:text-red-400 border border-red-550/15',
   CANCELLED: 'bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 border border-zinc-200/30',
 };
 
-export function InvoiceManager({ projectId, workspaceId, clientId, initialInvoices, workspaceSlug }: InvoiceManagerProps) {
+export function InvoiceManager({ projectId, workspaceId, clientId, initialInvoices }: InvoiceManagerProps) {
   const router = useRouter();
-  const [invoices, setInvoices] = useState<ExtendedInvoice[]>(initialInvoices);
+  const [invoices] = useState<ExtendedInvoice[]>(initialInvoices);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
   // Form states
-  const [dueDate, setDueDate] = useState<string>(
-    new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString().split('T')[0] // Default 14 days from now
-  );
+  const [dueDate, setDueDate] = useState<string>(() => toDateInputValue(14));
   const [currency, setCurrency] = useState<string>('USD');
   const [taxRate, setTaxRate] = useState<number>(0);
   const [items, setItems] = useState<BuilderItem[]>([
@@ -100,17 +106,10 @@ export function InvoiceManager({ projectId, workspaceId, clientId, initialInvoic
   const [invoiceToDelete, setInvoiceToDelete] = useState<ExtendedInvoice | null>(null);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
 
-  // Sync initialInvoices prop with local state when it updates
-  useEffect(() => {
-    setInvoices(initialInvoices);
-  }, [initialInvoices]);
-
   // Recurring Invoice states
   const [isRecurringActive, setIsRecurringActive] = useState<boolean>(false);
   const [recurringFrequency, setRecurringFrequency] = useState<string>('MONTHLY');
-  const [recurringNextRun, setRecurringNextRun] = useState<string>(
-    new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0] // Default 7 days from now
-  );
+  const [recurringNextRun, setRecurringNextRun] = useState<string>(() => toDateInputValue(7));
   const [isRecurringLoading, setIsRecurringLoading] = useState<boolean>(false);
 
   // Fetch Recurring Configuration on mount
@@ -124,7 +123,7 @@ export function InvoiceManager({ projectId, workspaceId, clientId, initialInvoic
           setRecurringFrequency(res.data.frequency);
           setRecurringNextRun(new Date(res.data.nextRunAt).toISOString().split('T')[0]);
         }
-      } catch (err: any) {
+      } catch (err: unknown) {
         console.error('Failed to load recurring invoice config:', err);
       } finally {
         setIsRecurringLoading(false);
@@ -147,7 +146,7 @@ export function InvoiceManager({ projectId, workspaceId, clientId, initialInvoic
         clientId,
         {
           clientId,
-          frequency: recurringFrequency as any,
+          frequency: recurringFrequency as Frequency,
           nextRunAt: new Date(recurringNextRun),
           active: isRecurringActive,
         },
@@ -160,8 +159,8 @@ export function InvoiceManager({ projectId, workspaceId, clientId, initialInvoic
       } else {
         toast.error(res.error || 'Failed to update recurring settings');
       }
-    } catch (err: any) {
-      toast.error(err.message || 'An error occurred while saving recurring settings');
+    } catch (err: unknown) {
+      toast.error(getErrorMessage(err, 'An error occurred while saving recurring settings'));
     } finally {
       setIsRecurringLoading(false);
     }
@@ -177,14 +176,14 @@ export function InvoiceManager({ projectId, workspaceId, clientId, initialInvoic
     setItems(newItems);
   };
 
-  const handleItemChange = (index: number, field: keyof BuilderItem, value: any) => {
+  const handleItemChange = (index: number, field: keyof BuilderItem, value: string) => {
     const newItems = [...items];
     if (field === 'quantity') {
       newItems[index].quantity = parseInt(value) || 0;
     } else if (field === 'unitPrice') {
       newItems[index].unitPrice = parseFloat(value) || 0;
     } else {
-      newItems[index][field] = value as never;
+      newItems[index][field] = value;
     }
     setItems(newItems);
   };
@@ -227,8 +226,8 @@ export function InvoiceManager({ projectId, workspaceId, clientId, initialInvoic
       } else {
         toast.error(res.error || 'Failed to create invoice');
       }
-    } catch (e: any) {
-      toast.error(e.message || 'An error occurred');
+    } catch (e: unknown) {
+      toast.error(getErrorMessage(e));
     } finally {
       setIsLoading(false);
     }
@@ -244,8 +243,8 @@ export function InvoiceManager({ projectId, workspaceId, clientId, initialInvoic
       } else {
         toast.error(res.error || 'Failed to send invoice');
       }
-    } catch (e: any) {
-      toast.error(e.message || 'An error occurred');
+    } catch (e: unknown) {
+      toast.error(getErrorMessage(e));
     } finally {
       setIsLoading(false);
     }
@@ -261,8 +260,8 @@ export function InvoiceManager({ projectId, workspaceId, clientId, initialInvoic
       } else {
         toast.error(res.error || 'Failed to update invoice status');
       }
-    } catch (e: any) {
-      toast.error(e.message || 'An error occurred');
+    } catch (e: unknown) {
+      toast.error(getErrorMessage(e));
     } finally {
       setIsLoading(false);
     }
@@ -282,8 +281,8 @@ export function InvoiceManager({ projectId, workspaceId, clientId, initialInvoic
       } else {
         toast.error(res.error || 'Failed to delete invoice');
       }
-    } catch (e: any) {
-      toast.error(e.message || 'An error occurred');
+    } catch (e: unknown) {
+      toast.error(getErrorMessage(e));
     } finally {
       setIsLoading(false);
     }
@@ -339,7 +338,7 @@ export function InvoiceManager({ projectId, workspaceId, clientId, initialInvoic
         <Card className="border-zinc-200/60 dark:border-zinc-800/80 bg-white dark:bg-slate-900 rounded-xl shadow-sm">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-xs font-semibold text-zinc-500 dark:text-zinc-400">Total Billed</CardTitle>
-            <TrendingUp className="h-4 w-4 text-amber-550" />
+            <TrendingUp className="h-4 w-4 text-primary" />
           </CardHeader>
           <CardContent>
             <div className="text-xl font-black text-slate-950 dark:text-zinc-50">
@@ -395,7 +394,7 @@ export function InvoiceManager({ projectId, workspaceId, clientId, initialInvoic
           <div className="flex items-center justify-between">
             <div>
               <CardTitle className="text-sm font-bold text-zinc-950 dark:text-zinc-50 flex items-center gap-2">
-                <Calendar className="h-4.5 w-4.5 text-amber-550" /> Recurring Invoice Automation
+                <Calendar className="h-4.5 w-4.5 text-primary" /> Recurring Invoice Automation
               </CardTitle>
               <CardDescription className="text-xs mt-0.5 text-zinc-500 dark:text-zinc-400">
                 Automatically clone and email the latest invoice for this client on a recurring schedule.
@@ -430,7 +429,7 @@ export function InvoiceManager({ projectId, workspaceId, clientId, initialInvoic
                   checked={isRecurringActive}
                   onChange={(e) => setIsRecurringActive(e.target.checked)}
                   disabled={isRecurringLoading}
-                  className="h-4 w-4 rounded border-slate-300 text-amber-600 focus:ring-amber-500 cursor-pointer dark:border-zinc-800/80 dark:bg-slate-900"
+                  className="h-4 w-4 rounded border-slate-300 text-primary focus:ring-primary cursor-pointer dark:border-zinc-800/80 dark:bg-slate-900"
                 />
               </div>
 
@@ -471,7 +470,7 @@ export function InvoiceManager({ projectId, workspaceId, clientId, initialInvoic
                 <Button
                   onClick={handleSaveRecurringSettings}
                   disabled={isRecurringLoading}
-                  className="bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold shadow-md shadow-amber-550/10 h-8 animate-none"
+                  className="bg-primary hover:bg-primary/90 text-primary-foreground text-xs font-bold shadow-sm h-8 animate-none"
                 >
                   {isRecurringLoading ? 'Saving Settings...' : 'Save Automation Settings'}
                 </Button>
@@ -486,7 +485,7 @@ export function InvoiceManager({ projectId, workspaceId, clientId, initialInvoic
         <h3 className="text-sm font-bold text-zinc-800 dark:text-zinc-200">Billing History</h3>
         <Button 
           onClick={() => setIsCreateOpen(true)}
-          className="bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold shadow-md shadow-amber-550/10"
+          className="bg-primary hover:bg-primary/90 text-primary-foreground text-xs font-bold shadow-sm"
         >
           <Plus className="mr-1.5 h-3.5 w-3.5" /> Create Invoice
         </Button>
@@ -499,7 +498,7 @@ export function InvoiceManager({ projectId, workspaceId, clientId, initialInvoic
             <div className="text-center py-12 text-slate-550 dark:text-zinc-400 space-y-2">
               <DollarSign className="h-10 w-10 mx-auto text-slate-350 dark:text-zinc-700" />
               <p className="text-sm font-semibold">No invoices generated yet</p>
-              <p className="text-xs text-slate-450">Click "Create Invoice" to start billing for project deliverables.</p>
+              <p className="text-xs text-slate-450">Click &ldquo;Create Invoice&rdquo; to start billing for project deliverables.</p>
             </div>
           ) : (
             <div className="overflow-x-auto">
@@ -608,7 +607,7 @@ export function InvoiceManager({ projectId, workspaceId, clientId, initialInvoic
         <DialogContent className="border-zinc-200/60 dark:border-zinc-800/80 bg-white dark:bg-zinc-950/20 sm:max-w-2xl overflow-y-auto max-h-[85vh]">
           <DialogHeader>
             <DialogTitle className="text-zinc-950 dark:text-zinc-100 flex items-center gap-2">
-              <DollarSign className="h-5 w-5 text-amber-550" /> Create New Invoice
+              <DollarSign className="h-5 w-5 text-primary" /> Create New Invoice
             </DialogTitle>
             <DialogDescription className="text-slate-550 dark:text-zinc-400 text-xs">
               Add billed line items, adjust currency rates, and configure tax rates.
@@ -664,7 +663,7 @@ export function InvoiceManager({ projectId, workspaceId, clientId, initialInvoic
                   type="button"
                   variant="ghost"
                   onClick={handleAddItem}
-                  className="cursor-pointer h-8 text-xs text-amber-600 dark:text-indigo-400 font-bold hover:bg-amber-500/10 dark:hover:bg-amber-950/20"
+                  className="cursor-pointer h-8 text-xs text-primary font-bold hover:bg-primary/10"
                 >
                   <PlusCircle className="mr-1 h-4 w-4" /> Add Line Item
                 </Button>
@@ -759,7 +758,7 @@ export function InvoiceManager({ projectId, workspaceId, clientId, initialInvoic
               <Button 
                 type="submit" 
                 disabled={isLoading}
-                className="bg-amber-600 hover:bg-amber-700 text-white font-semibold"
+                className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold"
               >
                 {isLoading ? 'Creating...' : 'Save Draft'}
               </Button>
@@ -774,7 +773,7 @@ export function InvoiceManager({ projectId, workspaceId, clientId, initialInvoic
           <DialogHeader>
             <DialogTitle className="text-zinc-950 dark:text-zinc-100">Delete Invoice</DialogTitle>
             <DialogDescription className="text-slate-550 dark:text-zinc-400 text-xs">
-              Are you sure you want to delete invoice <strong className="text-zinc-800 dark:text-zinc-200">"{invoiceToDelete?.invoiceNumber}"</strong>? This action is permanent and cannot be undone.
+              Are you sure you want to delete invoice <strong className="text-zinc-800 dark:text-zinc-200">&ldquo;{invoiceToDelete?.invoiceNumber}&rdquo;</strong>? This action is permanent and cannot be undone.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="mt-4 flex flex-col sm:flex-row gap-2 sm:justify-end">
