@@ -1,12 +1,12 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Client, Proposal, ProposalItem } from '@prisma/client';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
-import { Plus, Trash2, ArrowLeft, Save, AlertCircle, Sparkles, PlusCircle } from 'lucide-react';
+import { Trash2, ArrowLeft, Save, AlertCircle, FileText, PlusCircle } from 'lucide-react';
 import Link from 'next/link';
 
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -18,7 +18,6 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 
 import { createProposalSchema, CreateProposalInput } from '../schemas/proposal';
 import { createProposalAction, updateProposalAction } from '../actions/proposal-actions';
-import { cn } from '@/lib/utils';
 
 interface ProposalBuilderProps {
   initialProposal?: Proposal & { items: ProposalItem[]; client: Client };
@@ -172,7 +171,7 @@ export function ProposalBuilder({
               <Card className="shadow-xs border border-zinc-200/60 dark:border-zinc-800/80 rounded-xl overflow-hidden bg-white dark:bg-zinc-900">
                 <CardHeader className="pb-4 border-b border-zinc-150 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/30">
                   <CardTitle className="text-xs font-bold uppercase tracking-wider text-zinc-900 dark:text-zinc-50 flex items-center gap-2">
-                    <Sparkles className="h-4 w-4 text-amber-550" />
+                    <FileText className="h-4 w-4 text-primary" />
                     <span>Proposal Information</span>
                   </CardTitle>
                 </CardHeader>
@@ -397,7 +396,7 @@ export function ProposalBuilder({
             {/* Right side: Summary & Settings */}
             <div className="md:col-span-1 space-y-6">
               {/* Invoice Calculations */}
-              <Card className="shadow-xs border border-amber-500/25 rounded-xl overflow-hidden bg-white dark:bg-zinc-900 premium-glow">
+              <Card className="shadow-xs border border-border rounded-xl overflow-hidden bg-white dark:bg-zinc-900">
                 <CardHeader className="bg-zinc-50 dark:bg-zinc-900/50 pb-4 border-b border-zinc-150 dark:border-zinc-800">
                   <CardTitle className="text-xs font-bold text-zinc-400 uppercase tracking-wider">Cost Summary</CardTitle>
                 </CardHeader>

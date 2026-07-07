@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, Suspense } from 'react';
+import { useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { useForm } from 'react-hook-form';
@@ -15,15 +15,9 @@ import { signIn } from 'next-auth/react';
 function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const registeredSuccessfully = searchParams.get('registered') === 'true';
   const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-
-  useEffect(() => {
-    if (searchParams.get('registered') === 'true') {
-      setSuccess('Account created successfully! Please sign in.');
-    }
-  }, [searchParams]);
 
   const form = useForm<LoginInput>({
     resolver: zodResolver(loginSchema),
@@ -36,7 +30,6 @@ function LoginForm() {
   const onSubmit = async (data: LoginInput) => {
     setIsLoading(true);
     setError(null);
-    setSuccess(null);
     try {
       const result = await signIn('credentials', {
         email: data.email,
@@ -50,7 +43,7 @@ function LoginForm() {
         router.refresh();
         router.push('/');
       }
-    } catch (err: any) {
+    } catch {
       setError('An unexpected error occurred during sign in');
     } finally {
       setIsLoading(false);
@@ -62,7 +55,7 @@ function LoginForm() {
   };
 
   return (
-    <Card className="w-full max-w-md glass-card shadow-lg relative border-none">
+    <Card className="w-full max-w-md border-border bg-card shadow-sm">
       <CardHeader className="space-y-1.5 text-center">
         <CardTitle className="text-2xl font-bold tracking-tight font-heading">Sign in to SyncLancer</CardTitle>
         <CardDescription>
@@ -77,9 +70,9 @@ function LoginForm() {
                 {error}
               </div>
             )}
-            {success && (
+            {registeredSuccessfully && (
               <div className="rounded-lg bg-green-500/10 border border-green-500/20 p-3 text-sm text-green-600 dark:text-green-400 font-medium">
-                {success}
+                Account created successfully. Please sign in.
               </div>
             )}
             
@@ -112,7 +105,7 @@ function LoginForm() {
                     </Link>
                   </div>
                   <FormControl>
-                    <Input type="password" placeholder="••••••••" disabled={isLoading} {...field} />
+                    <Input type="password" placeholder="Password" disabled={isLoading} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -167,11 +160,8 @@ function LoginForm() {
 export default function LoginPage() {
   return (
     <div className="relative flex min-h-screen items-center justify-center bg-background p-4 overflow-hidden">
-      {/* Premium ambient Liquid Glass gold mesh glows */}
-      <div className="absolute -left-20 -top-20 h-96 w-96 rounded-full bg-primary/5 dark:bg-primary/10 blur-3xl pointer-events-none" />
-      <div className="absolute -right-20 -bottom-20 h-96 w-96 rounded-full bg-primary/5 dark:bg-primary/10 blur-3xl pointer-events-none" />
       <Suspense fallback={
-        <Card className="w-full max-w-md glass-card shadow-lg relative border-none">
+        <Card className="w-full max-w-md border-border bg-card shadow-sm">
           <CardHeader className="space-y-1.5 text-center">
             <CardTitle className="text-2xl font-bold tracking-tight font-heading">Loading...</CardTitle>
           </CardHeader>

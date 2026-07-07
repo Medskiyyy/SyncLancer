@@ -1,88 +1,67 @@
-# SyncLancer UI/UX Design System Specification
+# SyncLancer UI/UX Specification
 
-This document specifies the premium SaaS design system applied to SyncLancer. The theme aligns with modern SaaS products like Attio, Stripe, Linear, and Vercel, utilizing a high-contrast, clean Slate/Blue light-mode-first aesthetic.
+SyncLancer is a data-dense freelance operations workspace. The interface should feel like a practical working tool for repeated daily use: calm, scan-friendly, fast, and consistent across dashboard, CRM, projects, invoices, files, settings, and client portal.
 
----
+## Product Direction
 
-## 1. Color System
+- **Pattern:** Data-Dense + Drill-Down
+- **Primary use case:** Freelancers managing clients, proposals, projects, time, files, invoices, and workspace limits.
+- **Design benchmark:** Linear, Stripe Dashboard, Vercel dashboard, Attio-style operational clarity.
+- **Avoid:** Luxury branding, liquid glass, decorative glows, generic sparkle badges, oversized marketing composition, and non-standard Tailwind shade names unless explicitly defined as compatibility aliases.
 
-SyncLancer employs a unified color system defined in `globals.css` using CSS custom properties.
+## Color System
 
-### Foundation Palette (Slate)
-- **Background**: `#F8FAFC` (Slate 50) - Soft light-mode page canvas.
-- **Card Background**: `#FFFFFF` (White) - Elevated surface container blocks.
-- **Borders**: `#E2E8F0` (Slate 200) - Clean, thin boundaries.
-- **Body Text**: `#64748B` (Slate 500 / Slate 600) - High-legibility charcoal gray.
-- **Headings**: `#0F172A` (Slate 900) - Pure dark slate for premium emphasis.
+The production source of truth is `src/app/globals.css`.
 
-### Accent & Chart Colors
-- **Primary Blue**: `#2563EB` (Blue 600) - Signature branding color.
-- **Secondary Blue**: `#3B82F6` (Blue 500) - Alternative highlights.
-- **Accent Cyan**: `#06B6D4` (Cyan 500) - Informational/highlight accent.
-- **Success (Green)**: `#10B981` - Positive status indicators (PAID, COMPLETED).
-- **Warning (Amber)**: `#F59E0B` - Attention indicators (ON_HOLD, SENT).
-- **Danger (Red)**: `#EF4444` - Critical indicators (OVERDUE, CANCELLED).
-- **Grid Lines**: `#E2E8F0` - Soft lines for chart grids.
+- **Background:** `#F8FAFC` for app canvas.
+- **Surface:** `#FFFFFF` cards, tables, dialogs, and panels.
+- **Text:** `#0F172A` for primary text, `#334155` for secondary, `#64748B` for muted text.
+- **Border:** `#E2E8F0` for default divisions, `#CBD5E1` for stronger input boundaries.
+- **Primary:** `#2563EB` for main actions, active navigation, links, and chart focus.
+- **Semantic:** success `#059669`, warning `#D97706`, destructive `#DC2626`, info `#0284C7`.
 
----
+Use semantic tokens (`bg-card`, `text-muted-foreground`, `border-border`, `text-primary`) before hardcoded palettes.
 
-## 2. Typography & Hierarchy
+## Typography
 
-Clean, readable typography using the Inter font family with strict font-size hierarchy for high-density SaaS views.
+- **Font:** system Inter-style stack from `globals.css`; no remote CSS font import.
+- **Page title:** `text-2xl` to `text-3xl`, `font-semibold`, `tracking-tight`.
+- **Section/card title:** `text-base`, `font-semibold`.
+- **Table/body text:** `text-sm`.
+- **Dense metadata:** `text-xs`; avoid `text-[9px]` except compact badges.
+- **Letter spacing:** normal by default; uppercase labels can use small positive tracking sparingly.
 
-- **Page Title**: `32px` (`text-3xl font-bold tracking-tight text-slate-900`)
-- **Section Title**: `24px` (`text-2xl font-semibold tracking-tight text-slate-900`)
-- **Card Title / Table Title**: `16px` (`text-base font-bold text-slate-900`)
-- **Body / Content text**: `14px` (`text-sm font-medium text-slate-600`)
-- **Subtext / Meta info**: `12px` (`text-xs text-slate-500`)
+## Layout System
 
----
+- **Desktop shell:** fixed left sidebar, 240-260px width, non-floating utility panel.
+- **Header:** 64px sticky toolbar with breadcrumb, workspace search, notifications, and profile affordance.
+- **Main content:** max width `1440px`, padding `24px` desktop, `16px` mobile.
+- **Cards/panels:** default radius `8px`; use larger radius only for dialogs or intentionally isolated modules.
+- **Tables:** 48px header rows, 56-60px body rows, aligned `px-6`, visible hover state, actions right-aligned.
+- **Kanban:** 280px columns, horizontal scroll, clear status colors, no decorative blurred backgrounds.
 
-## 3. Layout Specifications
+## Component Rules
 
-Standardized layout dimensions ensure visual alignment across all pages.
+- Use one icon family in product UI. Prefer `lucide-react` for new or redesigned components.
+- Interactive elements need visible hover and focus states.
+- Hover must not shift layout. Avoid `hover:scale` on cards and file tiles.
+- Empty states must include a domain-specific next action where useful.
+- Copy should be concrete and operational: say what will happen, not marketing adjectives.
+- Charts should use semantic colors and real empty states instead of blank frames.
+- Client portal can be slightly friendlier, but should still share the same token system.
 
-- **Desktop Sidebar**: Fixed `260px` width. Sidebar navigation menu items have a list height of `44px` (`h-11`). Active state transition is background-only with a left blue border.
-- **Workspace Switcher**: Switcher card height is `72px` (`h-[72px]`), displaying a `40x40` (`h-10 w-10`) avatar.
-- **Top Header**: Height of `64px` (`h-16`).
-- **Workspace Settings**: Maximum content width is set to exactly `900px` (`max-w-[900px]`), displaying exactly 6 settings tabs: General, Workspace, Branding, Billing, Notifications, and Security.
+## AI Slop Guardrails
 
----
+- Do not use `Sparkles`, "premium", "liquid glass", "magic", "unlock absolute", "scale without borders", or fake real-time labels like "Updated: Just now" unless backed by data.
+- Do not introduce arbitrary palette steps such as `zinc-450` in new code. Existing aliases remain temporarily for migration.
+- Do not mix slate, zinc, stone, indigo, gold, and violet as competing brand systems.
+- Do not put cards inside cards unless the inner item is a repeated entity row/card.
+- Do not use decorative blobs, orbs, mesh gradients, or blur fields in app surfaces.
 
-## 4. Spacing & Grid Metrics
+## Redesign Priorities
 
-Specific component structures define the spacing system.
-
-- **Kanban Board columns**: Exactly `280px` wide, separated by a `16px` gap. Column header text uses Title casing and the label "Lead" instead of generic names.
-- **List Tables**: Table header height is `48px` (`h-[48px]`), and row height is `60px` (`h-[60px]`). Headers are aligned px-6. Row click targets are mapped directly on client/project names.
-- **Files Grid View**: Google Drive-style layout showing folder categories (Documents, Images, Archives, Others) at the top, and files in a 4-column card grid below. Card height is exactly `120px` (`h-[120px]`).
-- **Dashboard KPIs**: Card heights are exactly `120px` (`h-[120px]`). Greeting card is exactly `160px` (`h-[160px]`). Quick Actions card is exactly `88px` (`h-[88px]`).
-
----
-
-## 5. Transitions & Micro-Interactions
-
-Interactive states are optimized for high perceived performance.
-
-- **Page Transition (Enter)**: Custom layout animation wrapping App Router pages.
-  - Duration: `180ms`
-  - Opacity: `0 → 1`
-  - TranslateY: `8px → 0`
-- **Card Hover**: Cards scale slightly with a soft lift effect.
-  - Scale: `1 → 1.02`
-  - Duration: `150ms`
-- **Button Hover**:
-  - Duration: `150ms`
-- **Sidebar Navigation**:
-  - Background transition only (no sliding overlay).
-  - Duration: `150ms`
-
----
-
-## 6. Charts & Empty States
-
-Standards for analytical dashboards to ensure usefulness and styling consistency.
-
-- **Revenue Chart**: Height is `360px`. Filled area uses a blue gradient (`#2563EB` to Transparent).
-- **Projects Status Chart**: Height is `360px`. Bars mapped to individual status colors.
-- **Empty States**: Never render empty charts or lists. If data is absent, show an icon, helpful descriptive message, and a contextual call-to-action button (e.g. "Create Invoice").
+1. Normalize tokens and base components.
+2. Convert shell and dashboard to operational command-center layouts.
+3. Standardize tables, toolbars, status badges, dialogs, and empty states.
+4. Remove legacy shade aliases from feature code once each screen is migrated.
+5. Verify with lint, responsive screenshots, and dark/light contrast checks.

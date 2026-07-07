@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import { useRouter } from 'next/navigation';
-import { Search, Sparkles, ArrowRight } from 'lucide-react';
+import { Search, ArrowRight } from 'lucide-react';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { cn } from '@/lib/utils';
 
@@ -46,10 +46,6 @@ export function CommandPalette({ isOpen, onClose, workspaceSlug, isClient }: Com
   }, [workspaceSlug, isClient, query]);
 
   React.useEffect(() => {
-    setSelectedIndex(0);
-  }, [query]);
-
-  React.useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'k' && (e.metaKey || e.ctrlKey)) {
         e.preventDefault();
@@ -91,7 +87,10 @@ export function CommandPalette({ isOpen, onClose, workspaceSlug, isClient }: Com
           <Search className="mr-3 h-4 w-4 shrink-0 text-zinc-400 dark:text-zinc-500" />
           <input
             value={query}
-            onChange={(e) => setQuery(e.target.value)}
+            onChange={(e) => {
+              setQuery(e.target.value);
+              setSelectedIndex(0);
+            }}
             onKeyDown={onKeyDown}
             placeholder="Search dashboard page or workspace settings..."
             className="w-full bg-transparent text-sm text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-500 outline-none border-none focus:ring-0"
@@ -105,7 +104,7 @@ export function CommandPalette({ isOpen, onClose, workspaceSlug, isClient }: Com
         <div className="max-h-[300px] overflow-y-auto p-2">
           {searchItems.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-6 px-4 text-center">
-              <Sparkles className="h-8 w-8 text-zinc-300 dark:text-zinc-700 mb-2 animate-pulse" />
+              <Search className="h-8 w-8 text-zinc-300 dark:text-zinc-700 mb-2" />
               <p className="text-sm font-medium text-zinc-500 dark:text-zinc-400">No results found</p>
               <p className="text-xs text-zinc-400 dark:text-zinc-500 mt-0.5">Try searching for CRM, Invoices, or Settings</p>
             </div>
@@ -140,12 +139,12 @@ export function CommandPalette({ isOpen, onClose, workspaceSlug, isClient }: Com
         <div className="flex items-center justify-between border-t border-zinc-150 dark:border-zinc-800 px-4 py-2 text-[10px] text-zinc-400 dark:text-zinc-500 bg-zinc-50/50 dark:bg-zinc-900/50">
           <div className="flex items-center gap-1.5">
             <span>Use</span>
-            <kbd className="rounded bg-zinc-200/50 dark:bg-zinc-800 px-1">↑↓</kbd>
+            <kbd className="rounded bg-zinc-200/50 dark:bg-zinc-800 px-1">Up/Down</kbd>
             <span>to navigate</span>
             <kbd className="rounded bg-zinc-200/50 dark:bg-zinc-800 px-1">Enter</kbd>
             <span>to select</span>
           </div>
-          <span>SyncLancer Pro</span>
+          <span>SyncLancer</span>
         </div>
       </DialogContent>
     </Dialog>

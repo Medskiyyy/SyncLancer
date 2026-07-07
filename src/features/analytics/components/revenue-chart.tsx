@@ -10,10 +10,16 @@ interface RevenueChartProps {
   data: Array<{ name: string; revenue: number }>;
 }
 
-function CustomTooltip({ active, payload, label }: any) {
+interface ChartTooltipProps {
+  active?: boolean;
+  payload?: Array<{ value: number }>;
+  label?: string;
+}
+
+function CustomTooltip({ active, payload, label }: ChartTooltipProps) {
   if (active && payload && payload.length) {
     return (
-      <div className="rounded-xl border border-zinc-200 bg-white/95 p-3 shadow-premium-md dark:border-zinc-800/80 dark:bg-zinc-950/95 backdrop-blur-md text-xs">
+      <div className="rounded-md border border-border bg-popover p-3 text-xs text-popover-foreground shadow-lg">
         <p className="font-semibold text-zinc-900 dark:text-zinc-50">{label}</p>
         <p className="mt-1 font-bold text-primary dark:text-primary">
           {new Intl.NumberFormat('en-US', {
@@ -37,14 +43,14 @@ export function RevenueChart({ data }: RevenueChartProps) {
 
   if (isEmpty) {
     return (
-      <div className="flex flex-col items-center justify-center h-[360px] text-center border border-dashed border-zinc-200 dark:border-zinc-800 rounded-2xl bg-zinc-50/30 dark:bg-zinc-900/10 p-6 min-h-[360px]">
+      <div className="flex min-h-[360px] h-[360px] flex-col items-center justify-center rounded-lg border border-dashed border-border bg-muted/30 p-6 text-center">
         <Receipt className="h-10 w-10 text-zinc-400 dark:text-zinc-600 mb-3 shrink-0" />
         <h4 className="text-sm font-bold text-zinc-900 dark:text-zinc-100 mb-1">No revenue data yet</h4>
         <p className="text-xs text-zinc-500 dark:text-zinc-400 max-w-[240px] mb-4">
           Create your first invoice to start tracking revenue.
         </p>
         <Link href={`/${workspaceSlug}/invoices`}>
-          <Button size="sm" variant="default" className="font-medium text-xs rounded-lg px-3.5 h-8 cursor-pointer">
+          <Button size="sm" variant="default" className="font-medium text-xs rounded-md px-3.5 h-8 cursor-pointer">
             Create Invoice
           </Button>
         </Link>
@@ -87,7 +93,7 @@ export function RevenueChart({ data }: RevenueChartProps) {
             tickFormatter={(value) => `$${value}`}
             dx={-4}
           />
-          <Tooltip content={<CustomTooltip />} cursor={{ stroke: 'rgba(234, 179, 8, 0.12)', strokeWidth: 1 }} />
+          <Tooltip content={<CustomTooltip />} cursor={{ stroke: 'rgba(37, 99, 235, 0.16)', strokeWidth: 1 }} />
           <Area
             type="monotone"
             dataKey="revenue"

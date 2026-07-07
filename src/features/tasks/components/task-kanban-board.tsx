@@ -133,8 +133,8 @@ function DraggableTaskCard({
     <div
       ref={setNodeRef}
       style={style}
-      className={`group relative rounded-lg border border-slate-200 bg-white p-3 shadow-sm hover:shadow-md dark:border-slate-800 dark:bg-slate-900 transition-all duration-150 ${
-        isDragging ? 'opacity-50 shadow-lg scale-[1.02] z-50' : ''
+      className={`group relative rounded-lg border border-slate-200 bg-white p-3 shadow-sm hover:shadow-md dark:border-slate-800 dark:bg-slate-900 transition-colors duration-150 ${
+        isDragging ? 'opacity-50 shadow-lg z-50' : ''
       }`}
     >
       <div className="space-y-2.5">

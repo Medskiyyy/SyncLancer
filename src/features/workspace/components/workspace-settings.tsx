@@ -65,8 +65,8 @@ export function WorkspaceSettings({ workspace, usage }: WorkspaceSettingsProps) 
       } else {
         toast.error(result.error || 'Failed to update workspace.');
       }
-    } catch (err: any) {
-      toast.error(err.message || 'An error occurred.');
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : 'An error occurred.');
     } finally {
       setUpdatingGeneral(false);
     }
@@ -82,8 +82,8 @@ export function WorkspaceSettings({ workspace, usage }: WorkspaceSettingsProps) 
       } else {
         toast.error(result.error || 'Failed to change plan.');
       }
-    } catch (err: any) {
-      toast.error(err.message || 'An error occurred.');
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : 'An error occurred.');
     } finally {
       setUpdatingPlan(false);
     }
@@ -180,7 +180,7 @@ export function WorkspaceSettings({ workspace, usage }: WorkspaceSettingsProps) 
                   </div>
                   {workspace.plan === 'PRO' ? (
                     <Badge className="px-3 py-1 bg-primary text-primary-foreground font-bold shadow-sm border-0 uppercase tracking-wider text-[10px] rounded-full">
-                      PRO UNLOCKED
+                      PRO PLAN
                     </Badge>
                   ) : (
                     <Badge variant="secondary" className="px-3 py-1 text-zinc-700 bg-zinc-100 border-zinc-200 font-bold uppercase tracking-wider text-[10px] rounded-full dark:bg-zinc-800 dark:text-zinc-400 dark:border-zinc-700">
@@ -257,7 +257,7 @@ export function WorkspaceSettings({ workspace, usage }: WorkspaceSettingsProps) 
             <Card variant="elevated" className="border-zinc-200/60 dark:border-zinc-800/60 bg-white dark:bg-zinc-900/40 rounded-xl shadow-xs overflow-hidden">
               <CardHeader className="border-b border-zinc-200/60 dark:border-zinc-800/60 pb-4">
                 <CardTitle className="text-base font-bold text-zinc-900 dark:text-zinc-50 font-heading">Plan Tier Control</CardTitle>
-                <CardDescription className="text-xs text-zinc-500 dark:text-zinc-400">Unlock absolute capability and features.</CardDescription>
+                <CardDescription className="text-xs text-zinc-500 dark:text-zinc-400">Change workspace limits for projects, clients, and storage.</CardDescription>
               </CardHeader>
               <CardContent className="p-6">
                 {workspace.plan === 'FREE' ? (
@@ -265,7 +265,7 @@ export function WorkspaceSettings({ workspace, usage }: WorkspaceSettingsProps) 
                     <div className="rounded-xl border border-primary/20 bg-primary/5 p-6 space-y-4">
                       <div className="space-y-1">
                         <h4 className="text-lg font-bold text-primary font-heading">SyncLancer PRO</h4>
-                        <p className="text-xs text-zinc-500 dark:text-zinc-400">Everything a professional freelancer needs to scale billing.</p>
+                        <p className="text-xs text-zinc-500 dark:text-zinc-400">Higher limits for freelancers managing more active work.</p>
                       </div>
                       <div className="grid gap-2 sm:grid-cols-2 text-sm text-zinc-700 dark:text-zinc-300 font-semibold">
                         <div className="flex items-center gap-2">
@@ -310,7 +310,7 @@ export function WorkspaceSettings({ workspace, usage }: WorkspaceSettingsProps) 
                         <CheckCircle className="h-5 w-5" /> Active Subscription
                       </h4>
                       <p className="text-xs text-zinc-500 dark:text-zinc-400">
-                        Thank you! Your workspace limits have been completely lifted. You are ready to scale without borders.
+                        Your workspace is on the Pro plan. Project, client, and storage limits are expanded for this workspace.
                       </p>
                     </div>
                     <div>

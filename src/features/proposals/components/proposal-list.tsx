@@ -10,12 +10,11 @@ import {
   Edit, 
   Trash2, 
   Eye, 
-  Sparkles,
 } from 'lucide-react';
 import Link from 'next/link';
 import { toast } from 'sonner';
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardDescription, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';

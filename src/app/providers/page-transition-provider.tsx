@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import { usePathname } from 'next/navigation';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 
 interface PageTransitionProviderProps {
   children: React.ReactNode;
@@ -10,6 +10,11 @@ interface PageTransitionProviderProps {
 
 export function PageTransitionProvider({ children }: PageTransitionProviderProps) {
   const pathname = usePathname();
+  const shouldReduceMotion = useReducedMotion();
+
+  if (shouldReduceMotion) {
+    return <div className="flex flex-1 flex-col w-full">{children}</div>;
+  }
 
   return (
     <AnimatePresence mode="wait">

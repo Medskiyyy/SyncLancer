@@ -1,25 +1,22 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import { File as PrismaFile, User } from '@prisma/client';
+import { File as PrismaFile } from '@prisma/client';
 import { 
   UploadCloud, 
   FileText, 
   Trash2, 
   Download, 
-  AlertCircle, 
   Loader2, 
   HardDrive,
-  ExternalLink,
   Folder,
   FileImage,
-  FileCode,
   FileArchive,
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import {
@@ -259,7 +256,7 @@ export function FileManager({ projectId, workspaceId, initialFiles, workspaceSlu
         <Card className="border-zinc-200/60 dark:border-zinc-800/80 bg-white dark:bg-slate-900 rounded-xl shadow-sm">
           <CardContent className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div className="flex items-center gap-3">
-              <HardDrive className="h-5 w-5 text-amber-550 shrink-0" />
+              <HardDrive className="h-5 w-5 text-primary shrink-0" />
               <div>
                 <p className="text-xs font-bold text-zinc-800 dark:text-zinc-200">Workspace Storage Usage</p>
                 <p className="text-[10px] text-zinc-500 dark:text-zinc-400">
@@ -303,8 +300,8 @@ export function FileManager({ projectId, workspaceId, initialFiles, workspaceSlu
         onDrop={handleDrop}
         className={`border-2 border-dashed rounded-xl p-8 text-center transition-all cursor-pointer flex flex-col items-center justify-center space-y-3 ${
           isDragOver 
-            ? 'border-primary bg-amber-500/5 dark:bg-amber-950/5' 
-            : 'border-zinc-200/60 hover:border-amber-500/40 bg-white dark:border-zinc-800/80 dark:bg-slate-900 dark:hover:border-primary'
+            ? 'border-primary bg-blue-500/5 dark:bg-blue-950/20'
+            : 'border-zinc-200/60 hover:border-primary/40 bg-white dark:border-zinc-800/80 dark:bg-slate-900 dark:hover:border-primary'
         }`}
         onClick={() => fileInputRef.current?.click()}
       >
@@ -317,7 +314,7 @@ export function FileManager({ projectId, workspaceId, initialFiles, workspaceSlu
         
         {isUploading ? (
           <>
-            <Loader2 className="h-10 w-10 text-amber-550 animate-spin" />
+            <Loader2 className="h-10 w-10 text-primary animate-spin" />
             <p className="text-sm font-bold text-zinc-800 dark:text-zinc-200">Uploading file...</p>
             <p className="text-xs text-slate-400">Verifying limits and pushing data to cloud storage.</p>
           </>
@@ -325,7 +322,7 @@ export function FileManager({ projectId, workspaceId, initialFiles, workspaceSlu
           <>
             <UploadCloud className="h-10 w-10 text-slate-450 dark:text-slate-550" />
             <p className="text-sm font-bold text-zinc-800 dark:text-zinc-200">
-              Drag & drop a file here, or <span className="text-amber-600 dark:text-amber-400 hover:underline">browse files</span>
+              Drag & drop a file here, or <span className="text-primary hover:underline">browse files</span>
             </p>
             <p className="text-xs text-slate-400 max-w-sm">
               Supports Images, PDF, Word, Excel, ZIP, RAR up to 10MB.
@@ -344,8 +341,8 @@ export function FileManager({ projectId, workspaceId, initialFiles, workspaceSlu
                 key={cat.name}
                 onClick={() => setSelectedCategory(selectedCategory === cat.name ? null : cat.name as any)}
                 className={cn(
-                  "flex items-center gap-3 p-4 border rounded-xl bg-white shadow-xs transition-all hover:scale-[1.01] cursor-pointer text-left",
-                  selectedCategory === cat.name ? "border-blue-550 ring-2 ring-blue-550/5 bg-slate-50/50" : "border-slate-200"
+                  "flex items-center gap-3 p-4 border rounded-lg bg-white shadow-sm transition-colors hover:bg-muted/50 cursor-pointer text-left",
+                  selectedCategory === cat.name ? "border-primary ring-2 ring-primary/10 bg-blue-50/50" : "border-slate-200"
                 )}
               >
                 <div className={cn("p-2 rounded-lg border shrink-0", cat.color)}>
@@ -393,7 +390,7 @@ export function FileManager({ projectId, workspaceId, initialFiles, workspaceSlu
               return (
                 <Card 
                   key={file.id} 
-                  className="bg-white border-slate-200 p-4 h-[120px] flex flex-col justify-between shadow-xs hover:scale-[1.01] transition-all rounded-xl relative group overflow-hidden"
+                  className="bg-white border-slate-200 p-4 h-[120px] flex flex-col justify-between shadow-sm transition-colors hover:bg-muted/50 rounded-lg relative group overflow-hidden"
                 >
                   <div className="flex items-start justify-between min-w-0">
                     <div className="flex items-center gap-2.5 min-w-0">

@@ -8,9 +8,6 @@ import { toast } from 'sonner';
 import { 
   Plus, 
   Search, 
-  Mail, 
-  Phone, 
-  FolderKanban, 
   Archive, 
   Trash2, 
   Edit, 
@@ -18,13 +15,10 @@ import {
   RotateCcw,
   Users,
   Building,
-  Sparkles,
-  DollarSign,
-  Calendar,
 } from 'lucide-react';
 import Link from 'next/link';
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardDescription, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -217,7 +211,7 @@ export function ClientList({ initialClients, workspaceId, workspaceSlug }: Clien
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-6 border-b border-border/80">
         <div>
           <h1 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50 font-heading">Clients</h1>
-          <p className="text-sm text-zinc-500 dark:text-zinc-450 mt-1">Manage client profiles, projects, billing records, and access keys.</p>
+          <p className="text-sm text-muted-foreground mt-1">Manage client profiles, project history, billing records, and portal access.</p>
         </div>
         <Button onClick={() => setIsAddOpen(true)} className="cursor-pointer font-medium text-sm h-10 px-4 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg shadow-sm shrink-0 self-start sm:self-auto">
           <Plus className="mr-2 h-4 w-4" /> Add Client
@@ -264,9 +258,9 @@ export function ClientList({ initialClients, workspaceId, workspaceSlug }: Clien
 
       {/* Clients List */}
       {filteredClients.length === 0 ? (
-        <Card variant="elevated" className="flex flex-col items-center justify-center p-12 text-center border-dashed border-zinc-200/60 dark:border-zinc-800/60 bg-white dark:bg-zinc-900/40">
-          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-zinc-50 dark:bg-zinc-950/60 text-zinc-450 dark:text-zinc-500 mb-4 border border-zinc-200/40 dark:border-zinc-800/60">
-            <Users className="h-6 w-6 text-zinc-500 dark:text-zinc-450" />
+        <Card variant="elevated" className="flex flex-col items-center justify-center p-12 text-center border-dashed border-border bg-muted/30">
+          <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-muted text-muted-foreground mb-4 border border-border">
+            <Users className="h-6 w-6 text-muted-foreground" />
           </div>
           <CardTitle className="text-base font-bold text-zinc-900 dark:text-zinc-50">
             {searchQuery ? 'No matching clients found' : `No ${activeTab} clients yet`}
@@ -287,7 +281,7 @@ export function ClientList({ initialClients, workspaceId, workspaceSlug }: Clien
           )}
         </Card>
       ) : (
-        <Card variant="elevated" className="overflow-hidden border border-zinc-200/60 dark:border-zinc-800/60 rounded-xl bg-white dark:bg-zinc-900/40">
+        <Card variant="elevated" className="overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse text-sm">
               <thead>
@@ -307,7 +301,7 @@ export function ClientList({ initialClients, workspaceId, workspaceSlug }: Clien
                   const revenue = getClientRevenue(client);
                   const lastActivity = getClientLastActivity(client);
                   return (
-                    <tr key={client.id} className="hover:bg-zinc-55/40 dark:hover:bg-zinc-850/30 transition-colors h-[60px]">
+                    <tr key={client.id} className="hover:bg-muted/50 transition-colors h-[60px]">
                       <td className="px-6 align-middle">
                         <div className="flex items-center gap-3">
                           <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary font-bold border border-primary/20 text-xs">
@@ -402,11 +396,11 @@ export function ClientList({ initialClients, workspaceId, workspaceSlug }: Clien
         <DialogContent className="max-w-md p-6 bg-white dark:bg-zinc-900 border border-zinc-250 dark:border-zinc-800 rounded-xl">
           <DialogHeader>
             <DialogTitle className="text-base font-bold text-zinc-900 dark:text-zinc-50 flex items-center gap-2">
-              <Sparkles className="h-4 w-4 text-amber-500" />
+              <Building className="h-4 w-4 text-primary" />
               <span>Add Client</span>
             </DialogTitle>
             <DialogDescription className="text-zinc-400 dark:text-zinc-500 text-xs">
-              Introduce a new corporate entity or client contact to your workspace directory.
+              Add the client contact details used for projects, proposals, invoices, and portal access.
             </DialogDescription>
           </DialogHeader>
           <Form {...addForm}>

@@ -20,7 +20,6 @@ import {
   ShieldCheck, 
   Clock, 
   ChevronRight,
-  Sparkles,
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -532,7 +531,7 @@ export function ClientProfile({ client, files, workspaceId, workspaceSlug }: Cli
         <DialogContent className="max-w-md p-6 bg-white dark:bg-zinc-900 border border-zinc-250 dark:border-zinc-800 rounded-xl">
           <DialogHeader>
             <DialogTitle className="text-base font-bold text-zinc-900 dark:text-zinc-50 flex items-center gap-2">
-              <Sparkles className="h-4 w-4 text-amber-500" />
+              <UserPlus className="h-4 w-4 text-primary" />
               <span>Invite Portal User</span>
             </DialogTitle>
             <DialogDescription className="text-zinc-400 dark:text-zinc-500 text-xs">

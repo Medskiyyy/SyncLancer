@@ -15,7 +15,6 @@ import {
   ChartBar,
   Gear,
   MagnifyingGlass,
-  GitBranch,
   List,
   X,
   User as UserIcon,
@@ -39,6 +38,15 @@ interface SidebarNavProps {
   children: React.ReactNode;
 }
 
+interface ActiveTimer {
+  projectId: string;
+  taskId?: string | null;
+  startTime: string;
+  billable: boolean;
+  notes?: string;
+  projectName: string;
+}
+
 export function SidebarNav({
   currentWorkspace,
   workspaces,
@@ -53,7 +61,7 @@ export function SidebarNav({
   const pathname = usePathname();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
   const [isSearchOpen, setIsSearchOpen] = React.useState(false);
-  const [activeTimer, setActiveTimer] = React.useState<any>(null);
+  const [activeTimer, setActiveTimer] = React.useState<ActiveTimer | null>(null);
   const [elapsed, setElapsed] = React.useState(0);
 
   React.useEffect(() => {
@@ -63,12 +71,12 @@ export function SidebarNav({
       const stored = localStorage.getItem(timerStorageKey);
       if (stored) {
         try {
-          const parsed = JSON.parse(stored);
+          const parsed = JSON.parse(stored) as ActiveTimer;
           setActiveTimer(parsed);
           const start = new Date(parsed.startTime).getTime();
           setElapsed(Math.floor((Date.now() - start) / 1000));
-        } catch (e) {
-          console.error(e);
+        } catch {
+          localStorage.removeItem(timerStorageKey);
         }
       } else {
         setActiveTimer(null);
@@ -114,7 +122,7 @@ export function SidebarNav({
       } else {
         toast.error(res.error || 'Failed to save time entry');
       }
-    } catch (e: any) {
+    } catch {
       toast.error('Failed to stop timer');
     }
   };
@@ -206,7 +214,7 @@ export function SidebarNav({
                 key={item.name}
                 href={item.href}
                 className={cn(
-                  "relative flex h-10 items-center gap-3 rounded-lg px-3 text-sm font-medium transition-all duration-200 cursor-pointer outline-none",
+                  "relative flex h-10 items-center gap-3 rounded-md px-3 text-sm font-medium transition-colors duration-150 cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-ring",
                   active
                     ? "text-primary font-semibold"
                     : "text-zinc-600 hover:bg-zinc-100/70 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-900/50 dark:hover:text-zinc-100"
@@ -215,7 +223,7 @@ export function SidebarNav({
                 {active && (
                   <motion.div
                     layoutId="sidebar-indicator"
-                    className="absolute inset-0 rounded-lg bg-primary/8 dark:bg-primary/10 border-l-[3px] border-primary"
+                    className="absolute inset-0 rounded-md bg-sidebar-accent border-l-[3px] border-sidebar-primary"
                     transition={{ type: "spring", stiffness: 380, damping: 30 }}
                   />
                 )}
@@ -229,7 +237,7 @@ export function SidebarNav({
     }
 
     return (
-      <div className="space-y-6 px-3 py-4">
+      <div className="space-y-5 px-3 py-4">
         {adminGroups.map((group) => (
           <div key={group.title} className="space-y-1">
             <div className="px-3 mb-2 text-[10px] font-semibold tracking-wider text-zinc-400 dark:text-zinc-550 uppercase">
@@ -244,20 +252,20 @@ export function SidebarNav({
                     key={item.name}
                     href={item.href}
                     className={cn(
-                      "relative flex h-10 items-center gap-3 rounded-lg px-3 text-sm font-medium transition-all duration-200 cursor-pointer outline-none",
+                      "relative flex h-10 items-center gap-3 rounded-md px-3 text-sm font-medium transition-colors duration-150 cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-ring",
                       active
                         ? "text-primary font-semibold"
-                        : "text-zinc-650 hover:bg-zinc-100/70 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-900/50 dark:hover:text-zinc-100"
+                        : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
                     )}
                   >
                     {active && (
                       <motion.div
                         layoutId="sidebar-indicator"
-                        className="absolute inset-0 rounded-lg bg-primary/8 dark:bg-primary/10 border-l-[3px] border-primary"
+                        className="absolute inset-0 rounded-md bg-sidebar-accent border-l-[3px] border-sidebar-primary"
                         transition={{ type: "spring", stiffness: 380, damping: 30 }}
                       />
                     )}
-                    <Icon weight={active ? "fill" : "regular"} className={cn("h-5 w-5 shrink-0 transition-transform duration-200 relative z-10", active ? "text-primary" : "text-zinc-450 dark:text-zinc-500")} />
+                    <Icon weight={active ? "fill" : "regular"} className={cn("h-5 w-5 shrink-0 relative z-10", active ? "text-primary" : "text-muted-foreground")} />
                     <span className="relative z-10">{item.name}</span>
                   </Link>
                 );
@@ -310,7 +318,7 @@ export function SidebarNav({
   return (
     <>
       {/* Desktop Sidebar (Permanent) - Floating Glass panel */}
-      <aside className="fixed left-4 top-4 bottom-4 z-20 hidden w-60 rounded-2xl border border-border/50 bg-white/70 dark:bg-zinc-950/70 backdrop-blur-md shadow-xs md:flex md:flex-col">
+      <aside className="fixed left-0 top-0 bottom-0 z-20 hidden w-60 border-r border-sidebar-border bg-sidebar shadow-sm md:flex md:flex-col">
         {renderSidebarContent()}
       </aside>
 
@@ -319,12 +327,12 @@ export function SidebarNav({
         <div className="fixed inset-0 z-40 md:hidden flex">
           {/* Backdrop */}
           <div
-            className="fixed inset-0 bg-black/30 backdrop-blur-xs transition-opacity"
+            className="fixed inset-0 bg-black/30 transition-opacity"
             onClick={() => setIsMobileMenuOpen(false)}
           />
 
           {/* Drawer panel */}
-          <div className="relative flex w-[260px] max-w-xs flex-col bg-white dark:bg-zinc-950 border-r border-zinc-200 dark:border-zinc-800 animate-in slide-in-from-left duration-250">
+          <div className="relative flex w-[260px] max-w-xs flex-col border-r border-sidebar-border bg-sidebar animate-in slide-in-from-left duration-200">
             <button
               onClick={() => setIsMobileMenuOpen(false)}
               className="absolute top-4 right-4 z-50 rounded-lg p-1.5 text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-900 cursor-pointer outline-none"
@@ -336,22 +344,22 @@ export function SidebarNav({
         </div>
       )}
 
-      {/* Main Content Area Wrapper - 272px offset for floating sidebar */}
-      <div className="flex flex-1 flex-col md:pl-[272px] min-h-screen">
-        {/* Top Header - exactly 64px height (h-16) with subtle bottom glow */}
-        <header className="sticky top-0 z-10 flex h-16 border-b border-border/40 bg-background/60 backdrop-blur-md px-6 items-center justify-between w-full after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[1px] after:bg-gradient-to-r after:from-transparent after:via-primary/5 after:to-transparent">
+      {/* Main Content Area Wrapper */}
+      <div className="flex flex-1 flex-col md:pl-60 min-h-screen">
+        {/* Top Header - exactly 64px height (h-16) */}
+        <header className="sticky top-0 z-10 flex h-16 border-b border-border bg-card px-6 items-center justify-between w-full">
           <div className="flex flex-1 items-center justify-between">
             {/* Left section: Hamburger (mobile) + Page Title */}
             <div className="flex items-center gap-3">
               <button
                 onClick={() => setIsMobileMenuOpen(true)}
-                className="rounded-lg p-1.5 text-zinc-655 hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-800 md:hidden cursor-pointer outline-none"
+                className="rounded-md p-1.5 text-muted-foreground hover:bg-muted md:hidden cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-ring"
               >
                 <List className="h-5 w-5" />
               </button>
               
               <div className="flex items-center gap-1.5 text-sm font-semibold">
-                <span className="text-zinc-500 dark:text-zinc-400 font-normal">SyncLancer</span>
+                  <span className="text-muted-foreground font-normal">SyncLancer</span>
                 <span className="text-zinc-300 dark:text-zinc-700">/</span>
                 <span className="font-bold text-zinc-900 dark:text-zinc-50 truncate max-w-[120px] md:max-w-none">
                   {isClient ? 'Client Portal' : currentWorkspace.name}
@@ -363,10 +371,10 @@ export function SidebarNav({
             <div className="flex items-center gap-4">
               {/* Desktop header search bar trigger - exactly 320px width */}
               <div className="relative hidden md:block w-[320px]">
-                <MagnifyingGlass className="absolute left-2.5 top-2.5 h-4 w-4 text-zinc-450" />
+                <MagnifyingGlass className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                 <button
                   onClick={() => setIsSearchOpen(true)}
-                  className="flex h-9 w-full items-center justify-between rounded-lg border border-zinc-200 bg-zinc-50 pl-8 pr-3 text-left text-xs text-zinc-450 transition-all hover:bg-zinc-100 dark:border-zinc-800 dark:bg-zinc-950 cursor-pointer outline-none font-medium"
+                  className="flex h-9 w-full items-center justify-between rounded-md border border-border bg-muted/50 pl-8 pr-3 text-left text-xs text-muted-foreground transition-colors hover:bg-muted cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-ring font-medium"
                 >
                   <span>Search workspace...</span>
                   <kbd className="pointer-events-none font-mono text-[9px] text-zinc-400">Ctrl K</kbd>
@@ -384,7 +392,7 @@ export function SidebarNav({
               {/* Notification Center */}
               {notificationCenter}
 
-              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-zinc-100 text-zinc-650 dark:bg-zinc-800 dark:text-zinc-300 border border-zinc-200/50 dark:border-zinc-700/50">
+              <div className="flex h-8 w-8 items-center justify-center rounded-full border border-border bg-muted text-muted-foreground">
                 <UserIcon className="h-4 w-4" />
               </div>
             </div>
@@ -407,17 +415,14 @@ export function SidebarNav({
 
       {/* Floating Active Timer Panel */}
       {activeTimer && (
-        <div className="fixed bottom-6 right-6 z-50 flex items-center gap-4 rounded-2xl border border-primary/30 bg-zinc-900/95 dark:bg-zinc-950/95 text-white p-4 shadow-2xl animate-in slide-in-from-bottom duration-300 max-w-sm">
+        <div className="fixed bottom-6 right-6 z-50 flex max-w-sm items-center gap-4 rounded-lg border border-primary/30 bg-slate-950 text-white p-4 shadow-lg animate-in slide-in-from-bottom duration-200">
           <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary/10 border border-primary/20 shrink-0">
-            <span className="relative flex h-3.5 w-3.5">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-3.5 w-3.5 bg-primary"></span>
-            </span>
+            <span className="h-3.5 w-3.5 rounded-full bg-primary" />
           </div>
           <div className="flex flex-col min-w-0">
             <span className="text-[10px] font-bold uppercase tracking-wider text-primary">Active Timer</span>
             <span className="text-xs font-semibold truncate text-zinc-100">{activeTimer.projectName}</span>
-            <span className="text-[10px] text-zinc-450 truncate mt-0.5">{activeTimer.notes || 'No description'}</span>
+            <span className="text-[10px] text-slate-400 truncate mt-0.5">{activeTimer.notes || 'No description'}</span>
           </div>
           <div className="flex items-center gap-3 pl-2 border-l border-zinc-800">
             <span className="text-sm font-mono font-bold tracking-tight text-white">{formatTime(elapsed)}</span>

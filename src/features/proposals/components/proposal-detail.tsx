@@ -16,12 +16,10 @@ import {
   Building,
   Mail,
   Phone,
-  FileText,
-  Sparkles,
 } from 'lucide-react';
 import Link from 'next/link';
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import {
@@ -38,7 +36,6 @@ import {
   rejectProposalAction, 
   approveProposalAction 
 } from '../actions/proposal-actions';
-import { cn } from '@/lib/utils';
 
 interface ExtendedProposal extends Proposal {
   items: ProposalItem[];
@@ -316,7 +313,7 @@ export function ProposalDetail({ proposal: initialProposal, workspaceId, workspa
           </Card>
 
           {/* Pricing Totals Box */}
-          <Card className="shadow-xs border border-amber-500/25 rounded-xl overflow-hidden bg-white dark:bg-zinc-900 premium-glow">
+          <Card className="shadow-xs border border-border rounded-xl overflow-hidden bg-white dark:bg-zinc-900">
             <CardHeader className="bg-zinc-50/50 dark:bg-zinc-900/30 pb-3 border-b border-zinc-150 dark:border-zinc-800">
               <CardTitle className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Pricing Summary</CardTitle>
             </CardHeader>

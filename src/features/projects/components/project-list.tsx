@@ -6,30 +6,17 @@ import {
   Plus, 
   Search, 
   Briefcase, 
-  Calendar, 
-  DollarSign, 
-  MoreVertical, 
   Edit, 
   Trash2, 
   ExternalLink,
-  ChevronRight,
-  TrendingUp,
-  Sparkles,
 } from 'lucide-react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardDescription, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import {
   Dialog,
   DialogContent,
@@ -63,7 +50,6 @@ const STATUS_THEMES: Record<string, string> = {
 };
 
 export function ProjectList({ initialProjects, workspaceId, workspaceSlug }: ProjectListProps) {
-  const router = useRouter();
   const [projects, setProjects] = useState<ExtendedProject[]>(initialProjects);
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('ALL');
@@ -165,8 +151,8 @@ export function ProjectList({ initialProjects, workspaceId, workspaceSlug }: Pro
 
       {/* Grid List */}
       {filteredProjects.length === 0 ? (
-        <Card variant="elevated" className="flex flex-col items-center justify-center p-12 text-center border-dashed border-border/60 bg-zinc-50/50 dark:bg-zinc-900/10 rounded-2xl">
-          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-zinc-50 text-zinc-450 mb-4 border border-border/60 dark:bg-zinc-900/50">
+        <Card variant="elevated" className="flex flex-col items-center justify-center p-12 text-center border-dashed border-border bg-muted/30">
+          <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-muted text-muted-foreground mb-4 border border-border">
             <Briefcase className="h-6 w-6 text-primary" />
           </div>
           <CardTitle className="text-base font-bold text-zinc-900 dark:text-zinc-50 font-heading">No projects found</CardTitle>
@@ -184,7 +170,7 @@ export function ProjectList({ initialProjects, workspaceId, workspaceSlug }: Pro
           )}
         </Card>
       ) : (
-        <Card variant="elevated" className="overflow-hidden border border-zinc-200/60 dark:border-zinc-800/60 rounded-2xl shadow-xs bg-white dark:bg-zinc-900/40 backdrop-blur-md">
+        <Card variant="elevated" className="overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse text-sm">
               <thead>
@@ -201,7 +187,7 @@ export function ProjectList({ initialProjects, workspaceId, workspaceSlug }: Pro
               <tbody className="divide-y divide-border/40 bg-transparent">
                 {filteredProjects.map((project) => {
                   return (
-                    <tr key={project.id} className="hover:bg-zinc-50/50 dark:hover:bg-zinc-900/20 transition-colors h-[60px]">
+                    <tr key={project.id} className="hover:bg-muted/50 transition-colors h-[60px]">
                       <td className="px-6 align-middle">
                         <Link href={`/${workspaceSlug}/projects/${project.id}`} className="font-semibold text-zinc-900 dark:text-zinc-100 hover:text-primary dark:hover:text-primary transition-colors hover:underline">
                           {project.name}

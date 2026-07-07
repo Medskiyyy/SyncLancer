@@ -4,11 +4,11 @@ export default function manifest(): MetadataRoute.Manifest {
   return {
     name: 'SyncLancer',
     short_name: 'SyncLancer',
-    description: 'Manage projects, leads, clients, proposals, and invoices from a single dashboard.',
+    description: 'Freelance operations workspace for clients, projects, proposals, invoices, and files.',
     start_url: '/',
     display: 'standalone',
-    background_color: '#ffffff',
-    theme_color: '#4f46e5',
+    background_color: '#f8fafc',
+    theme_color: '#2563eb',
     icons: [
       {
         src: '/icon-192.png',

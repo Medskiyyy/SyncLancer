@@ -1,13 +1,12 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Lead, LeadStatus } from '@prisma/client';
 import {
   DndContext,
   useSensor,
   useSensors,
   PointerSensor,
-  KeyboardSensor,
   DragEndEvent,
   closestCorners,
   useDraggable,
@@ -21,7 +20,6 @@ import {
   deleteLeadAction,
   convertLeadToClientAction,
 } from '../actions/lead-actions';
-import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -39,7 +37,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { createLeadSchema, CreateLeadInput } from '../schemas/lead';
 import { toast } from 'sonner';
-import { Plus, Edit2, Trash2, ArrowRightLeft, User, Phone, Briefcase, Mail, GripVertical, Sparkles, Filter, Search } from 'lucide-react';
+import { Plus, Edit2, Trash2, ArrowRightLeft, Phone, Briefcase, Mail, GripVertical, Search } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { FadeIn } from '@/components/ui/motion';
 
@@ -50,11 +48,11 @@ interface LeadKanbanBoardProps {
 
 const COLUMNS = [
   { label: 'Lead', status: LeadStatus.NEW, theme: 'border-zinc-200/60 dark:border-zinc-800/60 bg-zinc-50/40 dark:bg-zinc-900/10' },
-  { label: 'Contacted', status: LeadStatus.CONTACTED, theme: 'border-blue-200/40 dark:border-blue-900/10 bg-blue-500/3 dark:bg-blue-950/5' },
-  { label: 'Proposal Sent', status: LeadStatus.PROPOSAL_SENT, theme: 'border-violet-200/40 dark:border-violet-900/10 bg-violet-500/3 dark:bg-violet-955/5' },
-  { label: 'Negotiation', status: LeadStatus.NEGOTIATION, theme: 'border-amber-200/40 dark:border-amber-900/10 bg-amber-500/3 dark:bg-amber-955/5' },
-  { label: 'Won', status: LeadStatus.WON, theme: 'border-green-200/40 dark:border-green-900/10 bg-green-500/3 dark:bg-green-955/5' },
-  { label: 'Lost', status: LeadStatus.LOST, theme: 'border-red-200/40 dark:border-red-900/10 bg-red-500/3 dark:bg-red-955/5' },
+  { label: 'Contacted', status: LeadStatus.CONTACTED, theme: 'border-blue-200/60 dark:border-blue-900/30 bg-blue-50/50 dark:bg-blue-950/20' },
+  { label: 'Proposal Sent', status: LeadStatus.PROPOSAL_SENT, theme: 'border-violet-200/60 dark:border-violet-900/30 bg-violet-50/50 dark:bg-violet-950/20' },
+  { label: 'Negotiation', status: LeadStatus.NEGOTIATION, theme: 'border-amber-200/60 dark:border-amber-900/30 bg-amber-50/50 dark:bg-amber-950/20' },
+  { label: 'Won', status: LeadStatus.WON, theme: 'border-green-200/60 dark:border-green-900/30 bg-green-50/50 dark:bg-green-950/20' },
+  { label: 'Lost', status: LeadStatus.LOST, theme: 'border-red-200/60 dark:border-red-900/30 bg-red-50/50 dark:bg-red-950/20' },
 ];
 
 // Droppable Column Component
@@ -100,8 +98,8 @@ function KanbanCard({ lead, onEdit, onDelete, onConvert }: any) {
       ref={setNodeRef}
       style={style}
       className={cn(
-        "group relative rounded-xl border border-zinc-200/60 bg-white p-3.5 shadow-xs hover-lift dark:border-zinc-850 dark:bg-zinc-900/60 transition-all",
-        isDragging ? "cursor-grabbing shadow-premium-lg scale-[1.02] border-primary/30" : "cursor-grab"
+        "group relative rounded-lg border border-border bg-card p-3.5 shadow-sm transition-colors hover:bg-muted/40",
+        isDragging ? "cursor-grabbing border-primary/40 shadow-lg" : "cursor-grab"
       )}
     >
       <div className="space-y-3">
@@ -426,11 +424,11 @@ export function LeadKanbanBoard({ initialLeads, workspaceId }: LeadKanbanBoardPr
         <DialogContent className="max-w-md p-6 bg-white dark:bg-zinc-900 border border-zinc-250 dark:border-zinc-800 rounded-xl">
           <DialogHeader>
             <DialogTitle className="text-base font-bold text-zinc-900 dark:text-zinc-50 flex items-center gap-2">
-              <Sparkles className="h-4 w-4 text-amber-500" />
+              <Plus className="h-4 w-4 text-primary" />
               <span>Add New Lead</span>
             </DialogTitle>
             <DialogDescription className="text-zinc-400 dark:text-zinc-500 text-xs">
-              Add a contact to the pipeline. They will be placed in the &apos;New Lead&apos; stage.
+              Add a contact to the pipeline. New leads start in the Lead stage.
             </DialogDescription>
           </DialogHeader>
           <Form {...addForm}>

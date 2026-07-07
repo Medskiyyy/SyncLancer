@@ -39,8 +39,8 @@ export default function RegisterPage() {
       
       // Successfully registered, auto login or redirect to login
       router.push('/login?registered=true');
-    } catch (err: any) {
-      setError(err.message || 'An unexpected error occurred');
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'An unexpected error occurred');
     } finally {
       setIsLoading(false);
     }
@@ -52,11 +52,7 @@ export default function RegisterPage() {
 
   return (
     <div className="relative flex min-h-screen items-center justify-center bg-background p-4 overflow-hidden">
-      {/* Premium ambient Liquid Glass gold mesh glows */}
-      <div className="absolute -left-20 -top-20 h-96 w-96 rounded-full bg-primary/5 dark:bg-primary/10 blur-3xl pointer-events-none" />
-      <div className="absolute -right-20 -bottom-20 h-96 w-96 rounded-full bg-primary/5 dark:bg-primary/10 blur-3xl pointer-events-none" />
-
-      <Card className="w-full max-w-md glass-card shadow-lg relative border-none">
+      <Card className="w-full max-w-md border-border bg-card shadow-sm">
         <CardHeader className="space-y-1.5 text-center">
           <CardTitle className="text-2xl font-bold tracking-tight font-heading">Create an account</CardTitle>
           <CardDescription>
@@ -107,7 +103,7 @@ export default function RegisterPage() {
                   <FormItem>
                     <FormLabel>Password</FormLabel>
                     <FormControl>
-                      <Input type="password" placeholder="••••••••" disabled={isLoading} {...field} />
+                      <Input type="password" placeholder="Password" disabled={isLoading} {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
