@@ -27,8 +27,15 @@ export const authConfig = {
         nextUrl.pathname.startsWith('/forgot-password') ||
         nextUrl.pathname.startsWith('/reset-password');
 
+      const isPublicRoute =
+        nextUrl.pathname === '/' ||
+        nextUrl.pathname.startsWith('/offline');
+
       // Allow API routes (they handle their own auth checks or are public)
       if (isApiRoute) return true;
+
+      // Allow public landing and offline routes
+      if (isPublicRoute) return true;
 
       if (isAuthRoute) {
         if (isLoggedIn) {
