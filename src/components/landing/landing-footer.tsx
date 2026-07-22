@@ -14,7 +14,7 @@ export const LandingFooter: React.FC<LandingFooterProps> = ({ lang }) => {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="border-t border-slate-200 dark:border-slate-800/80 bg-slate-50 dark:bg-slate-950 text-slate-600 dark:text-slate-400 py-12">
+    <footer className="border-t border-white/10 bg-[#02050e] text-slate-400 py-12">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Brand info */}
@@ -23,25 +23,25 @@ export const LandingFooter: React.FC<LandingFooterProps> = ({ lang }) => {
               <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-600 text-white">
                 <Layers className="h-4 w-4" />
               </div>
-              <span className="text-xl font-bold tracking-tight text-slate-900 dark:text-white font-heading">
-                Sync<span className="text-blue-600 dark:text-blue-400">Lancer</span>
+              <span className="text-xl font-bold tracking-tight text-white font-heading">
+                Sync<span className="text-blue-500">Lancer</span>
               </span>
             </Link>
-            <p className="text-sm text-slate-500 dark:text-slate-400 max-w-sm">
+            <p className="text-sm text-slate-400 max-w-sm">
               {t.tagline}
             </p>
           </div>
 
           {/* Quick links */}
           <div>
-            <h4 className="text-sm font-semibold text-slate-900 dark:text-white font-heading mb-3">
+            <h4 className="text-sm font-semibold text-white font-heading mb-3">
               {t.navigation}
             </h4>
             <ul className="space-y-2 text-sm">
               <li>
                 <a
                   href="#features"
-                  className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                  className="hover:text-blue-400 transition-colors"
                 >
                   {translations[lang].nav.features}
                 </a>
@@ -49,7 +49,7 @@ export const LandingFooter: React.FC<LandingFooterProps> = ({ lang }) => {
               <li>
                 <a
                   href="#workflow"
-                  className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                  className="hover:text-blue-400 transition-colors"
                 >
                   {translations[lang].nav.workflow}
                 </a>
@@ -57,7 +57,7 @@ export const LandingFooter: React.FC<LandingFooterProps> = ({ lang }) => {
               <li>
                 <a
                   href="#portal"
-                  className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                  className="hover:text-blue-400 transition-colors"
                 >
                   {translations[lang].nav.portal}
                 </a>
@@ -65,16 +65,16 @@ export const LandingFooter: React.FC<LandingFooterProps> = ({ lang }) => {
             </ul>
           </div>
 
-          {/* Account links */}
+          {/* Support links */}
           <div>
-            <h4 className="text-sm font-semibold text-slate-900 dark:text-white font-heading mb-3">
+            <h4 className="text-sm font-semibold text-white font-heading mb-3">
               {t.support}
             </h4>
             <ul className="space-y-2 text-sm">
               <li>
                 <Link
                   href="/login"
-                  className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                  className="hover:text-blue-400 transition-colors"
                 >
                   {translations[lang].nav.login}
                 </Link>
@@ -82,7 +82,7 @@ export const LandingFooter: React.FC<LandingFooterProps> = ({ lang }) => {
               <li>
                 <Link
                   href="/register"
-                  className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                  className="hover:text-blue-400 transition-colors"
                 >
                   {translations[lang].nav.register}
                 </Link>
@@ -91,7 +91,7 @@ export const LandingFooter: React.FC<LandingFooterProps> = ({ lang }) => {
           </div>
         </div>
 
-        <div className="mt-12 border-t border-slate-200/80 dark:border-slate-800/80 pt-6 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 gap-4">
+        <div className="mt-12 border-t border-white/10 pt-6 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 gap-4">
           <p>© {currentYear} SyncLancer. {t.rights}</p>
           <div className="flex gap-4">
             <span className="hover:underline cursor-pointer">{t.privacy}</span>

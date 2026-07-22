@@ -2,6 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
+import { motion } from 'framer-motion';
 import { Globe, ArrowRight, Layers, LogIn, UserPlus } from 'lucide-react';
 import { Language, translations } from './translations';
 
@@ -17,73 +18,86 @@ export const LandingNavbar: React.FC<LandingNavbarProps> = ({
   const t = translations[lang].nav;
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-slate-200/80 bg-white/80 backdrop-blur-md dark:border-slate-800/80 dark:bg-slate-950/80 transition-colors">
+    <header className="sticky top-0 z-50 w-full border-b border-white/10 bg-[#030712]/80 backdrop-blur-xl transition-all">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-        {/* Logo */}
-        <Link href="/" className="flex items-center gap-2.5 group">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-500 text-white shadow-md shadow-blue-500/20 group-hover:scale-105 transition-transform">
-            <Layers className="h-5 w-5" />
-          </div>
+        {/* Brand Logo */}
+        <Link href="/" className="flex items-center gap-3 group">
+          <motion.div
+            whileHover={{ scale: 1.05, rotate: 3 }}
+            whileTap={{ scale: 0.95 }}
+            className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-500 text-white shadow-lg shadow-blue-600/20"
+          >
+            <Layers className="h-5 w-5 text-white" />
+          </motion.div>
           <div className="flex flex-col">
-            <span className="text-xl font-bold tracking-tight text-slate-900 dark:text-white font-heading">
-              Sync<span className="text-blue-600 dark:text-blue-400">Lancer</span>
+            <span className="text-lg font-bold tracking-tight text-white font-heading">
+              Sync<span className="text-blue-500">Lancer</span>
             </span>
           </div>
         </Link>
 
         {/* Navigation Links */}
-        <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-slate-600 dark:text-slate-300">
-          <a
+        <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-slate-300">
+          <motion.a
+            whileHover={{ y: -1, color: '#60a5fa' }}
             href="#features"
-            className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+            className="transition-colors"
           >
             {t.features}
-          </a>
-          <a
+          </motion.a>
+          <motion.a
+            whileHover={{ y: -1, color: '#60a5fa' }}
             href="#workflow"
-            className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+            className="transition-colors"
           >
             {t.workflow}
-          </a>
-          <a
+          </motion.a>
+          <motion.a
+            whileHover={{ y: -1, color: '#60a5fa' }}
             href="#portal"
-            className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+            className="transition-colors"
           >
             {t.portal}
-          </a>
+          </motion.a>
         </nav>
 
         {/* Right Action Controls */}
         <div className="flex items-center gap-3">
-          {/* Language Selector Toggle */}
-          <button
+          {/* Language Switcher */}
+          <motion.button
+            whileHover={{ scale: 1.03 }}
+            whileTap={{ scale: 0.97 }}
             type="button"
             onClick={() => onLanguageChange(lang === 'id' ? 'en' : 'id')}
-            className="flex items-center gap-1.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 px-2.5 py-1.5 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+            className="flex items-center gap-1.5 rounded-lg border border-white/10 bg-slate-900/80 px-3 py-1.5 text-xs font-semibold text-slate-200 hover:border-blue-500/50 hover:bg-slate-800 transition-all"
             title="Switch Language"
           >
-            <Globe className="h-3.5 w-3.5 text-blue-600 dark:text-blue-400" />
+            <Globe className="h-3.5 w-3.5 text-blue-400" />
             <span>{lang.toUpperCase()}</span>
-          </button>
+          </motion.button>
 
           {/* Login Button */}
-          <Link
-            href="/login"
-            className="hidden sm:inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-semibold text-slate-700 hover:text-blue-600 dark:text-slate-200 dark:hover:text-blue-400 transition-colors"
-          >
-            <LogIn className="h-4 w-4" />
-            <span>{t.login}</span>
+          <Link href="/login">
+            <motion.div
+              whileHover={{ y: -1 }}
+              whileTap={{ scale: 0.97 }}
+              className="hidden sm:inline-flex items-center gap-1.5 rounded-lg px-3.5 py-1.5 text-sm font-semibold text-slate-300 hover:text-white transition-colors cursor-pointer"
+            >
+              <LogIn className="h-4 w-4" />
+              <span>{t.login}</span>
+            </motion.div>
           </Link>
 
-          {/* Register CTA Button */}
-          <Link
-            href="/register"
-            className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-md shadow-blue-600/20 hover:bg-blue-700 active:scale-95 transition-all"
-          >
-            <UserPlus className="h-4 w-4 sm:hidden" />
-            <span className="hidden sm:inline">{t.register}</span>
-            <span className="sm:hidden">{t.register}</span>
-            <ArrowRight className="h-4 w-4 hidden sm:inline" />
+          {/* Register Button */}
+          <Link href="/register">
+            <motion.div
+              whileHover={{ scale: 1.02, y: -1 }}
+              whileTap={{ scale: 0.97 }}
+              className="inline-flex items-center gap-2 rounded-lg bg-blue-600 hover:bg-blue-500 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-blue-600/25 transition-all cursor-pointer"
+            >
+              <span>{t.register}</span>
+              <ArrowRight className="h-4 w-4 hidden sm:inline" />
+            </motion.div>
           </Link>
         </div>
       </div>
