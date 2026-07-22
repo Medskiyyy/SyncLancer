@@ -1,7 +1,11 @@
 'use client';
 
 import * as React from 'react';
-import { motion, useMotionValue, useTransform, animate, useReducedMotion } from 'framer-motion';
+import { motion, useInView, useMotionValue, animate, useReducedMotion } from 'framer-motion';
+
+// Refined easing: smoother than default spring, less bouncy
+export const easeOutQuart = [0.22, 1, 0.36, 1] as const;
+export const easeInOutQuart = [0.76, 0, 0.24, 1] as const;
 
 interface FadeInProps extends Omit<React.ComponentProps<typeof motion.div>, 'children'> {
   children?: React.ReactNode;
@@ -14,32 +18,35 @@ export function FadeIn({
   children,
   direction = 'up',
   delay = 0,
-  duration = 0.35,
+  duration = 0.5,
   className,
   ...props
 }: FadeInProps) {
   const shouldReduceMotion = useReducedMotion();
-  
+  const ref = React.useRef<HTMLDivElement>(null);
+  const isInView = useInView(ref, { once: true, margin: '-80px' });
+
   if (shouldReduceMotion) {
     return <div className={className}>{children}</div>;
   }
 
   const directions = {
-    up: { y: 12 },
-    down: { y: -12 },
-    left: { x: 12 },
-    right: { x: -12 },
+    up: { y: 24 },
+    down: { y: -24 },
+    left: { x: 24 },
+    right: { x: -24 },
     none: {},
   };
 
   return (
     <motion.div
+      ref={ref}
       initial={{ opacity: 0, ...directions[direction] }}
-      animate={{ opacity: 1, x: 0, y: 0 }}
+      animate={isInView ? { opacity: 1, x: 0, y: 0 } : { opacity: 0, ...directions[direction] }}
       transition={{
         duration,
         delay,
-        ease: [0.16, 1, 0.3, 1], // easeOutQuart
+        ease: easeOutQuart,
       }}
       className={className}
       {...props}
@@ -58,11 +65,13 @@ interface StaggerContainerProps extends Omit<React.ComponentProps<typeof motion.
 export function StaggerContainer({
   children,
   delayChildren = 0,
-  staggerChildren = 0.05,
+  staggerChildren = 0.08,
   className,
   ...props
 }: StaggerContainerProps) {
   const shouldReduceMotion = useReducedMotion();
+  const ref = React.useRef<HTMLDivElement>(null);
+  const isInView = useInView(ref, { once: true, margin: '-80px' });
 
   if (shouldReduceMotion) {
     return <div className={className}>{children}</div>;
@@ -70,8 +79,9 @@ export function StaggerContainer({
 
   return (
     <motion.div
+      ref={ref}
       initial="hidden"
-      animate="show"
+      animate={isInView ? 'show' : 'hidden'}
       variants={{
         hidden: {},
         show: {
@@ -107,8 +117,8 @@ export function StaggerItem({
   }
 
   const directions = {
-    up: { y: 12 },
-    down: { y: -12 },
+    up: { y: 16 },
+    down: { y: -16 },
     none: {},
   };
 
@@ -116,14 +126,96 @@ export function StaggerItem({
     <motion.div
       variants={{
         hidden: { opacity: 0, ...directions[direction] },
-        show: { 
-          opacity: 1, 
-          y: 0, 
+        show: {
+          opacity: 1,
+          y: 0,
           transition: {
-            duration: 0.35,
-            ease: [0.16, 1, 0.3, 1],
-          }
+            duration: 0.5,
+            ease: easeOutQuart,
+          },
         },
+      }}
+      className={className}
+      {...props}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
+interface RevealProps extends Omit<React.ComponentProps<typeof motion.div>, 'children'> {
+  children?: React.ReactNode;
+  delay?: number;
+  duration?: number;
+}
+
+export function Reveal({
+  children,
+  delay = 0,
+  duration = 0.6,
+  className,
+  ...props
+}: RevealProps) {
+  const shouldReduceMotion = useReducedMotion();
+  const ref = React.useRef<HTMLDivElement>(null);
+  const isInView = useInView(ref, { once: true, margin: '-100px' });
+
+  if (shouldReduceMotion) {
+    return <div className={className}>{children}</div>;
+  }
+
+  return (
+    <motion.div
+      ref={ref}
+      initial={{ opacity: 0, scale: 0.96 }}
+      animate={isInView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.96 }}
+      transition={{
+        duration,
+        delay,
+        ease: easeOutQuart,
+      }}
+      className={className}
+      {...props}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
+interface SlideInProps extends Omit<React.ComponentProps<typeof motion.div>, 'children'> {
+  children?: React.ReactNode;
+  from?: 'left' | 'right';
+  delay?: number;
+  duration?: number;
+}
+
+export function SlideIn({
+  children,
+  from = 'left',
+  delay = 0,
+  duration = 0.6,
+  className,
+  ...props
+}: SlideInProps) {
+  const shouldReduceMotion = useReducedMotion();
+  const ref = React.useRef<HTMLDivElement>(null);
+  const isInView = useInView(ref, { once: true, margin: '-80px' });
+
+  if (shouldReduceMotion) {
+    return <div className={className}>{children}</div>;
+  }
+
+  const xOffset = from === 'left' ? -40 : 40;
+
+  return (
+    <motion.div
+      ref={ref}
+      initial={{ opacity: 0, x: xOffset }}
+      animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: xOffset }}
+      transition={{
+        duration,
+        delay,
+        ease: easeOutQuart,
       }}
       className={className}
       {...props}
@@ -170,7 +262,7 @@ export function AnimatedNumber({
     const timer = setTimeout(() => {
       const controls = animate(count, value, {
         duration,
-        ease: [0.16, 1, 0.3, 1],
+        ease: easeOutQuart,
         onUpdate: (latest) => {
           setDisplayValue(`${prefix}${formatNumber(latest)}${suffix}`);
         },
