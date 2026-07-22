@@ -31,13 +31,13 @@ const Step = ({ number, title, desc, index, isLast = false }: StepProps) => {
       >
         {/* Step number circle */}
         <div className="mb-6">
-          <div className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/[0.14] bg-white/[0.04] text-sm font-mono font-semibold text-blue-400">
+          <div className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white text-sm font-mono font-semibold text-blue-600">
             {number}
           </div>
         </div>
 
         {/* Content */}
-        <h3 className="text-lg font-semibold text-white mb-2">
+        <h3 className="text-lg font-semibold text-slate-900 mb-2">
           {title}
         </h3>
         <p className="text-base leading-relaxed text-slate-500">
@@ -54,7 +54,7 @@ const Step = ({ number, title, desc, index, isLast = false }: StepProps) => {
           transition={{ duration: 0.6, delay: index * 0.2 + 0.4, ease: easeOutQuart }}
           style={{ transformOrigin: 'left' }}
         >
-          <div className="h-px bg-gradient-to-r from-white/[0.14] to-transparent" />
+          <div className="h-px bg-slate-200" />
         </motion.div>
       )}
     </div>
@@ -65,32 +65,20 @@ export const LandingWorkflow: React.FC<LandingWorkflowProps> = ({ lang }) => {
   const t = translations[lang].workflow;
 
   const steps = [
-    {
-      number: '01',
-      title: t.step1Title,
-      desc: t.step1Desc,
-    },
-    {
-      number: '02',
-      title: t.step2Title,
-      desc: t.step2Desc,
-    },
-    {
-      number: '03',
-      title: t.step3Title,
-      desc: t.step3Desc,
-    },
+    { number: '01', title: t.step1Title, desc: t.step1Desc },
+    { number: '02', title: t.step2Title, desc: t.step2Desc },
+    { number: '03', title: t.step3Title, desc: t.step3Desc },
   ];
 
   return (
-    <section id="workflow" className="py-24 md:py-32 bg-[#030712] text-slate-100 border-y border-white/[0.06]">
+    <section id="workflow" className="py-24 md:py-32 bg-white text-slate-900 border-y border-slate-200">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto mb-16 md:mb-20">
-          <h2 className="text-3xl font-semibold tracking-tight text-white sm:text-4xl font-heading leading-snug">
+          <h2 className="text-3xl font-semibold tracking-tight text-slate-900 sm:text-4xl font-heading leading-snug">
             {t.title}
           </h2>
-          <p className="mt-5 text-lg text-slate-400 leading-relaxed">
+          <p className="mt-5 text-lg text-slate-500 leading-relaxed">
             {t.subtitle}
           </p>
         </div>

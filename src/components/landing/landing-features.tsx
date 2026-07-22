@@ -41,17 +41,17 @@ const FeatureCard = ({ icon, tag, title, desc, className = '', index }: FeatureC
         delay: index * 0.1,
         ease: easeOutQuart,
       }}
-      className={`group rounded-xl border border-white/[0.07] bg-[#0a0f1e] p-6 hover:border-white/[0.14] transition-colors ${className}`}
+      className={`group rounded-xl border border-slate-200 bg-white p-6 hover:border-slate-300 hover:shadow-lg hover:shadow-slate-200/50 transition-all ${className}`}
     >
-      <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-white/[0.04] border border-white/[0.07] text-blue-400">
+      <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-50 border border-blue-100 text-blue-600">
         {icon}
       </div>
 
-      <span className="mt-5 inline-block text-[11px] font-semibold tracking-wider text-blue-400 uppercase">
+      <span className="mt-5 inline-block text-[11px] font-semibold tracking-wider text-blue-600 uppercase">
         {tag}
       </span>
 
-      <h3 className="mt-2 text-lg font-semibold text-white">
+      <h3 className="mt-2 text-lg font-semibold text-slate-900">
         {title}
       </h3>
 
@@ -71,68 +71,60 @@ export const LandingFeatures: React.FC<LandingFeaturesProps> = ({ lang }) => {
       tag: t.crm.tag,
       title: t.crm.title,
       desc: t.crm.desc,
-      wide: true,
     },
     {
       icon: <FileText className="h-5 w-5" />,
       tag: t.proposals.tag,
       title: t.proposals.title,
       desc: t.proposals.desc,
-      wide: false,
     },
     {
       icon: <LayoutGrid className="h-5 w-5" />,
       tag: t.kanban.tag,
       title: t.kanban.title,
       desc: t.kanban.desc,
-      wide: false,
     },
     {
       icon: <Clock className="h-5 w-5" />,
       tag: t.timeTracking.tag,
       title: t.timeTracking.title,
       desc: t.timeTracking.desc,
-      wide: false,
     },
     {
       icon: <Receipt className="h-5 w-5" />,
       tag: t.invoicing.tag,
       title: t.invoicing.title,
       desc: t.invoicing.desc,
-      wide: true,
     },
     {
       icon: <ShieldCheck className="h-5 w-5" />,
       tag: t.clientPortal.tag,
       title: t.clientPortal.title,
       desc: t.clientPortal.desc,
-      wide: false,
     },
     {
       icon: <HardDrive className="h-5 w-5" />,
       tag: t.storage.tag,
       title: t.storage.title,
       desc: t.storage.desc,
-      wide: true,
     },
   ];
 
   return (
-    <section id="features" className="py-24 md:py-32 bg-[#030712] text-slate-100">
+    <section id="features" className="py-24 md:py-32 bg-slate-50 text-slate-900">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto">
-          <h2 className="text-3xl font-semibold tracking-tight text-white sm:text-4xl font-heading leading-snug">
+          <h2 className="text-3xl font-semibold tracking-tight text-slate-900 sm:text-4xl font-heading leading-snug">
             {t.title}
           </h2>
-          <p className="mt-5 text-lg text-slate-400 leading-relaxed">
+          <p className="mt-5 text-lg text-slate-500 leading-relaxed">
             {t.subtitle}
           </p>
         </div>
 
         {/* Asymmetric Bento Grid */}
         <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-5">
-          {/* Row 1: Wide + Regular */}
           <FeatureCard
             icon={features[0].icon}
             tag={features[0].tag}
@@ -148,8 +140,6 @@ export const LandingFeatures: React.FC<LandingFeaturesProps> = ({ lang }) => {
             desc={features[1].desc}
             index={1}
           />
-
-          {/* Row 2: Regular + Regular + Regular */}
           <FeatureCard
             icon={features[2].icon}
             tag={features[2].tag}
@@ -171,8 +161,6 @@ export const LandingFeatures: React.FC<LandingFeaturesProps> = ({ lang }) => {
             desc={features[4].desc}
             index={4}
           />
-
-          {/* Row 3: Regular + Wide */}
           <FeatureCard
             icon={features[5].icon}
             tag={features[5].tag}
