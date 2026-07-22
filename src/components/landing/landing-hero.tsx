@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, Variants } from 'framer-motion';
 import {
   Sparkles,
   ArrowRight,
@@ -29,7 +29,7 @@ export const LandingHero: React.FC<LandingHeroProps> = ({ lang }) => {
   const t = translations[lang];
   const [activeTab, setActiveTab] = useState<TabType>('crm');
 
-  const containerVariants = {
+  const containerVariants: Variants = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
@@ -40,7 +40,7 @@ export const LandingHero: React.FC<LandingHeroProps> = ({ lang }) => {
     },
   };
 
-  const itemVariants = {
+  const itemVariants: Variants = {
     hidden: { opacity: 0, y: 20 },
     visible: {
       opacity: 1,

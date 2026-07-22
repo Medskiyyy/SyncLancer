@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { motion } from 'framer-motion';
+import { motion, Variants } from 'framer-motion';
 import {
   Users,
   FileText,
@@ -22,7 +22,7 @@ interface LandingFeaturesProps {
 export const LandingFeatures: React.FC<LandingFeaturesProps> = ({ lang }) => {
   const t = translations[lang].features;
 
-  const cardVariants = {
+  const cardVariants: Variants = {
     hidden: { opacity: 0, y: 30 },
     visible: {
       opacity: 1,

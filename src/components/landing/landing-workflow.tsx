@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { motion } from 'framer-motion';
+import { motion, Variants } from 'framer-motion';
 import { Language, translations } from './translations';
 
 interface LandingWorkflowProps {
@@ -11,7 +11,7 @@ interface LandingWorkflowProps {
 export const LandingWorkflow: React.FC<LandingWorkflowProps> = ({ lang }) => {
   const t = translations[lang].workflow;
 
-  const stepVariants = {
+  const stepVariants: Variants = {
     hidden: { opacity: 0, y: 30 },
     visible: (i: number) => ({
       opacity: 1,
