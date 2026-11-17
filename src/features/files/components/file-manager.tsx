@@ -222,26 +222,26 @@ export function FileManager({ projectId, workspaceId, initialFiles }: FileManage
   const getFileIconInfo = (fileName: string) => {
     const ext = fileName.split('.').pop()?.toLowerCase() || '';
     if (ext === 'pdf') {
-      return { icon: FileText, color: 'text-red-600 bg-red-50 border-red-100' };
+      return { icon: FileText, color: 'border-red-500/20 bg-red-500/10 text-red-700 dark:text-red-400' };
     }
     if (['xls', 'xlsx', 'csv'].includes(ext)) {
-      return { icon: FileText, color: 'text-emerald-700 bg-emerald-50 border-emerald-100' };
+      return { icon: FileText, color: 'border-emerald-500/20 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400' };
     }
     if (['png', 'jpg', 'jpeg', 'gif', 'svg', 'webp'].includes(ext)) {
-      return { icon: FileImage, color: 'text-violet-600 bg-violet-50 border-violet-100' };
+      return { icon: FileImage, color: 'border-border bg-secondary text-foreground' };
     }
     if (['zip', 'rar', '7z', 'tar', 'gz'].includes(ext)) {
-      return { icon: FileArchive, color: 'text-amber-600 bg-amber-50 border-amber-100' };
+      return { icon: FileArchive, color: 'border-amber-500/20 bg-amber-500/10 text-amber-700 dark:text-amber-400' };
     }
-    return { icon: FileText, color: 'text-blue-600 bg-blue-50 border-blue-100' };
+    return { icon: FileText, color: 'border-border bg-secondary text-foreground' };
   };
 
   type FileCategory = 'Documents' | 'Images' | 'Archives' | 'Others';
-  const folderCategories: { name: FileCategory; count: number; color: string }[] = [
-    { name: 'Documents', count: files.filter(f => getFileCategory(f.fileName) === 'Documents').length, color: 'text-blue-600 bg-blue-50 border-blue-100' },
-    { name: 'Images', count: files.filter(f => getFileCategory(f.fileName) === 'Images').length, color: 'text-violet-600 bg-violet-50 border-violet-100' },
-    { name: 'Archives', count: files.filter(f => getFileCategory(f.fileName) === 'Archives').length, color: 'text-amber-600 bg-amber-50 border-amber-100' },
-    { name: 'Others', count: files.filter(f => getFileCategory(f.fileName) === 'Others').length, color: 'text-slate-600 bg-slate-50 border-slate-100' },
+  const folderCategories: { name: FileCategory; count: number }[] = [
+    { name: 'Documents', count: files.filter(f => getFileCategory(f.fileName) === 'Documents').length },
+    { name: 'Images', count: files.filter(f => getFileCategory(f.fileName) === 'Images').length },
+    { name: 'Archives', count: files.filter(f => getFileCategory(f.fileName) === 'Archives').length },
+    { name: 'Others', count: files.filter(f => getFileCategory(f.fileName) === 'Others').length },
   ];
 
   const filteredCategoryFiles = selectedCategory
@@ -250,18 +250,17 @@ export function FileManager({ projectId, workspaceId, initialFiles }: FileManage
 
   return (
     <div className="space-y-6">
-      {/* Storage Progress bar (Free plan limits) */}
       {storageUsage && (
-        <Card className="border-zinc-200/60 dark:border-zinc-800/80 bg-white dark:bg-slate-900 rounded-xl shadow-sm">
-          <CardContent className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <Card className="border-border bg-card">
+          <CardContent className="flex flex-col justify-between gap-4 p-4 sm:flex-row sm:items-center">
             <div className="flex items-center gap-3">
-              <HardDrive className="h-5 w-5 text-primary shrink-0" />
+              <HardDrive className="h-5 w-5 shrink-0 text-brand" strokeWidth={1.75} />
               <div>
-                <p className="text-xs font-bold text-zinc-800 dark:text-zinc-200">Workspace Storage Usage</p>
-                <p className="text-[10px] text-zinc-500 dark:text-zinc-400">
-                  Used: <span className="font-semibold text-zinc-700 dark:text-slate-400">{formatBytes(storageUsage.usedBytes)}</span>
+                <p className="text-xs font-semibold text-foreground">Workspace Storage Usage</p>
+                <p className="text-[11px] text-muted-foreground">
+                  Used: <span className="font-mono font-semibold text-foreground">{formatBytes(storageUsage.usedBytes)}</span>
                   {storageUsage.limitBytes !== Infinity ? (
-                    <> of <span className="font-semibold text-zinc-700 dark:text-slate-400">{formatBytes(storageUsage.limitBytes)}</span> (Free Plan)</>
+                    <> of <span className="font-mono font-semibold text-foreground">{formatBytes(storageUsage.limitBytes)}</span> (Free Plan)</>
                   ) : (
                     <> (Pro Plan - Unlimited)</>
                   )}
@@ -270,20 +269,20 @@ export function FileManager({ projectId, workspaceId, initialFiles }: FileManage
             </div>
 
             {storageUsage.limitBytes !== Infinity && (
-              <div className="w-full sm:max-w-xs space-y-1">
-                <div className="w-full bg-zinc-100 dark:bg-zinc-800 rounded-full h-2 overflow-hidden">
-                  <div 
+              <div className="w-full space-y-1 sm:max-w-xs">
+                <div className="h-2 w-full overflow-hidden rounded-full bg-secondary">
+                  <div
                     className={`h-2 rounded-full transition-all duration-500 ${
-                      storagePercentage > 90 
-                        ? 'bg-red-500' 
-                        : storagePercentage > 75 
-                        ? 'bg-orange-500' 
-                        : 'bg-primary'
-                    }`} 
+                      storagePercentage > 90
+                        ? 'bg-destructive'
+                        : storagePercentage > 75
+                        ? 'bg-amber-500'
+                        : 'bg-brand'
+                    }`}
                     style={{ width: `${storagePercentage}%` }}
-                  ></div>
+                  />
                 </div>
-                <div className="text-[11px] text-right font-semibold text-zinc-500">
+                <div className="text-right font-mono text-[11px] font-medium text-muted-foreground">
                   {storagePercentage.toFixed(1)}% full
                 </div>
               </div>
@@ -292,64 +291,64 @@ export function FileManager({ projectId, workspaceId, initialFiles }: FileManage
         </Card>
       )}
 
-      {/* Drag & Drop Upload Zone */}
-      <div 
+      <div
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
-        className={`border-2 border-dashed rounded-xl p-8 text-center transition-all cursor-pointer flex flex-col items-center justify-center space-y-3 ${
-          isDragOver 
-            ? 'border-primary bg-blue-500/5 dark:bg-blue-950/20'
-            : 'border-zinc-200/60 hover:border-primary/40 bg-white dark:border-zinc-800/80 dark:bg-slate-900 dark:hover:border-primary'
+        className={`flex cursor-pointer flex-col items-center justify-center space-y-3 rounded-lg border-2 border-dashed p-8 text-center transition-colors ${
+          isDragOver
+            ? 'border-brand bg-secondary/70'
+            : 'border-border bg-card hover:border-foreground/40'
         }`}
         onClick={() => fileInputRef.current?.click()}
       >
-        <input 
-          type="file" 
-          ref={fileInputRef} 
-          onChange={handleFileChange} 
-          className="hidden" 
+        <input
+          type="file"
+          ref={fileInputRef}
+          onChange={handleFileChange}
+          className="hidden"
         />
-        
+
         {isUploading ? (
           <>
-            <Loader2 className="h-10 w-10 text-primary animate-spin" />
-            <p className="text-sm font-bold text-zinc-800 dark:text-zinc-200">Uploading file...</p>
-            <p className="text-xs text-slate-400">Verifying limits and pushing data to cloud storage.</p>
+            <Loader2 className="h-9 w-9 animate-spin text-brand" />
+            <p className="text-sm font-semibold text-foreground">Uploading file...</p>
+            <p className="text-xs text-muted-foreground">Verifying limits and pushing data to cloud storage.</p>
           </>
         ) : (
           <>
-            <UploadCloud className="h-10 w-10 text-slate-500 dark:text-gray-500" />
-            <p className="text-sm font-bold text-zinc-800 dark:text-zinc-200">
-              Drag & drop a file here, or <span className="text-primary hover:underline">browse files</span>
+            <UploadCloud className="h-9 w-9 text-muted-foreground" strokeWidth={1.75} />
+            <p className="text-sm font-semibold text-foreground">
+              Drag & drop a file here, or <span className="text-brand underline-offset-4 hover:underline">browse files</span>
             </p>
-            <p className="text-xs text-slate-400 max-w-sm">
+            <p className="max-w-sm text-xs text-muted-foreground">
               Supports Images, PDF, Word, Excel, ZIP, RAR up to 10MB.
             </p>
           </>
         )}
       </div>
 
-      {/* Folders Section */}
       {files.length > 0 && (
         <div className="space-y-3">
-          <h2 className="text-sm font-semibold text-slate-500 uppercase tracking-wider">Folders</h2>
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <h2 className="font-heading text-sm font-semibold text-foreground">Folders</h2>
+          <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
             {folderCategories.map((cat) => (
               <button
                 key={cat.name}
                 onClick={() => setSelectedCategory(selectedCategory === cat.name ? null : cat.name)}
                 className={cn(
-                  "flex items-center gap-3 p-4 border rounded-lg bg-white shadow-sm transition-colors hover:bg-muted/50 cursor-pointer text-left",
-                  selectedCategory === cat.name ? "border-primary ring-2 ring-primary/10 bg-blue-50/50" : "border-slate-200"
+                  'flex items-center gap-3 rounded-lg border p-4 text-left transition-colors cursor-pointer',
+                  selectedCategory === cat.name
+                    ? 'border-foreground bg-secondary'
+                    : 'border-border bg-card hover:bg-secondary/50'
                 )}
               >
-                <div className={cn("p-2 rounded-lg border shrink-0", cat.color)}>
-                  <Folder className="h-5 w-5 fill-current" />
+                <div className={cn('shrink-0 rounded-md border p-2', selectedCategory === cat.name ? 'border-foreground bg-foreground text-background' : 'border-border bg-secondary text-foreground')}>
+                  <Folder className="h-4 w-4" strokeWidth={1.75} />
                 </div>
-                <div className="flex flex-col min-w-0">
-                  <span className="text-sm font-semibold text-slate-900 truncate">{cat.name}</span>
-                  <span className="text-xs text-slate-500">{cat.count} {cat.count === 1 ? 'file' : 'files'}</span>
+                <div className="flex min-w-0 flex-col">
+                  <span className="truncate text-sm font-semibold text-foreground">{cat.name}</span>
+                  <span className="font-mono text-xs text-muted-foreground">{cat.count} {cat.count === 1 ? 'file' : 'files'}</span>
                 </div>
               </button>
             ))}
@@ -357,16 +356,15 @@ export function FileManager({ projectId, workspaceId, initialFiles }: FileManage
         </div>
       )}
 
-      {/* Files List Card */}
       <div className="space-y-3">
         <div className="flex items-center justify-between">
-          <h2 className="text-sm font-semibold text-slate-500 uppercase tracking-wider">
+          <h2 className="font-heading text-sm font-semibold text-foreground">
             {selectedCategory ? `${selectedCategory} Files` : 'All Files'}
           </h2>
           {selectedCategory && (
-            <button 
-              onClick={() => setSelectedCategory(null)} 
-              className="text-xs text-blue-600 hover:underline font-medium"
+            <button
+              onClick={() => setSelectedCategory(null)}
+              className="text-xs font-medium text-brand hover:underline cursor-pointer"
             >
               Clear Filter
             </button>
@@ -374,46 +372,46 @@ export function FileManager({ projectId, workspaceId, initialFiles }: FileManage
         </div>
 
         {filteredCategoryFiles.length === 0 ? (
-          <Card className="border-slate-200 bg-white rounded-xl shadow-sm p-12 text-center">
-            <FileText className="h-10 w-10 mx-auto text-slate-300 mb-3" />
-            <p className="text-sm font-semibold text-slate-900">No files found</p>
-            <p className="text-xs text-slate-500 mt-1 max-w-xs mx-auto">
+          <Card className="border-border bg-card p-12 text-center">
+            <FileText className="mx-auto mb-3 h-9 w-9 text-muted-foreground/50" />
+            <p className="text-sm font-semibold text-foreground">No files found</p>
+            <p className="mx-auto mt-1 max-w-xs text-xs text-muted-foreground">
               There are no files uploaded in this category.
             </p>
           </Card>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
             {filteredCategoryFiles.map((file) => {
               const fileInfo = getFileIconInfo(file.fileName);
               const FileIconComponent = fileInfo.icon;
               return (
-                <Card 
-                  key={file.id} 
-                  className="bg-white border-slate-200 p-4 h-[120px] flex flex-col justify-between shadow-sm transition-colors hover:bg-muted/50 rounded-lg relative group overflow-hidden"
+                <Card
+                  key={file.id}
+                  className="group relative flex h-[120px] flex-col justify-between overflow-hidden rounded-lg border-border bg-card p-4 transition-colors hover:border-foreground/30"
                 >
-                  <div className="flex items-start justify-between min-w-0">
-                    <div className="flex items-center gap-2.5 min-w-0">
-                      <div className={cn("p-1.5 rounded-lg border shrink-0", fileInfo.color)}>
+                  <div className="flex min-w-0 items-start justify-between">
+                    <div className="flex min-w-0 items-center gap-2.5">
+                      <div className={cn('shrink-0 rounded-md border p-1.5', fileInfo.color)}>
                         <FileIconComponent className="h-4 w-4" />
                       </div>
-                      <div className="flex flex-col min-w-0">
-                        <span className="text-sm font-semibold text-slate-900 truncate block pr-2" title={file.fileName}>
+                      <div className="flex min-w-0 flex-col">
+                        <span className="block truncate pr-2 text-sm font-semibold text-foreground" title={file.fileName}>
                           {file.fileName}
                         </span>
-                        <span className="text-[10px] text-slate-500 mt-0.5">{formatBytes(file.fileSize)}</span>
+                        <span className="mt-0.5 font-mono text-[11px] text-muted-foreground">{formatBytes(file.fileSize)}</span>
                       </div>
                     </div>
                   </div>
-                  
-                  <div className="flex items-center justify-between mt-auto">
-                    <span className="text-[11px] font-medium text-slate-500 truncate max-w-[120px]" title={`Uploaded by ${file.uploader?.fullName || 'Workspace member'}`}>
+
+                  <div className="mt-auto flex items-center justify-between">
+                    <span className="max-w-[120px] truncate text-[11px] font-medium text-muted-foreground" title={`Uploaded by ${file.uploader?.fullName || 'Workspace member'}`}>
                       By {file.uploader?.fullName?.split(' ')[0] || 'Member'}
                     </span>
                     <div className="flex items-center gap-0.5">
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="h-7 w-7 text-slate-400 hover:text-slate-900 rounded-md shrink-0 cursor-pointer"
+                        className="h-7 w-7 shrink-0 text-muted-foreground hover:text-foreground"
                         onClick={() => handleDownload(file)}
                         title="Download file"
                       >
@@ -422,7 +420,7 @@ export function FileManager({ projectId, workspaceId, initialFiles }: FileManage
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="h-7 w-7 text-zinc-400 hover:text-red-700 hover:bg-red-50 rounded-md shrink-0 cursor-pointer"
+                        className="h-7 w-7 shrink-0 text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
                         onClick={() => {
                           setFileToDelete(file);
                           setIsDeleteOpen(true);
@@ -440,28 +438,27 @@ export function FileManager({ projectId, workspaceId, initialFiles }: FileManage
         )}
       </div>
 
-      {/* Delete Confirmation Dialog */}
       <Dialog open={isDeleteOpen} onOpenChange={setIsDeleteOpen}>
-        <DialogContent className="border-zinc-200/60 dark:border-zinc-800/80 bg-white dark:bg-zinc-950/20 sm:max-w-md">
+        <DialogContent className="border-border bg-popover sm:max-w-md">
           <DialogHeader>
-            <DialogTitle className="text-zinc-950 dark:text-zinc-100">Delete File</DialogTitle>
-            <DialogDescription className="text-gray-500 dark:text-zinc-400 text-xs">
+            <DialogTitle className="font-heading text-foreground">Delete File</DialogTitle>
+            <DialogDescription className="text-xs text-muted-foreground">
               Are you sure you want to permanently delete this file? This will remove the file from cloud storage and database.
             </DialogDescription>
           </DialogHeader>
           {fileToDelete && (
-            <div className="py-2 space-y-1 text-xs">
-              <div className="flex justify-between text-zinc-500 dark:text-zinc-400">
+            <div className="space-y-1 py-2 text-xs">
+              <div className="flex justify-between text-muted-foreground">
                 <span>Name:</span>
-                <span className="font-semibold text-zinc-700 dark:text-zinc-300 max-w-[200px] truncate">{fileToDelete.fileName}</span>
+                <span className="max-w-[200px] truncate font-semibold text-foreground">{fileToDelete.fileName}</span>
               </div>
-              <div className="flex justify-between text-zinc-500 dark:text-zinc-400">
+              <div className="flex justify-between text-muted-foreground">
                 <span>Size:</span>
-                <span className="font-semibold text-zinc-700 dark:text-zinc-300">{formatBytes(fileToDelete.fileSize)}</span>
+                <span className="font-mono font-semibold text-foreground">{formatBytes(fileToDelete.fileSize)}</span>
               </div>
             </div>
           )}
-          <DialogFooter className="mt-4 flex flex-col sm:flex-row gap-2 sm:justify-end">
+          <DialogFooter className="mt-4 flex flex-col gap-2 sm:flex-row sm:justify-end">
             <Button
               variant="outline"
               disabled={isLoading}
@@ -469,7 +466,6 @@ export function FileManager({ projectId, workspaceId, initialFiles }: FileManage
                 setIsDeleteOpen(false);
                 setFileToDelete(null);
               }}
-              className="cursor-pointer border-zinc-200/60 dark:border-zinc-800/80 text-gray-700 dark:text-slate-400"
             >
               Cancel
             </Button>
@@ -477,7 +473,6 @@ export function FileManager({ projectId, workspaceId, initialFiles }: FileManage
               variant="destructive"
               disabled={isLoading}
               onClick={handleDelete}
-              className="cursor-pointer bg-red-700 hover:bg-red-700 text-white font-medium"
             >
               {isLoading ? 'Deleting...' : 'Delete'}
             </Button>

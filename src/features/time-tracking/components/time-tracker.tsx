@@ -424,48 +424,42 @@ export function TimeTracker({ project, initialTimeEntries }: TimeTrackerProps) {
 
   return (
     <div className="space-y-6">
-      {/* Metrics Summary Grid */}
-      <div className="grid gap-4 sm:grid-cols-3">
-        <Card className="border-border bg-card rounded-xl shadow-xs">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-xs font-semibold text-muted-foreground">Total Hours Logged</CardTitle>
-            <Clock className="h-4 w-4 text-primary" />
-          </CardHeader>
-          <CardContent>
-            <div className="font-mono text-2xl font-semibold tabular-nums text-foreground">{totalHours} hrs</div>
-            <p className="text-xs text-muted-foreground mt-1">All entries combined</p>
-          </CardContent>
-        </Card>
+      {/* Metrics Summary Strip */}
+      <div className="grid sm:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x divide-border border border-border rounded-lg bg-card overflow-hidden">
+        <div className="p-4 space-y-1">
+          <div className="flex items-center justify-between text-xs font-medium text-muted-foreground">
+            <span>Total Hours Logged</span>
+            <Clock className="h-4 w-4 text-brand" />
+          </div>
+          <div className="font-mono text-2xl font-bold tabular-nums text-foreground">{totalHours} hrs</div>
+          <p className="text-[11px] text-muted-foreground">All entries combined</p>
+        </div>
 
-        <Card className="border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 rounded-xl shadow-sm">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-xs font-semibold text-slate-500 dark:text-slate-400">Billable Hours</CardTitle>
-            <DollarSign className="h-4 w-4 text-emerald-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-black text-slate-950 dark:text-slate-50">{billableHours} hrs</div>
-            <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-1">
-              {totalMinutes > 0 ? Math.round((billableMinutes / totalMinutes) * 100) : 0}% of total time
-            </p>
-          </CardContent>
-        </Card>
+        <div className="p-4 space-y-1">
+          <div className="flex items-center justify-between text-xs font-medium text-muted-foreground">
+            <span>Billable Hours</span>
+            <DollarSign className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+          </div>
+          <div className="font-mono text-2xl font-bold tabular-nums text-foreground">{billableHours} hrs</div>
+          <p className="text-[11px] text-muted-foreground tabular-nums">
+            {totalMinutes > 0 ? Math.round((billableMinutes / totalMinutes) * 100) : 0}% of total time
+          </p>
+        </div>
 
-        <Card className="border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 rounded-xl shadow-sm">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-xs font-semibold text-slate-500 dark:text-slate-400">Total Logs</CardTitle>
-            <FileText className="h-4 w-4 text-primary" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-black text-slate-950 dark:text-slate-50">{totalEntriesCount}</div>
-            <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-1">Logged sessions</p>
-          </CardContent>
-        </Card>
+        <div className="p-4 space-y-1">
+          <div className="flex items-center justify-between text-xs font-medium text-muted-foreground">
+            <span>Total Logs</span>
+            <FileText className="h-4 w-4 text-muted-foreground" />
+          </div>
+          <div className="font-mono text-2xl font-bold tabular-nums text-foreground">{totalEntriesCount}</div>
+          <p className="text-[11px] text-muted-foreground">Logged sessions</p>
+        </div>
       </div>
 
       {/* Other Timer Running Alert */}
       {otherTimerRunning && (
-        <div className="flex items-center gap-3 p-4 rounded-lg bg-blue-50 border border-blue-200 dark:bg-blue-950/30 dark:border-blue-900/50 text-blue-900 dark:text-blue-300 text-xs">
-          <AlertCircle className="h-5 w-5 text-blue-600 shrink-0" />
+        <div className="flex items-center gap-3 p-4 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-800 dark:text-amber-300 text-xs">
+          <AlertCircle className="h-5 w-5 text-amber-600 dark:text-amber-400 shrink-0" />
           <div>
             <span className="font-bold">Timer Running Elsewhere:</span> A timer is currently running in this workspace for project <span className="font-semibold underline">&ldquo;{otherTimerRunning.projectName}&rdquo;</span>.
             You must stop it or discard it before starting a timer on this project.
@@ -474,22 +468,22 @@ export function TimeTracker({ project, initialTimeEntries }: TimeTrackerProps) {
       )}
 
       {/* Core Time Tracker Panel */}
-      <Card className="border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 rounded-xl shadow-sm overflow-hidden">
+      <Card className="border-border bg-card rounded-lg overflow-hidden">
         {activeTimer ? (
           /* Running Timer UI */
-          <div className="bg-muted/40 p-6 md:p-8">
+          <div className="bg-muted/30 p-6 md:p-8">
             <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
               <div className="space-y-3">
                 <div className="flex items-center gap-2">
-                  <span className="inline-block h-2 w-2 rounded-full bg-red-600" />
-                  <span className="text-xs font-semibold text-muted-foreground tracking-wider uppercase">Timer Active</span>
+                  <span className="inline-block h-2 w-2 rounded-full bg-brand" />
+                  <span className="text-xs font-semibold text-foreground">Timer Active</span>
                 </div>
                 <div className="text-4xl font-bold text-foreground font-mono tabular-nums tracking-tight">
                   {formatSeconds(elapsedSeconds)}
                 </div>
                 <div className="space-y-1">
                   {activeTimer.taskId && (
-                    <div className="flex items-center gap-1.5 text-xs text-primary font-semibold">
+                    <div className="flex items-center gap-1.5 text-xs text-brand font-semibold">
                       <Tag className="h-3.5 w-3.5" />
                       <span>
                         {project.tasks?.find(t => t.id === activeTimer.taskId)?.title || 'Task'}
@@ -497,12 +491,12 @@ export function TimeTracker({ project, initialTimeEntries }: TimeTrackerProps) {
                     </div>
                   )}
                   {activeTimer.notes && (
-                    <p className="text-sm text-slate-600 dark:text-slate-400 italic">
+                    <p className="text-sm text-muted-foreground">
                       &ldquo;{activeTimer.notes}&rdquo;
                     </p>
                   )}
                   <div className="flex items-center gap-1.5 pt-1">
-                    <Badge variant="outline" className={`text-[10px] font-semibold tracking-wide uppercase ${activeTimer.billable ? 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/20 dark:text-emerald-300 dark:border-emerald-900/30' : 'bg-slate-50 text-slate-600 border-slate-200 dark:bg-slate-950/20 dark:text-slate-300 dark:border-slate-800'}`}>
+                    <Badge variant="outline" className={`text-[11px] font-semibold ${activeTimer.billable ? 'bg-emerald-500/10 text-emerald-700 border-emerald-500/20 dark:text-emerald-400' : 'bg-muted text-muted-foreground border-border'}`}>
                       {activeTimer.billable ? 'Billable' : 'Non-Billable'}
                     </Badge>
                   </div>
@@ -511,16 +505,17 @@ export function TimeTracker({ project, initialTimeEntries }: TimeTrackerProps) {
 
               <div className="flex items-center gap-3">
                 <Button 
+                  variant="destructive"
                   onClick={handleStopTimer}
                   disabled={isLoading}
-                  className="bg-red-600 hover:bg-red-700 text-white font-bold px-6 py-5 shadow-lg shadow-red-500/10"
+                  className="font-semibold px-6 py-5"
                 >
-                  <Square className="mr-2 h-4.5 w-4.5 fill-white" /> Stop Timer
+                  <Square className="mr-2 h-4 w-4 fill-current" /> Stop Timer
                 </Button>
                 <Button 
                   variant="outline"
                   onClick={handleDiscardTimer}
-                  className="border-zinc-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 py-5"
+                  className="border-border text-foreground hover:bg-muted py-5"
                 >
                   Discard
                 </Button>
@@ -532,14 +527,14 @@ export function TimeTracker({ project, initialTimeEntries }: TimeTrackerProps) {
           <div className="p-6">
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <h3 className="text-sm font-bold text-foreground flex items-center gap-2">
-                  <Play className="h-4.5 w-4.5 text-primary fill-primary" /> Start Live Time Tracker
+                <h3 className="font-heading text-sm font-bold text-foreground flex items-center gap-2">
+                  <Play className="h-4 w-4 text-brand fill-brand" /> Start Live Time Tracker
                 </h3>
                 <Button
                   type="button"
                   variant="ghost"
                   onClick={() => setIsManualOpen(true)}
-                  className="text-xs text-primary font-semibold hover:bg-primary/10 px-3 h-8"
+                  className="text-xs text-foreground font-semibold hover:bg-muted px-3 h-8"
                 >
                   <Plus className="mr-1 h-3.5 w-3.5" /> Log Manual Time
                 </Button>
@@ -547,14 +542,14 @@ export function TimeTracker({ project, initialTimeEntries }: TimeTrackerProps) {
 
               <div className="grid gap-4 md:grid-cols-3 md:items-end">
                 <div className="space-y-1.5">
-                  <label className="text-xs font-semibold text-slate-600 dark:text-slate-400">Select Task (Optional)</label>
+                  <label className="text-xs font-medium text-muted-foreground">Select Task (Optional)</label>
                   <Select value={timerTaskId} onValueChange={(val) => setTimerTaskId(val ?? 'none')}>
-                    <SelectTrigger className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 h-9 text-xs">
+                    <SelectTrigger className="bg-background border-border h-9 text-xs">
                       <SelectValue placeholder="No Task Linked">
                         {timerTaskId && timerTaskId !== 'none' ? (project.tasks?.find(t => t.id === timerTaskId)?.title || timerTaskId) : undefined}
                       </SelectValue>
                     </SelectTrigger>
-                    <SelectContent className="bg-white dark:bg-slate-950 border-zinc-200 dark:border-slate-800">
+                    <SelectContent className="bg-card border-border">
                       <SelectItem value="none">No Task Linked</SelectItem>
                       {project.tasks?.map((task) => (
                         <SelectItem key={task.id} value={task.id}>
@@ -566,30 +561,30 @@ export function TimeTracker({ project, initialTimeEntries }: TimeTrackerProps) {
                 </div>
 
                 <div className="space-y-1.5 md:col-span-2">
-                  <label className="text-xs font-semibold text-slate-600 dark:text-slate-400">What are you working on?</label>
+                  <label className="text-xs font-medium text-muted-foreground">What are you working on?</label>
                   <div className="flex gap-2">
                     <Input
                       placeholder="e.g. Design homepage mobile mockups..."
                       value={timerNotes}
                       onChange={(e) => setTimerNotes(e.target.value)}
-                      className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 h-9 text-xs"
+                      className="bg-background border-border h-9 text-xs"
                     />
-                    <div className="flex items-center px-3 border border-slate-200 dark:border-slate-800 rounded-lg bg-white dark:bg-slate-900 gap-2 shrink-0">
+                    <div className="flex items-center px-3 border border-border rounded-lg bg-background gap-2 shrink-0">
                       <input
                         type="checkbox"
                         id="timerBillableCheck"
-                        className="rounded border-input text-primary focus:ring-ring h-4 w-4 cursor-pointer"
+                        className="rounded border-border accent-brand h-4 w-4 cursor-pointer"
                         checked={timerBillable}
                         onChange={(e) => setTimerBillable(e.target.checked)}
                       />
-                      <label htmlFor="timerBillableCheck" className="text-xs font-bold text-slate-600 dark:text-slate-400 cursor-pointer select-none">
+                      <label htmlFor="timerBillableCheck" className="text-xs font-semibold text-foreground cursor-pointer select-none">
                         Billable
                       </label>
                     </div>
                     <Button 
                       onClick={handleStartTimer}
                       disabled={!!otherTimerRunning}
-                      className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold shrink-0 h-9 px-4.5 text-xs"
+                      className="font-semibold shrink-0 h-9 px-4.5 text-xs"
                     >
                       <Play className="mr-1.5 h-3.5 w-3.5 fill-current" /> Start
                     </Button>
@@ -602,59 +597,59 @@ export function TimeTracker({ project, initialTimeEntries }: TimeTrackerProps) {
       </Card>
 
       {/* Log History */}
-      <Card className="border-border bg-card rounded-xl shadow-xs overflow-hidden">
+      <Card className="border-border bg-card rounded-lg overflow-hidden">
         <CardHeader className="border-b border-border pb-4">
-          <CardTitle className="text-base font-bold text-foreground flex items-center gap-2">
-            <Calendar className="h-5 w-5 text-primary" /> Log History
+          <CardTitle className="font-heading text-base font-bold text-foreground flex items-center gap-2">
+            <Calendar className="h-5 w-5 text-brand" /> Log History
           </CardTitle>
         </CardHeader>
         <CardContent className="p-0">
           {timeEntries.length === 0 ? (
-            <div className="text-center py-12 text-gray-500 dark:text-slate-400 space-y-2">
-              <Clock className="h-10 w-10 mx-auto text-slate-300 dark:text-slate-700" />
-              <p className="text-sm font-semibold">No time entries logged yet</p>
-              <p className="text-xs text-slate-400">Start the timer or add a manual entry to track project hours.</p>
+            <div className="text-center py-12 text-muted-foreground space-y-2">
+              <Clock className="h-10 w-10 mx-auto text-muted-foreground/60" />
+              <p className="text-sm font-semibold text-foreground">No time entries logged yet</p>
+              <p className="text-xs text-muted-foreground">Start the timer or add a manual entry to track project hours.</p>
             </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse">
                 <thead>
-                  <tr className="border-b border-slate-100 dark:border-gray-800 bg-slate-50/50 dark:bg-slate-950/20 text-xs font-bold text-slate-500 dark:text-slate-400">
-                    <th className="py-3 px-4 font-bold">Date & Time Range</th>
-                    <th className="py-3 px-4 font-bold">Linked Task</th>
-                    <th className="py-3 px-4 font-bold">Description</th>
-                    <th className="py-3 px-4 font-bold text-center">Duration</th>
-                    <th className="py-3 px-4 font-bold text-center">Billing</th>
-                    <th className="py-3 px-4 font-bold text-right">Actions</th>
+                  <tr className="border-b border-border bg-muted/40 text-xs font-semibold text-muted-foreground">
+                    <th className="py-3 px-4 font-semibold">Date & Time Range</th>
+                    <th className="py-3 px-4 font-semibold">Linked Task</th>
+                    <th className="py-3 px-4 font-semibold">Description</th>
+                    <th className="py-3 px-4 font-semibold text-center">Duration</th>
+                    <th className="py-3 px-4 font-semibold text-center">Billing</th>
+                    <th className="py-3 px-4 font-semibold text-right">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100 dark:divide-gray-800 text-xs">
+                <tbody className="divide-y divide-border text-xs">
                   {timeEntries.map((entry) => (
-                    <tr key={entry.id} className="hover:bg-slate-50/40 dark:hover:bg-slate-950/10 transition-colors">
-                      <td className="py-3.5 px-4 font-medium text-slate-800 dark:text-slate-300">
+                    <tr key={entry.id} className="hover:bg-muted/30 transition-colors">
+                      <td className="py-3.5 px-4 font-medium text-foreground">
                         <div>{formatDate(entry.startTime)}</div>
-                        <div className="text-[10px] text-slate-500 dark:text-slate-500 mt-0.5">
+                        <div className="text-[11px] text-muted-foreground mt-0.5 tabular-nums">
                           {formatTimeRange(entry.startTime, entry.endTime)}
                         </div>
                       </td>
                       <td className="py-3.5 px-4 max-w-[150px] truncate">
                         {entry.task ? (
-                          <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-primary bg-primary/10 px-2 py-0.5 rounded border border-primary/20">
+                          <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-brand bg-brand/10 px-2 py-0.5 rounded border border-brand/20">
                             <Tag className="h-3 w-3 shrink-0" />
                             <span className="truncate">{entry.task.title}</span>
                           </span>
                         ) : (
-                          <span className="text-slate-400 italic">None</span>
+                          <span className="text-muted-foreground">-</span>
                         )}
                       </td>
-                      <td className="py-3.5 px-4 text-slate-600 dark:text-slate-400 font-normal max-w-[250px] break-words">
+                      <td className="py-3.5 px-4 text-muted-foreground font-normal max-w-[250px] break-words">
                         {entry.notes}
                       </td>
                       <td className="py-3.5 px-4 text-center font-mono font-semibold tabular-nums text-foreground">
                         {formatDuration(entry.durationMinutes)}
                       </td>
                       <td className="py-3.5 px-4 text-center">
-                        <Badge variant="outline" className={`text-[11px] font-semibold uppercase px-1.5 py-0 ${entry.billable ? 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/20 dark:text-emerald-300 dark:border-emerald-900/30' : 'bg-slate-50 text-slate-600 border-slate-200 dark:bg-slate-950/20 dark:text-slate-300 dark:border-slate-800'}`}>
+                        <Badge variant="outline" className={`text-[11px] font-semibold px-1.5 py-0 ${entry.billable ? 'bg-emerald-500/10 text-emerald-700 border-emerald-500/20 dark:text-emerald-400' : 'bg-muted text-muted-foreground border-border'}`}>
                           {entry.billable ? 'Billable' : 'Non-Bill'}
                         </Badge>
                       </td>
@@ -663,7 +658,7 @@ export function TimeTracker({ project, initialTimeEntries }: TimeTrackerProps) {
                           <Button
                             variant="ghost"
                             size="icon"
-                            className="h-7 w-7 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+                            className="cursor-pointer h-7 w-7 text-muted-foreground hover:text-foreground"
                             onClick={() => handleOpenEditModal(entry)}
                           >
                             <Edit className="h-3.5 w-3.5" />
@@ -671,7 +666,7 @@ export function TimeTracker({ project, initialTimeEntries }: TimeTrackerProps) {
                           <Button
                             variant="ghost"
                             size="icon"
-                            className="h-7 w-7 text-red-400 hover:text-red-700 dark:hover:text-red-400"
+                            className="cursor-pointer h-7 w-7 text-muted-foreground hover:text-destructive"
                             onClick={() => {
                               setEntryToDelete(entry);
                               setIsDeleteOpen(true);
@@ -692,59 +687,59 @@ export function TimeTracker({ project, initialTimeEntries }: TimeTrackerProps) {
 
       {/* Manual Entry Dialog */}
       <Dialog open={isManualOpen} onOpenChange={setIsManualOpen}>
-        <DialogContent className="border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 sm:max-w-md">
+        <DialogContent className="border-border bg-card sm:max-w-md">
           <DialogHeader>
-            <DialogTitle className="text-foreground flex items-center gap-2">
-              <Clock className="h-5 w-5 text-primary" /> Log Time Manually
+            <DialogTitle className="font-heading text-foreground flex items-center gap-2">
+              <Clock className="h-5 w-5 text-brand" /> Log Time Manually
             </DialogTitle>
-            <DialogDescription className="text-gray-500 dark:text-slate-400 text-xs">
+            <DialogDescription className="text-muted-foreground text-xs">
               Log project progress by manually specifying date, hours, and notes.
             </DialogDescription>
           </DialogHeader>
           <form onSubmit={handleCreateManualEntry} className="space-y-4">
             <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">Date</label>
+              <label className="text-xs font-semibold text-foreground">Date</label>
               <Input
                 type="date"
                 required
                 value={manualDate}
                 onChange={(e) => setManualDate(e.target.value)}
-                className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-xs"
+                className="bg-background border-border text-xs"
               />
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">Start Time</label>
+                <label className="text-xs font-semibold text-foreground">Start Time</label>
                 <Input
                   type="time"
                   required
                   value={manualStartTime}
                   onChange={(e) => setManualStartTime(e.target.value)}
-                  className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-xs"
+                  className="bg-background border-border text-xs font-mono tabular-nums"
                 />
               </div>
               <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">End Time</label>
+                <label className="text-xs font-semibold text-foreground">End Time</label>
                 <Input
                   type="time"
                   required
                   value={manualEndTime}
                   onChange={(e) => setManualEndTime(e.target.value)}
-                  className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-xs"
+                  className="bg-background border-border text-xs font-mono tabular-nums"
                 />
               </div>
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">Task (Optional)</label>
+              <label className="text-xs font-semibold text-foreground">Task (Optional)</label>
               <Select value={manualTaskId} onValueChange={(val) => setManualTaskId(val ?? 'none')}>
-                <SelectTrigger className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-xs">
+                <SelectTrigger className="bg-background border-border text-xs">
                   <SelectValue placeholder="No Task Linked">
                     {manualTaskId && manualTaskId !== 'none' ? (project.tasks?.find(t => t.id === manualTaskId)?.title || manualTaskId) : undefined}
                   </SelectValue>
                 </SelectTrigger>
-                <SelectContent className="bg-white dark:bg-slate-950 border-zinc-200 dark:border-slate-800">
+                <SelectContent className="bg-card border-border">
                   <SelectItem value="none">No Task Linked</SelectItem>
                   {project.tasks?.map((task) => (
                     <SelectItem key={task.id} value={task.id}>
@@ -756,13 +751,13 @@ export function TimeTracker({ project, initialTimeEntries }: TimeTrackerProps) {
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">Work Details / Notes</label>
+              <label className="text-xs font-semibold text-foreground">Work Details / Notes</label>
               <Textarea
                 placeholder="Describe what was accomplished..."
                 value={manualNotes}
                 onChange={(e) => setManualNotes(e.target.value)}
                 required
-                className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-xs min-h-[80px]"
+                className="bg-background border-border text-xs min-h-[80px]"
               />
             </div>
 
@@ -770,11 +765,11 @@ export function TimeTracker({ project, initialTimeEntries }: TimeTrackerProps) {
               <input
                 type="checkbox"
                 id="manualBillable"
-                className="rounded border-input text-primary focus:ring-ring h-4 w-4 cursor-pointer"
+                className="rounded border-border accent-brand h-4 w-4 cursor-pointer"
                 checked={manualBillable}
                 onChange={(e) => setManualBillable(e.target.checked)}
               />
-              <label htmlFor="manualBillable" className="text-xs font-bold text-slate-700 dark:text-slate-400 cursor-pointer select-none">
+              <label htmlFor="manualBillable" className="text-xs font-semibold text-muted-foreground cursor-pointer select-none">
                 This time entry is billable
               </label>
             </div>
@@ -784,14 +779,14 @@ export function TimeTracker({ project, initialTimeEntries }: TimeTrackerProps) {
                 type="button" 
                 variant="outline" 
                 onClick={() => setIsManualOpen(false)}
-                className="border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 font-medium"
+                className="border-border text-foreground font-medium"
               >
                 Cancel
               </Button>
               <Button 
                 type="submit" 
                 disabled={isLoading}
-                className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold"
+                className="font-semibold"
               >
                 {isLoading ? 'Saving...' : 'Log Time'}
               </Button>
@@ -802,59 +797,59 @@ export function TimeTracker({ project, initialTimeEntries }: TimeTrackerProps) {
 
       {/* Edit Entry Dialog */}
       <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
-        <DialogContent className="border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 sm:max-w-md">
+        <DialogContent className="border-border bg-card sm:max-w-md">
           <DialogHeader>
-            <DialogTitle className="text-foreground flex items-center gap-2">
-              <Edit className="h-5 w-5 text-primary" /> Edit Time Entry
+            <DialogTitle className="font-heading text-foreground flex items-center gap-2">
+              <Edit className="h-5 w-5 text-brand" /> Edit Time Entry
             </DialogTitle>
-            <DialogDescription className="text-gray-500 dark:text-slate-400 text-xs">
+            <DialogDescription className="text-muted-foreground text-xs">
               Modify the start/end logs, note details, or status of this entry.
             </DialogDescription>
           </DialogHeader>
           <form onSubmit={handleUpdateEntry} className="space-y-4">
             <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">Date</label>
+              <label className="text-xs font-semibold text-foreground">Date</label>
               <Input
                 type="date"
                 required
                 value={editDate}
                 onChange={(e) => setEditDate(e.target.value)}
-                className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-xs"
+                className="bg-background border-border text-xs"
               />
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">Start Time</label>
+                <label className="text-xs font-semibold text-foreground">Start Time</label>
                 <Input
                   type="time"
                   required
                   value={editStartTime}
                   onChange={(e) => setEditStartTime(e.target.value)}
-                  className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-xs"
+                  className="bg-background border-border text-xs font-mono tabular-nums"
                 />
               </div>
               <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">End Time</label>
+                <label className="text-xs font-semibold text-foreground">End Time</label>
                 <Input
                   type="time"
                   required
                   value={editEndTime}
                   onChange={(e) => setEditEndTime(e.target.value)}
-                  className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-xs"
+                  className="bg-background border-border text-xs font-mono tabular-nums"
                 />
               </div>
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">Task (Optional)</label>
+              <label className="text-xs font-semibold text-foreground">Task (Optional)</label>
               <Select value={editTaskId} onValueChange={(val) => setEditTaskId(val ?? 'none')}>
-                <SelectTrigger className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-xs">
+                <SelectTrigger className="bg-background border-border text-xs">
                   <SelectValue placeholder="No Task Linked">
                     {editTaskId && editTaskId !== 'none' ? (project.tasks?.find(t => t.id === editTaskId)?.title || editTaskId) : undefined}
                   </SelectValue>
                 </SelectTrigger>
-                <SelectContent className="bg-white dark:bg-slate-950 border-zinc-200 dark:border-slate-800">
+                <SelectContent className="bg-card border-border">
                   <SelectItem value="none">No Task Linked</SelectItem>
                   {project.tasks?.map((task) => (
                     <SelectItem key={task.id} value={task.id}>
@@ -866,13 +861,13 @@ export function TimeTracker({ project, initialTimeEntries }: TimeTrackerProps) {
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">Work Details / Notes</label>
+              <label className="text-xs font-semibold text-foreground">Work Details / Notes</label>
               <Textarea
                 placeholder="Describe what was accomplished..."
                 value={editNotes}
                 onChange={(e) => setEditNotes(e.target.value)}
                 required
-                className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-xs min-h-[80px]"
+                className="bg-background border-border text-xs min-h-[80px]"
               />
             </div>
 
@@ -880,11 +875,11 @@ export function TimeTracker({ project, initialTimeEntries }: TimeTrackerProps) {
               <input
                 type="checkbox"
                 id="editBillable"
-                className="rounded border-input text-primary focus:ring-ring h-4 w-4 cursor-pointer"
+                className="rounded border-border accent-brand h-4 w-4 cursor-pointer"
                 checked={editBillable}
                 onChange={(e) => setEditBillable(e.target.checked)}
               />
-              <label htmlFor="editBillable" className="text-xs font-bold text-slate-700 dark:text-slate-400 cursor-pointer select-none">
+              <label htmlFor="editBillable" className="text-xs font-semibold text-muted-foreground cursor-pointer select-none">
                 This time entry is billable
               </label>
             </div>
@@ -897,14 +892,14 @@ export function TimeTracker({ project, initialTimeEntries }: TimeTrackerProps) {
                   setIsEditOpen(false);
                   setSelectedEntry(null);
                 }}
-                className="border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 font-medium"
+                className="border-border text-foreground font-medium"
               >
                 Cancel
               </Button>
               <Button 
                 type="submit" 
                 disabled={isLoading}
-                className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold"
+                className="font-semibold"
               >
                 {isLoading ? 'Saving...' : 'Save Changes'}
               </Button>
@@ -915,26 +910,26 @@ export function TimeTracker({ project, initialTimeEntries }: TimeTrackerProps) {
 
       {/* Delete Confirmation Dialog */}
       <Dialog open={isDeleteOpen} onOpenChange={setIsDeleteOpen}>
-        <DialogContent className="border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 sm:max-w-md">
+        <DialogContent className="border-border bg-card sm:max-w-md">
           <DialogHeader>
-            <DialogTitle className="text-slate-900 dark:text-slate-100">Delete Time Entry</DialogTitle>
-            <DialogDescription className="text-gray-500 dark:text-slate-400 text-xs">
+            <DialogTitle className="font-heading text-foreground">Delete Time Entry</DialogTitle>
+            <DialogDescription className="text-muted-foreground text-xs">
               Are you sure you want to delete this time entry? This action is permanent and cannot be undone.
             </DialogDescription>
           </DialogHeader>
           {entryToDelete && (
             <div className="py-2 space-y-1 text-xs">
-              <div className="flex justify-between text-slate-500 dark:text-slate-400">
+              <div className="flex justify-between text-muted-foreground">
                 <span>Date:</span>
-                <span className="font-semibold text-slate-700 dark:text-slate-300">{formatDate(entryToDelete.startTime)}</span>
+                <span className="font-semibold text-foreground">{formatDate(entryToDelete.startTime)}</span>
               </div>
-              <div className="flex justify-between text-slate-500 dark:text-slate-400">
+              <div className="flex justify-between text-muted-foreground">
                 <span>Duration:</span>
-                <span className="font-semibold text-slate-700 dark:text-slate-300">{formatDuration(entryToDelete.durationMinutes)}</span>
+                <span className="font-semibold font-mono tabular-nums text-foreground">{formatDuration(entryToDelete.durationMinutes)}</span>
               </div>
-              <div className="flex justify-between text-slate-500 dark:text-slate-400">
+              <div className="flex justify-between text-muted-foreground">
                 <span>Notes:</span>
-                <span className="font-semibold text-slate-700 dark:text-slate-300 max-w-[200px] truncate">{entryToDelete.notes}</span>
+                <span className="font-semibold text-foreground max-w-[200px] truncate">{entryToDelete.notes}</span>
               </div>
             </div>
           )}
@@ -946,7 +941,7 @@ export function TimeTracker({ project, initialTimeEntries }: TimeTrackerProps) {
                 setIsDeleteOpen(false);
                 setEntryToDelete(null);
               }}
-              className="border-slate-200 dark:border-slate-800 text-gray-700 dark:text-slate-300"
+              className="border-border text-foreground"
             >
               Cancel
             </Button>
@@ -954,7 +949,7 @@ export function TimeTracker({ project, initialTimeEntries }: TimeTrackerProps) {
               variant="destructive"
               disabled={isLoading}
               onClick={handleDeleteEntry}
-              className="bg-red-700 hover:bg-red-700 text-white font-medium"
+              className="font-medium"
             >
               {isLoading ? 'Deleting...' : 'Delete'}
             </Button>

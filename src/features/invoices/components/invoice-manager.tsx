@@ -79,11 +79,11 @@ const toDateInputValue = (offsetDays: number) => {
 };
 
 const STATUS_COLORS: Record<string, string> = {
-  DRAFT: 'bg-zinc-50 dark:bg-zinc-950 text-zinc-400 dark:text-zinc-50 border border-zinc-200/60 dark:border-gray-800',
-  SENT: 'bg-blue-500/10 text-blue-700 dark:text-blue-300 border border-blue-500/20',
-  PAID: 'bg-green-500/10 text-green-600 dark:text-green-400 border border-green-600/15',
-  OVERDUE: 'bg-red-500/10 text-red-700 dark:text-red-400 border border-red-600/15',
-  CANCELLED: 'bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 border border-zinc-200/30',
+  DRAFT: 'bg-muted text-muted-foreground border border-border',
+  SENT: 'bg-secondary text-foreground border border-border',
+  PAID: 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-500/20',
+  OVERDUE: 'bg-red-500/10 text-red-700 dark:text-red-400 border border-red-500/20',
+  CANCELLED: 'bg-muted text-muted-foreground border border-border',
 };
 
 export function InvoiceManager({ projectId, workspaceId, clientId, initialInvoices }: InvoiceManagerProps) {
@@ -331,70 +331,62 @@ export function InvoiceManager({ projectId, workspaceId, clientId, initialInvoic
 
   return (
     <div className="space-y-6">
-      {/* KPI Stats Cards */}
-      <div className="grid gap-4 sm:grid-cols-4">
-        <Card className="border-zinc-200/60 dark:border-zinc-800/80 bg-white dark:bg-slate-900 rounded-xl shadow-sm">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-xs font-semibold text-zinc-500 dark:text-zinc-400">Total Billed</CardTitle>
-            <TrendingUp className="h-4 w-4 text-primary" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-xl font-black text-slate-950 dark:text-zinc-50">
-              {formatCurrency(invoiceStats.totalInvoiced, currency)}
-            </div>
-            <p className="text-xs text-muted-foreground mt-1">Excludes cancelled invoices</p>
-          </CardContent>
-        </Card>
+      {/* KPI Ledger Strip */}
+      <div className="grid sm:grid-cols-4 divide-y sm:divide-y-0 sm:divide-x divide-border border border-border rounded-lg bg-card overflow-hidden">
+        <div className="p-4 space-y-1">
+          <div className="flex items-center justify-between text-xs font-medium text-muted-foreground">
+            <span>Total Billed</span>
+            <TrendingUp className="h-4 w-4 text-brand" />
+          </div>
+          <div className="font-mono text-xl font-bold tabular-nums text-foreground">
+            {formatCurrency(invoiceStats.totalInvoiced, currency)}
+          </div>
+          <p className="text-[11px] text-muted-foreground">Excludes cancelled invoices</p>
+        </div>
 
-        <Card className="border-zinc-200/60 dark:border-zinc-800/80 bg-white dark:bg-slate-900 rounded-xl shadow-sm">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-xs font-semibold text-zinc-500 dark:text-zinc-400">Collected</CardTitle>
-            <CheckCircle className="h-4 w-4 text-emerald-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-xl font-black text-emerald-700 dark:text-emerald-400">
-              {formatCurrency(invoiceStats.collected, currency)}
-            </div>
-            <p className="text-xs text-muted-foreground mt-1">Paid in full</p>
-          </CardContent>
-        </Card>
+        <div className="p-4 space-y-1">
+          <div className="flex items-center justify-between text-xs font-medium text-muted-foreground">
+            <span>Collected</span>
+            <CheckCircle className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+          </div>
+          <div className="font-mono text-xl font-bold tabular-nums text-emerald-700 dark:text-emerald-400">
+            {formatCurrency(invoiceStats.collected, currency)}
+          </div>
+          <p className="text-[11px] text-muted-foreground">Paid in full</p>
+        </div>
 
-        <Card className="border-zinc-200/60 dark:border-zinc-800/80 bg-white dark:bg-slate-900 rounded-xl shadow-sm">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-xs font-semibold text-zinc-500 dark:text-zinc-400">Pending</CardTitle>
-            <CreditCard className="h-4 w-4 text-blue-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-xl font-black text-blue-700 dark:text-blue-400">
-              {formatCurrency(invoiceStats.pending, currency)}
-            </div>
-            <p className="text-xs text-muted-foreground mt-1">Sent to client, awaiting payment</p>
-          </CardContent>
-        </Card>
+        <div className="p-4 space-y-1">
+          <div className="flex items-center justify-between text-xs font-medium text-muted-foreground">
+            <span>Pending</span>
+            <CreditCard className="h-4 w-4 text-muted-foreground" />
+          </div>
+          <div className="font-mono text-xl font-bold tabular-nums text-foreground">
+            {formatCurrency(invoiceStats.pending, currency)}
+          </div>
+          <p className="text-[11px] text-muted-foreground">Sent to client, awaiting payment</p>
+        </div>
 
-        <Card className="border-zinc-200/60 dark:border-zinc-800/80 bg-white dark:bg-slate-900 rounded-xl shadow-sm">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-xs font-semibold text-zinc-500 dark:text-zinc-400">Drafts</CardTitle>
-            <FileText className="h-4 w-4 text-zinc-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-xl font-black text-slate-700 dark:text-zinc-300">
-              {formatCurrency(invoiceStats.drafts, currency)}
-            </div>
-            <p className="text-xs text-muted-foreground mt-1">Unsent invoices</p>
-          </CardContent>
-        </Card>
+        <div className="p-4 space-y-1">
+          <div className="flex items-center justify-between text-xs font-medium text-muted-foreground">
+            <span>Drafts</span>
+            <FileText className="h-4 w-4 text-muted-foreground" />
+          </div>
+          <div className="font-mono text-xl font-bold tabular-nums text-muted-foreground">
+            {formatCurrency(invoiceStats.drafts, currency)}
+          </div>
+          <p className="text-[11px] text-muted-foreground">Unsent invoices</p>
+        </div>
       </div>
 
       {/* Recurring Invoice settings card */}
-      <Card className="border-zinc-200/60 dark:border-zinc-800/80 bg-white dark:bg-slate-900 rounded-xl shadow-sm overflow-hidden">
-        <CardHeader className="border-b border-gray-100 dark:border-zinc-800/50 pb-4">
+      <Card className="border-border bg-card rounded-lg overflow-hidden">
+        <CardHeader className="border-b border-border pb-4">
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle className="text-sm font-bold text-zinc-950 dark:text-zinc-50 flex items-center gap-2">
-                <Calendar className="h-4.5 w-4.5 text-primary" /> Recurring Invoice Automation
+              <CardTitle className="font-heading text-sm font-bold text-foreground flex items-center gap-2">
+                <Calendar className="h-4.5 w-4.5 text-brand" /> Recurring Invoice Automation
               </CardTitle>
-              <CardDescription className="text-xs mt-0.5 text-zinc-500 dark:text-zinc-400">
+              <CardDescription className="text-xs mt-0.5 text-muted-foreground">
                 Automatically clone and email the latest invoice for this client on a recurring schedule.
               </CardDescription>
             </div>
@@ -402,23 +394,23 @@ export function InvoiceManager({ projectId, workspaceId, clientId, initialInvoic
         </CardHeader>
         <CardContent className="pt-5 space-y-4">
           {invoices.length === 0 ? (
-            <div className="flex items-start gap-2.5 p-3.5 bg-amber-50 dark:bg-amber-950/20 text-amber-900 dark:text-amber-300 rounded-lg border border-amber-100 dark:border-amber-900/60 text-xs">
-              <AlertCircle className="h-4.5 w-4.5 shrink-0 mt-0.5 text-amber-600 dark:text-amber-500" />
+            <div className="flex items-start gap-2.5 p-3.5 bg-amber-500/10 text-amber-800 dark:text-amber-300 rounded-lg border border-amber-500/20 text-xs">
+              <AlertCircle className="h-4.5 w-4.5 shrink-0 mt-0.5 text-amber-600 dark:text-amber-400" />
               <div className="space-y-1">
                 <p className="font-bold">Manual Invoice Required</p>
-                <p className="text-slate-600 dark:text-slate-400">
+                <p className="text-muted-foreground">
                   Recurring billing requires at least one manual invoice for this client to act as a template. Please create an invoice first.
                 </p>
               </div>
             </div>
           ) : (
             <div className="space-y-4">
-              <div className="flex items-center justify-between p-3.5 bg-zinc-50/50 dark:bg-zinc-950/20 rounded-lg border border-gray-100 dark:border-slate-900">
+              <div className="flex items-center justify-between p-3.5 bg-muted/30 rounded-lg border border-border">
                 <div className="space-y-0.5">
-                  <label className="text-xs font-bold text-zinc-800 dark:text-zinc-200">
+                  <label className="text-xs font-semibold text-foreground">
                     Enable Automatic Recurring Billing
                   </label>
-                  <p className="text-[10px] text-slate-500 dark:text-zinc-500">
+                  <p className="text-[11px] text-muted-foreground">
                     If active, the system will process schedules automatically on the designated run dates.
                   </p>
                 </div>
@@ -427,23 +419,23 @@ export function InvoiceManager({ projectId, workspaceId, clientId, initialInvoic
                   checked={isRecurringActive}
                   onChange={(e) => setIsRecurringActive(e.target.checked)}
                   disabled={isRecurringLoading}
-                  className="h-4 w-4 rounded border-slate-300 text-primary focus:ring-primary cursor-pointer dark:border-zinc-800/80 dark:bg-slate-900"
+                  className="h-4 w-4 rounded border-border accent-brand cursor-pointer"
                 />
               </div>
 
               {isRecurringActive && (
-                <div className="grid gap-4 sm:grid-cols-2 p-4 bg-zinc-50/50 dark:bg-zinc-950/20 rounded-lg border border-gray-100/60 dark:border-slate-900/50">
+                <div className="grid gap-4 sm:grid-cols-2 p-4 bg-muted/30 rounded-lg border border-border">
                   <div className="space-y-1.5">
-                    <label className="text-xs font-semibold text-zinc-700 dark:text-zinc-300">Billing Frequency</label>
+                    <label className="text-xs font-semibold text-foreground">Billing Frequency</label>
                     <Select
                       value={recurringFrequency}
                       onValueChange={(val) => setRecurringFrequency(val || 'MONTHLY')}
                       disabled={isRecurringLoading}
                     >
-                      <SelectTrigger className="bg-white dark:bg-slate-900 border-zinc-200/60 dark:border-zinc-800/80 h-9 text-xs">
+                      <SelectTrigger className="bg-background border-border h-9 text-xs">
                         <SelectValue placeholder="Select Frequency" />
                       </SelectTrigger>
-                      <SelectContent className="bg-white dark:bg-slate-950 border-zinc-200 dark:border-zinc-800/80">
+                      <SelectContent className="bg-card border-border">
                         <SelectItem value="WEEKLY">Weekly</SelectItem>
                         <SelectItem value="MONTHLY">Monthly</SelectItem>
                         <SelectItem value="QUARTERLY">Quarterly</SelectItem>
@@ -452,13 +444,13 @@ export function InvoiceManager({ projectId, workspaceId, clientId, initialInvoic
                     </Select>
                   </div>
                   <div className="space-y-1.5">
-                    <label className="text-xs font-semibold text-zinc-700 dark:text-zinc-300">Next Scheduled Run Date</label>
+                    <label className="text-xs font-semibold text-foreground">Next Scheduled Run Date</label>
                     <Input
                       type="date"
                       value={recurringNextRun}
                       onChange={(e) => setRecurringNextRun(e.target.value)}
                       disabled={isRecurringLoading}
-                      className="bg-white dark:bg-slate-900 border-zinc-200/60 dark:border-zinc-800/80 text-xs h-9"
+                      className="bg-background border-border text-xs h-9"
                     />
                   </div>
                 </div>
@@ -468,7 +460,7 @@ export function InvoiceManager({ projectId, workspaceId, clientId, initialInvoic
                 <Button
                   onClick={handleSaveRecurringSettings}
                   disabled={isRecurringLoading}
-                  className="bg-primary hover:bg-primary/90 text-primary-foreground text-xs font-bold shadow-sm h-8 animate-none"
+                  className="text-xs font-semibold h-8"
                 >
                   {isRecurringLoading ? 'Saving Settings...' : 'Save Automation Settings'}
                 </Button>
@@ -480,59 +472,59 @@ export function InvoiceManager({ projectId, workspaceId, clientId, initialInvoic
 
       {/* Action Header bar */}
       <div className="flex items-center justify-between">
-        <h3 className="text-sm font-bold text-zinc-800 dark:text-zinc-200">Billing History</h3>
+        <h3 className="font-heading text-sm font-bold text-foreground">Billing History</h3>
         <Button 
           onClick={() => setIsCreateOpen(true)}
-          className="bg-primary hover:bg-primary/90 text-primary-foreground text-xs font-bold shadow-sm"
+          className="text-xs font-semibold"
         >
           <Plus className="mr-1.5 h-3.5 w-3.5" /> Create Invoice
         </Button>
       </div>
 
       {/* Invoices List Table */}
-      <Card className="border-zinc-200/60 dark:border-zinc-800/80 bg-white dark:bg-slate-900 rounded-xl shadow-sm overflow-hidden">
+      <Card className="border-border bg-card rounded-lg overflow-hidden">
         <CardContent className="p-0">
           {invoices.length === 0 ? (
-            <div className="text-center py-12 text-gray-500 dark:text-zinc-400 space-y-2">
-              <DollarSign className="h-10 w-10 mx-auto text-slate-400 dark:text-zinc-700" />
-              <p className="text-sm font-semibold">No invoices generated yet</p>
-              <p className="text-xs text-slate-500">Click &ldquo;Create Invoice&rdquo; to start billing for project deliverables.</p>
+            <div className="text-center py-12 text-muted-foreground space-y-2">
+              <DollarSign className="h-10 w-10 mx-auto text-muted-foreground/60" />
+              <p className="text-sm font-semibold text-foreground">No invoices generated yet</p>
+              <p className="text-xs text-muted-foreground">Click &ldquo;Create Invoice&rdquo; to start billing for project deliverables.</p>
             </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse">
                 <thead>
-                  <tr className="border-b border-gray-100 dark:border-gray-800 bg-zinc-50/50 dark:bg-zinc-950/20 text-xs font-bold text-zinc-500 dark:text-zinc-400">
-                    <th className="py-3 px-4 font-bold">Invoice Number</th>
-                    <th className="py-3 px-4 font-bold">Due Date</th>
-                    <th className="py-3 px-4 font-bold">Status</th>
-                    <th className="py-3 px-4 font-bold text-right">Subtotal</th>
-                    <th className="py-3 px-4 font-bold text-right">Tax</th>
-                    <th className="py-3 px-4 font-bold text-right">Total</th>
-                    <th className="py-3 px-4 font-bold text-right">Actions</th>
+                  <tr className="border-b border-border bg-muted/40 text-xs font-semibold text-muted-foreground">
+                    <th className="py-3 px-4 font-semibold">Invoice Number</th>
+                    <th className="py-3 px-4 font-semibold">Due Date</th>
+                    <th className="py-3 px-4 font-semibold">Status</th>
+                    <th className="py-3 px-4 font-semibold text-right">Subtotal</th>
+                    <th className="py-3 px-4 font-semibold text-right">Tax</th>
+                    <th className="py-3 px-4 font-semibold text-right">Total</th>
+                    <th className="py-3 px-4 font-semibold text-right">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100 dark:divide-gray-800 text-xs">
+                <tbody className="divide-y divide-border text-xs">
                   {invoices.map((invoice) => (
-                    <tr key={invoice.id} className="hover:bg-zinc-50/50 dark:hover:bg-slate-950/10 transition-colors">
-                      <td className="py-3.5 px-4 font-bold text-zinc-950 dark:text-zinc-50">
+                    <tr key={invoice.id} className="hover:bg-muted/30 transition-colors">
+                      <td className="py-3.5 px-4 font-mono font-semibold text-foreground">
                         {invoice.invoiceNumber}
                       </td>
-                      <td className="py-3.5 px-4 text-slate-600 dark:text-slate-500 font-medium">
+                      <td className="py-3.5 px-4 text-muted-foreground font-medium">
                         {formatDate(invoice.dueDate)}
                       </td>
                       <td className="py-3.5 px-4">
-                        <Badge variant="outline" className={`cursor-pointer text-[11px] font-semibold uppercase tracking-wider px-2 border ${STATUS_COLORS[invoice.status]}`}>
+                        <Badge variant="outline" className={`text-[11px] font-semibold px-2 border ${STATUS_COLORS[invoice.status]}`}>
                           {invoice.status}
                         </Badge>
                       </td>
-                      <td className="py-3.5 px-4 text-right text-slate-600 dark:text-zinc-400">
+                      <td className="py-3.5 px-4 text-right font-mono tabular-nums text-muted-foreground">
                         {formatCurrency(Number(invoice.subtotal), invoice.currency)}
                       </td>
-                      <td className="py-3.5 px-4 text-right text-slate-600 dark:text-zinc-400">
+                      <td className="py-3.5 px-4 text-right font-mono tabular-nums text-muted-foreground">
                         {formatCurrency(Number(invoice.taxAmount), invoice.currency)}
                       </td>
-                      <td className="py-3.5 px-4 text-right font-bold text-zinc-950 dark:text-zinc-50">
+                      <td className="py-3.5 px-4 text-right font-mono tabular-nums font-bold text-foreground">
                         {formatCurrency(Number(invoice.totalAmount), invoice.currency)}
                       </td>
                       <td className="py-3.5 px-4 text-right">
@@ -542,7 +534,7 @@ export function InvoiceManager({ projectId, workspaceId, clientId, initialInvoic
                             <Button
                               variant="ghost"
                               size="icon"
-                              className="cursor-pointer h-7 w-7 text-blue-500 hover:text-blue-900 dark:hover:text-blue-400"
+                              className="cursor-pointer h-7 w-7 text-muted-foreground hover:text-foreground"
                               onClick={() => handleSendInvoice(invoice.id)}
                               title="Send Invoice to client"
                               disabled={isLoading}
@@ -555,7 +547,7 @@ export function InvoiceManager({ projectId, workspaceId, clientId, initialInvoic
                             <Button
                               variant="ghost"
                               size="icon"
-                              className="cursor-pointer h-7 w-7 text-emerald-500 hover:text-emerald-800 dark:hover:text-emerald-400"
+                              className="cursor-pointer h-7 w-7 text-emerald-600 dark:text-emerald-400 hover:text-emerald-700"
                               onClick={() => handleMarkAsPaid(invoice.id)}
                               title="Mark invoice as paid"
                               disabled={isLoading}
@@ -567,7 +559,7 @@ export function InvoiceManager({ projectId, workspaceId, clientId, initialInvoic
                           <Button
                             variant="ghost"
                             size="icon"
-                            className="cursor-pointer h-7 w-7 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+                            className="cursor-pointer h-7 w-7 text-muted-foreground hover:text-foreground"
                             onClick={() => handleDownloadPdf(invoice.id)}
                             title="Download PDF Invoice"
                           >
@@ -578,7 +570,7 @@ export function InvoiceManager({ projectId, workspaceId, clientId, initialInvoic
                             <Button
                               variant="ghost"
                               size="icon"
-                              className="cursor-pointer h-7 w-7 text-red-400 hover:text-red-700 dark:hover:text-red-400"
+                              className="cursor-pointer h-7 w-7 text-muted-foreground hover:text-destructive"
                               onClick={() => {
                                 setInvoiceToDelete(invoice);
                                 setIsDeleteOpen(true);
@@ -602,12 +594,12 @@ export function InvoiceManager({ projectId, workspaceId, clientId, initialInvoic
 
       {/* Create Invoice Dialog */}
       <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
-        <DialogContent className="border-zinc-200/60 dark:border-zinc-800/80 bg-white dark:bg-zinc-950/20 sm:max-w-2xl overflow-y-auto max-h-[85vh]">
+        <DialogContent className="border-border bg-card sm:max-w-2xl overflow-y-auto max-h-[85vh]">
           <DialogHeader>
-            <DialogTitle className="text-zinc-950 dark:text-zinc-100 flex items-center gap-2">
-              <DollarSign className="h-5 w-5 text-primary" /> Create New Invoice
+            <DialogTitle className="font-heading text-foreground flex items-center gap-2">
+              <DollarSign className="h-5 w-5 text-brand" /> Create New Invoice
             </DialogTitle>
-            <DialogDescription className="text-gray-500 dark:text-zinc-400 text-xs">
+            <DialogDescription className="text-muted-foreground text-xs">
               Add billed line items, adjust currency rates, and configure tax rates.
             </DialogDescription>
           </DialogHeader>
@@ -615,22 +607,22 @@ export function InvoiceManager({ projectId, workspaceId, clientId, initialInvoic
           <form onSubmit={handleCreateInvoice} className="space-y-6">
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
               <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-zinc-700 dark:text-zinc-300">Due Date</label>
+                <label className="text-xs font-semibold text-foreground">Due Date</label>
                 <Input
                   type="date"
                   required
                   value={dueDate}
                   onChange={(e) => setDueDate(e.target.value)}
-                  className="bg-white dark:bg-slate-900 border-zinc-200/60 dark:border-zinc-800/80 text-xs"
+                  className="bg-background border-border text-xs"
                 />
               </div>
               <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-zinc-700 dark:text-zinc-300">Currency</label>
+                <label className="text-xs font-semibold text-foreground">Currency</label>
                 <Select value={currency} onValueChange={(val) => setCurrency(val ?? 'USD')}>
-                  <SelectTrigger className="bg-white dark:bg-slate-900 border-zinc-200/60 dark:border-zinc-800/80 h-9 text-xs">
+                  <SelectTrigger className="bg-background border-border h-9 text-xs">
                     <SelectValue placeholder="USD" />
                   </SelectTrigger>
-                  <SelectContent className="bg-white dark:bg-zinc-950/20 border-zinc-200 dark:border-zinc-800/80">
+                  <SelectContent className="bg-card border-border">
                     <SelectItem value="USD">USD ($)</SelectItem>
                     <SelectItem value="EUR">EUR (€)</SelectItem>
                     <SelectItem value="GBP">GBP (£)</SelectItem>
@@ -639,7 +631,7 @@ export function InvoiceManager({ projectId, workspaceId, clientId, initialInvoic
                 </Select>
               </div>
               <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-zinc-700 dark:text-zinc-300">Tax Rate (%)</label>
+                <label className="text-xs font-semibold text-foreground">Tax Rate (%)</label>
                 <Input
                   type="number"
                   min="0"
@@ -648,27 +640,27 @@ export function InvoiceManager({ projectId, workspaceId, clientId, initialInvoic
                   required
                   value={taxRate}
                   onChange={(e) => setTaxRate(parseFloat(e.target.value) || 0)}
-                  className="bg-white dark:bg-slate-900 border-zinc-200/60 dark:border-zinc-800/80 text-xs"
+                  className="bg-background border-border text-xs font-mono tabular-nums"
                 />
               </div>
             </div>
 
             {/* Line Items builder */}
             <div className="space-y-4">
-              <div className="flex items-center justify-between border-b border-gray-100 dark:border-zinc-800/50 pb-2">
-                <h4 className="text-xs font-bold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider">Line Items</h4>
+              <div className="flex items-center justify-between border-b border-border pb-2">
+                <h4 className="text-xs font-semibold text-muted-foreground">Line Items</h4>
                 <Button
                   type="button"
                   variant="ghost"
                   onClick={handleAddItem}
-                  className="cursor-pointer h-8 text-xs text-primary font-bold hover:bg-primary/10"
+                  className="cursor-pointer h-8 text-xs text-foreground font-semibold hover:bg-muted"
                 >
-                  <PlusCircle className="mr-1 h-4 w-4" /> Add Line Item
+                  <PlusCircle className="mr-1 h-4 w-4 text-brand" /> Add Line Item
                 </Button>
               </div>
 
               {items.map((item, index) => (
-                <div key={index} className="flex gap-3 items-start p-3 bg-zinc-50/50 dark:bg-zinc-950/20 rounded-lg border border-gray-100 dark:border-slate-900 relative pr-10">
+                <div key={index} className="flex gap-3 items-start p-3 bg-muted/30 rounded-lg border border-border relative pr-10">
                   <div className="grid gap-3 grid-cols-12 flex-1">
                     <div className="col-span-6 space-y-1">
                       <Input
@@ -676,13 +668,13 @@ export function InvoiceManager({ projectId, workspaceId, clientId, initialInvoic
                         value={item.name}
                         onChange={(e) => handleItemChange(index, 'name', e.target.value)}
                         required
-                        className="bg-white dark:bg-slate-900 border-zinc-200/60 dark:border-zinc-800/80 h-9 text-xs"
+                        className="bg-background border-border h-9 text-xs"
                       />
                       <Input
                         placeholder="Optional description"
                         value={item.description}
                         onChange={(e) => handleItemChange(index, 'description', e.target.value)}
-                        className="bg-white dark:bg-slate-900 border-zinc-200/60 dark:border-zinc-800/80 h-8 text-[11px] font-normal"
+                        className="bg-background border-border h-8 text-[11px] font-normal"
                       />
                     </div>
                     <div className="col-span-2 space-y-1">
@@ -693,7 +685,7 @@ export function InvoiceManager({ projectId, workspaceId, clientId, initialInvoic
                         value={item.quantity}
                         onChange={(e) => handleItemChange(index, 'quantity', e.target.value)}
                         required
-                        className="bg-white dark:bg-slate-900 border-zinc-200/60 dark:border-zinc-800/80 h-9 text-xs text-center"
+                        className="bg-background border-border h-9 text-xs text-center font-mono tabular-nums"
                       />
                     </div>
                     <div className="col-span-4 space-y-1">
@@ -705,9 +697,9 @@ export function InvoiceManager({ projectId, workspaceId, clientId, initialInvoic
                         value={item.unitPrice}
                         onChange={(e) => handleItemChange(index, 'unitPrice', e.target.value)}
                         required
-                        className="bg-white dark:bg-slate-900 border-zinc-200/60 dark:border-zinc-800/80 h-9 text-xs text-right"
+                        className="bg-background border-border h-9 text-xs text-right font-mono tabular-nums"
                       />
-                      <div className="text-right text-[10px] font-bold text-zinc-500 pt-1">
+                      <div className="text-right text-[11px] font-mono tabular-nums font-semibold text-muted-foreground pt-1">
                         Total: {formatCurrency(item.quantity * item.unitPrice, currency)}
                       </div>
                     </div>
@@ -717,7 +709,7 @@ export function InvoiceManager({ projectId, workspaceId, clientId, initialInvoic
                     <button
                       type="button"
                       onClick={() => handleRemoveItem(index)}
-                      className="absolute right-2.5 top-3.5 text-red-400 hover:text-red-700 dark:hover:text-red-400"
+                      className="absolute right-2.5 top-3.5 text-muted-foreground hover:text-destructive cursor-pointer"
                     >
                       <MinusCircle className="h-4.5 w-4.5" />
                     </button>
@@ -727,19 +719,19 @@ export function InvoiceManager({ projectId, workspaceId, clientId, initialInvoic
             </div>
 
             {/* Total Cost calculations panel */}
-            <div className="border-t border-gray-100 dark:border-zinc-800/50 pt-4 flex justify-end">
+            <div className="border-t border-border pt-4 flex justify-end">
               <div className="w-64 space-y-2 text-xs">
-                <div className="flex justify-between text-zinc-500">
+                <div className="flex justify-between text-muted-foreground">
                   <span>Subtotal:</span>
-                  <span className="font-semibold text-zinc-800 dark:text-zinc-300">{formatCurrency(subtotal, currency)}</span>
+                  <span className="font-mono tabular-nums font-semibold text-foreground">{formatCurrency(subtotal, currency)}</span>
                 </div>
-                <div className="flex justify-between text-zinc-500">
+                <div className="flex justify-between text-muted-foreground">
                   <span>Tax ({taxRate}%):</span>
-                  <span className="font-semibold text-zinc-800 dark:text-zinc-300">{formatCurrency(taxAmount, currency)}</span>
+                  <span className="font-mono tabular-nums font-semibold text-foreground">{formatCurrency(taxAmount, currency)}</span>
                 </div>
-                <div className="flex justify-between border-t border-slate-200 dark:border-zinc-800/80 pt-2 text-sm font-bold">
-                  <span className="text-zinc-950 dark:text-zinc-50">Grand Total:</span>
-                  <span className="text-primary">{formatCurrency(totalAmount, currency)}</span>
+                <div className="flex justify-between border-t border-border pt-2 text-sm font-bold">
+                  <span className="text-foreground">Grand Total:</span>
+                  <span className="font-mono tabular-nums text-foreground">{formatCurrency(totalAmount, currency)}</span>
                 </div>
               </div>
             </div>
@@ -749,14 +741,14 @@ export function InvoiceManager({ projectId, workspaceId, clientId, initialInvoic
                 type="button" 
                 variant="outline" 
                 onClick={() => setIsCreateOpen(false)}
-                className="cursor-pointer border-zinc-200/60 dark:border-zinc-800/80 text-zinc-700 dark:text-zinc-300 font-medium"
+                className="cursor-pointer border-border text-foreground font-medium"
               >
                 Cancel
               </Button>
               <Button 
                 type="submit" 
                 disabled={isLoading}
-                className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold"
+                className="font-semibold"
               >
                 {isLoading ? 'Creating...' : 'Save Draft'}
               </Button>
@@ -767,11 +759,11 @@ export function InvoiceManager({ projectId, workspaceId, clientId, initialInvoic
 
       {/* Delete Confirmation Dialog */}
       <Dialog open={isDeleteOpen} onOpenChange={setIsDeleteOpen}>
-        <DialogContent className="border-zinc-200/60 dark:border-zinc-800/80 bg-white dark:bg-zinc-950/20 sm:max-w-md">
+        <DialogContent className="border-border bg-card sm:max-w-md">
           <DialogHeader>
-            <DialogTitle className="text-zinc-950 dark:text-zinc-100">Delete Invoice</DialogTitle>
-            <DialogDescription className="text-gray-500 dark:text-zinc-400 text-xs">
-              Are you sure you want to delete invoice <strong className="text-zinc-800 dark:text-zinc-200">&ldquo;{invoiceToDelete?.invoiceNumber}&rdquo;</strong>? This action is permanent and cannot be undone.
+            <DialogTitle className="font-heading text-foreground">Delete Invoice</DialogTitle>
+            <DialogDescription className="text-muted-foreground text-xs">
+              Are you sure you want to delete invoice <strong className="text-foreground font-mono">&ldquo;{invoiceToDelete?.invoiceNumber}&rdquo;</strong>? This action is permanent and cannot be undone.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="mt-4 flex flex-col sm:flex-row gap-2 sm:justify-end">
@@ -782,7 +774,7 @@ export function InvoiceManager({ projectId, workspaceId, clientId, initialInvoic
                 setIsDeleteOpen(false);
                 setInvoiceToDelete(null);
               }}
-              className="cursor-pointer border-zinc-200/60 dark:border-zinc-800/80 text-gray-700 dark:text-slate-400"
+              className="cursor-pointer border-border text-foreground"
             >
               Cancel
             </Button>
@@ -790,7 +782,7 @@ export function InvoiceManager({ projectId, workspaceId, clientId, initialInvoic
               variant="destructive"
               disabled={isLoading}
               onClick={handleDeleteInvoice}
-              className="cursor-pointer bg-red-700 hover:bg-red-700 text-white font-medium"
+              className="cursor-pointer font-medium"
             >
               {isLoading ? 'Deleting...' : 'Delete'}
             </Button>

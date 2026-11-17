@@ -74,33 +74,33 @@ interface ClientProjectPortalProps {
 }
 
 const STATUS_COLORS: Record<string, string> = {
-  DRAFT: 'bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-200 border-zinc-200 dark:border-zinc-700',
-  ACTIVE: 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800',
-  ON_HOLD: 'bg-amber-50 text-amber-800 dark:bg-amber-950/40 dark:text-amber-300 border-amber-200 dark:border-amber-800',
-  REVIEW: 'bg-blue-50 text-blue-700 dark:bg-blue-950/40 dark:text-blue-300 border-blue-200 dark:border-blue-800',
-  COMPLETED: 'bg-primary/10 text-primary border-primary/20',
-  CANCELLED: 'bg-red-50 text-red-700 dark:bg-red-950/40 dark:text-red-300 border-red-200 dark:border-red-800',
+  DRAFT: 'border-border bg-secondary text-foreground',
+  ACTIVE: 'border-emerald-500/20 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400',
+  ON_HOLD: 'border-amber-500/20 bg-amber-500/10 text-amber-700 dark:text-amber-400',
+  REVIEW: 'border-border bg-secondary text-foreground',
+  COMPLETED: 'border-emerald-500/20 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400',
+  CANCELLED: 'border-red-500/20 bg-red-500/10 text-red-700 dark:text-red-400',
 };
 
 const MILESTONE_STATUS_COLORS: Record<string, string> = {
-  NOT_STARTED: 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-200',
-  IN_PROGRESS: 'bg-blue-50 text-blue-700 dark:bg-blue-950/40 dark:text-blue-300',
-  COMPLETED: 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300',
+  NOT_STARTED: 'border-border bg-secondary text-muted-foreground',
+  IN_PROGRESS: 'border-border bg-secondary text-foreground',
+  COMPLETED: 'border-emerald-500/20 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400',
 };
 
 const TASK_PRIORITY_COLORS: Record<string, string> = {
-  LOW: 'text-slate-600 bg-slate-50 border-slate-200 dark:bg-slate-900 dark:border-slate-800',
-  MEDIUM: 'text-blue-700 bg-blue-50 border-blue-200 dark:bg-blue-950/20 dark:border-blue-900/30',
-  HIGH: 'text-amber-700 bg-amber-50 border-amber-200 dark:bg-amber-950/20 dark:border-amber-900/30',
-  URGENT: 'text-red-700 bg-red-50 border-red-200 dark:bg-red-950/20 dark:border-red-900/30',
+  LOW: 'border-border bg-secondary text-muted-foreground',
+  MEDIUM: 'border-border bg-background text-foreground',
+  HIGH: 'border-amber-500/20 bg-amber-500/10 text-amber-700 dark:text-amber-400',
+  URGENT: 'border-red-500/20 bg-red-500/10 text-red-700 dark:text-red-400',
 };
 
 const INVOICE_STATUS_COLORS: Record<string, string> = {
-  DRAFT: 'bg-slate-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-200 border-zinc-200',
-  SENT: 'bg-blue-50 text-blue-700 dark:bg-blue-950/40 dark:text-blue-300 border-blue-200',
-  PAID: 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300 border-emerald-200',
-  OVERDUE: 'bg-red-50 text-red-700 dark:bg-red-950/40 dark:text-red-300 border-red-200',
-  CANCELLED: 'bg-amber-50 text-amber-800 dark:bg-amber-950/40 dark:text-amber-300 border-amber-200',
+  DRAFT: 'border-border bg-secondary text-muted-foreground',
+  SENT: 'border-border bg-secondary text-foreground',
+  PAID: 'border-emerald-500/20 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400',
+  OVERDUE: 'border-red-500/20 bg-red-500/10 text-red-700 dark:text-red-400',
+  CANCELLED: 'border-amber-500/20 bg-amber-500/10 text-amber-700 dark:text-amber-400',
 };
 
 export function ClientProjectPortal({ project }: ClientProjectPortalProps) {
@@ -205,30 +205,28 @@ export function ClientProjectPortal({ project }: ClientProjectPortalProps) {
 
   return (
     <div className="space-y-6">
-      {/* Header Info */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">{project.name}</h1>
-            <Badge className={`font-semibold uppercase tracking-wider text-[10px] ${STATUS_COLORS[project.status] || ''}`}>
+          <div className="flex flex-wrap items-center gap-2.5">
+            <h1 className="font-heading text-2xl font-bold tracking-tight text-foreground">{project.name}</h1>
+            <Badge className={`px-2 text-[11px] font-medium ${STATUS_COLORS[project.status] || 'border-border bg-secondary text-foreground'}`}>
               {project.status}
             </Badge>
           </div>
-          <p className="text-sm text-zinc-500 mt-0.5">
-            Client: <span className="font-semibold text-zinc-700 dark:text-zinc-300">{project.client.companyName}</span>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Client: <span className="font-semibold text-foreground">{project.client.companyName}</span>
           </p>
         </div>
       </div>
 
-      {/* Tabs Bar */}
-      <div className="flex border-b border-border overflow-x-auto scrollbar-none">
+      <div className="flex overflow-x-auto border-b border-border scrollbar-none">
         {(['overview', 'milestones', 'files', 'invoices'] as const).map((tab) => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
-            className={`py-3 px-4 text-sm font-semibold border-b-2 whitespace-nowrap capitalize transition-colors cursor-pointer ${
+            className={`cursor-pointer border-b-2 px-4 py-3 text-sm font-medium whitespace-nowrap capitalize transition-colors ${
               activeTab === tab
-                ? 'border-primary text-primary'
+                ? 'border-brand font-semibold text-foreground'
                 : 'border-transparent text-muted-foreground hover:text-foreground'
             }`}
           >
@@ -237,32 +235,30 @@ export function ClientProjectPortal({ project }: ClientProjectPortalProps) {
         ))}
       </div>
 
-      {/* Tab Contents */}
       {activeTab === 'overview' && (
         <div className="grid gap-6 md:grid-cols-3">
-          {/* Main Info */}
-          <div className="md:col-span-2 space-y-6">
-            <Card className="border-border bg-card rounded-xl shadow-xs">
+          <div className="space-y-6 md:col-span-2">
+            <Card className="border-border bg-card">
               <CardHeader className="border-b border-border pb-4">
-                <CardTitle className="text-base font-bold text-foreground flex items-center gap-2">
-                  <Layers className="h-5 w-5 text-primary" /> Description & Scope
+                <CardTitle className="flex items-center gap-2 font-heading text-base font-bold text-foreground">
+                  <Layers className="h-4 w-4 text-brand" strokeWidth={1.75} /> Description & Scope
                 </CardTitle>
               </CardHeader>
               <CardContent className="pt-6">
-                <p className="text-sm text-muted-foreground whitespace-pre-line leading-relaxed">
+                <p className="whitespace-pre-line text-sm leading-relaxed text-muted-foreground">
                   {project.description || 'No description provided for this project.'}
                 </p>
               </CardContent>
             </Card>
 
             <div className="grid gap-6 sm:grid-cols-2">
-              <Card className="border-border bg-card rounded-xl shadow-xs">
+              <Card className="border-border bg-card">
                 <CardHeader className="border-b border-border pb-4">
-                  <CardTitle className="text-base font-bold text-foreground flex items-center gap-2">
-                    <DollarSign className="h-5 w-5 text-primary" /> Budget Details
+                  <CardTitle className="flex items-center gap-2 font-heading text-base font-bold text-foreground">
+                    <DollarSign className="h-4 w-4 text-brand" strokeWidth={1.75} /> Budget Details
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="pt-6 space-y-3">
+                <CardContent className="space-y-3 pt-6">
                   <div>
                     <span className="text-xs text-muted-foreground">Contract Value</span>
                     <p className="font-mono text-2xl font-semibold tabular-nums text-foreground">
@@ -272,22 +268,22 @@ export function ClientProjectPortal({ project }: ClientProjectPortalProps) {
                 </CardContent>
               </Card>
 
-              <Card className="border-border bg-card rounded-xl shadow-xs">
+              <Card className="border-border bg-card">
                 <CardHeader className="border-b border-border pb-4">
-                  <CardTitle className="text-base font-bold text-foreground flex items-center gap-2">
-                    <Calendar className="h-5 w-5 text-primary" /> Key Dates
+                  <CardTitle className="flex items-center gap-2 font-heading text-base font-bold text-foreground">
+                    <Calendar className="h-4 w-4 text-brand" strokeWidth={1.75} /> Key Dates
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="pt-6 space-y-3">
+                <CardContent className="space-y-3 pt-6">
                   <div>
-                    <span className="text-xs text-zinc-400 dark:text-zinc-500">Start Date</span>
-                    <p className="text-sm font-bold text-gray-800 dark:text-zinc-200">
+                    <span className="text-xs text-muted-foreground">Start Date</span>
+                    <p className="text-sm font-semibold text-foreground">
                       {formatDate(project.startDate)}
                     </p>
                   </div>
                   <div>
-                    <span className="text-xs text-zinc-400 dark:text-zinc-500">Deadline</span>
-                    <p className="text-sm font-bold text-gray-800 dark:text-zinc-200">
+                    <span className="text-xs text-muted-foreground">Deadline</span>
+                    <p className="text-sm font-semibold text-foreground">
                       {formatDate(project.deadline)}
                     </p>
                   </div>
@@ -296,36 +292,35 @@ export function ClientProjectPortal({ project }: ClientProjectPortalProps) {
             </div>
           </div>
 
-          {/* Project Health Side panel */}
           <div className="space-y-6">
-            <Card className="border-border bg-card rounded-xl shadow-xs">
+            <Card className="border-border bg-card">
               <CardHeader className="border-b border-border pb-4">
-                <CardTitle className="text-base font-bold text-foreground flex items-center gap-2">
-                  <TrendingUp className="h-5 w-5 text-primary" /> Project Progress
+                <CardTitle className="flex items-center gap-2 font-heading text-base font-bold text-foreground">
+                  <TrendingUp className="h-4 w-4 text-brand" strokeWidth={1.75} /> Project Progress
                 </CardTitle>
               </CardHeader>
-              <CardContent className="pt-6 space-y-4">
+              <CardContent className="space-y-4 pt-6">
                 <div className="space-y-2">
-                  <div className="flex items-center justify-between text-xs font-semibold text-muted-foreground">
+                  <div className="flex items-center justify-between text-xs font-medium text-muted-foreground">
                     <span>Overall Completion</span>
-                    <span className="font-mono tabular-nums">{project.progress}%</span>
+                    <span className="font-mono font-semibold tabular-nums text-foreground">{project.progress}%</span>
                   </div>
-                  <div className="w-full bg-muted h-2 rounded-full overflow-hidden">
-                    <div 
-                      className="bg-primary h-2 rounded-full transition-all duration-500" 
+                  <div className="h-2 w-full overflow-hidden rounded-full bg-secondary">
+                    <div
+                      className="h-2 rounded-full bg-brand transition-all duration-500"
                       style={{ width: `${project.progress}%` }}
-                    ></div>
+                    />
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-2 text-center text-xs font-semibold">
-                  <div className="rounded-lg bg-muted/50 p-2">
+                <div className="grid grid-cols-2 divide-x divide-border overflow-hidden rounded-md border border-border bg-secondary/40 text-center text-xs">
+                  <div className="p-2.5">
                     <p className="text-[11px] text-muted-foreground">Milestones</p>
-                    <p className="font-mono text-sm font-bold text-foreground">{project.milestones.length}</p>
+                    <p className="mt-0.5 font-mono text-sm font-bold text-foreground">{project.milestones.length}</p>
                   </div>
-                  <div className="rounded-lg bg-muted/50 p-2">
+                  <div className="p-2.5">
                     <p className="text-[11px] text-muted-foreground">Invoices</p>
-                    <p className="font-mono text-sm font-bold text-foreground">{project.invoices.length}</p>
+                    <p className="mt-0.5 font-mono text-sm font-bold text-foreground">{project.invoices.length}</p>
                   </div>
                 </div>
               </CardContent>
@@ -335,62 +330,61 @@ export function ClientProjectPortal({ project }: ClientProjectPortalProps) {
       )}
 
       {activeTab === 'milestones' && (
-        <Card className="border-border bg-card rounded-xl shadow-xs">
+        <Card className="border-border bg-card">
           <CardHeader className="border-b border-border pb-4">
-            <CardTitle className="text-base font-bold text-foreground flex items-center gap-2">
-              <Layers className="h-5 w-5 text-primary" /> Milestones Timeline
+            <CardTitle className="flex items-center gap-2 font-heading text-base font-bold text-foreground">
+              <Layers className="h-4 w-4 text-brand" strokeWidth={1.75} /> Milestones Timeline
             </CardTitle>
-            <CardDescription className="text-xs">
+            <CardDescription className="text-xs text-muted-foreground">
               View the scheduled milestones and delivery timeline. All milestones and tasks are read-only.
             </CardDescription>
           </CardHeader>
           <CardContent className="pt-6">
             {project.milestones.length === 0 ? (
-              <div className="text-center py-8 text-muted-foreground space-y-2">
-                <AlertCircle className="h-8 w-8 mx-auto text-muted-foreground/60" />
-                <p className="text-sm font-semibold">No milestones set up for this project yet.</p>
+              <div className="space-y-2 py-8 text-center text-muted-foreground">
+                <AlertCircle className="mx-auto h-8 w-8 text-muted-foreground/60" />
+                <p className="text-sm font-semibold text-foreground">No milestones set up for this project yet.</p>
               </div>
             ) : (
-              <div className="relative border-l border-border pl-6 space-y-8 py-2">
+              <div className="relative space-y-8 border-l border-border py-2 pl-6">
                 {project.milestones.map((milestone) => (
                   <div key={milestone.id} className="relative">
                     <span className="absolute -left-[31px] top-1 flex h-4.5 w-4.5 items-center justify-center rounded-full border border-border bg-card">
-                      <span className="h-2 w-2 rounded-full bg-primary"></span>
+                      <span className="h-2 w-2 rounded-full bg-brand" />
                     </span>
 
                     <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
                       <div className="space-y-1">
-                        <h3 className="font-bold text-foreground text-sm">{milestone.title}</h3>
+                        <h3 className="text-sm font-semibold text-foreground">{milestone.title}</h3>
                         {milestone.description && (
                           <p className="text-xs text-muted-foreground">{milestone.description}</p>
                         )}
-                        <div className="flex items-center gap-2.5 text-[11px] text-muted-foreground pt-1">
+                        <div className="flex items-center gap-2.5 pt-1 text-[11px] text-muted-foreground">
                           <span className="flex items-center">
                             <Calendar className="mr-1 h-3 w-3" /> Due {formatDate(milestone.dueDate)}
                           </span>
-                          <span>&bull;</span>
+                          <span>·</span>
                           <span>{milestone.tasks.length} tasks</span>
                         </div>
                       </div>
-                      <Badge className={`w-fit uppercase tracking-wider text-[11px] font-semibold ${MILESTONE_STATUS_COLORS[milestone.status]}`}>
+                      <Badge className={`w-fit border px-2 text-[11px] font-medium ${MILESTONE_STATUS_COLORS[milestone.status] || 'border-border bg-secondary text-foreground'}`}>
                         {milestone.status.replace('_', ' ')}
                       </Badge>
                     </div>
 
-                    {/* Milestone tasks */}
                     {milestone.tasks && milestone.tasks.length > 0 && (
-                      <div className="mt-4 rounded-lg bg-muted/40 p-3 space-y-2 border border-border max-w-xl">
+                      <div className="mt-4 max-w-xl space-y-2 rounded-md border border-border bg-secondary/40 p-3">
                         {milestone.tasks.map((task) => (
-                          <div key={task.id} className="flex items-center justify-between text-xs py-0.5">
+                          <div key={task.id} className="flex items-center justify-between py-0.5 text-xs">
                             <span className="flex items-center gap-2 font-medium text-foreground">
-                              <CheckSquare className="h-3.5 w-3.5 text-primary" />
+                              <CheckSquare className="h-3.5 w-3.5 text-brand" />
                               {task.title}
                             </span>
                             <div className="flex items-center gap-2">
-                              <Badge variant="outline" className={`text-[11px] font-semibold border tracking-wider px-1.5 py-0 uppercase ${TASK_PRIORITY_COLORS[task.priority]}`}>
+                              <Badge variant="outline" className={`px-1.5 py-0 text-[11px] font-medium ${TASK_PRIORITY_COLORS[task.priority] || ''}`}>
                                 {task.priority}
                               </Badge>
-                              <Badge variant="secondary" className="text-[11px] font-semibold uppercase tracking-wider px-1.5 py-0 border">
+                              <Badge variant="secondary" className="border border-border bg-background px-1.5 py-0 text-[11px] font-medium text-foreground">
                                 {task.status}
                               </Badge>
                             </div>
@@ -408,56 +402,54 @@ export function ClientProjectPortal({ project }: ClientProjectPortalProps) {
 
       {activeTab === 'files' && (
         <div className="space-y-6">
-          {/* File Upload Zone */}
-          <div 
+          <div
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
             onDrop={handleDrop}
-            className={`border-2 border-dashed rounded-xl p-8 text-center transition-all cursor-pointer flex flex-col items-center justify-center space-y-3 ${
-              isDragOver 
-                ? 'border-primary bg-primary/5' 
-                : 'border-border hover:border-primary/50 bg-card'
+            className={`flex cursor-pointer flex-col items-center justify-center space-y-3 rounded-lg border-2 border-dashed p-8 text-center transition-colors ${
+              isDragOver
+                ? 'border-brand bg-secondary/70'
+                : 'border-border bg-card hover:border-foreground/40'
             }`}
             onClick={() => fileInputRef.current?.click()}
           >
-            <input 
-              type="file" 
-              ref={fileInputRef} 
-              onChange={handleFileChange} 
-              className="hidden" 
+            <input
+              type="file"
+              ref={fileInputRef}
+              onChange={handleFileChange}
+              className="hidden"
               disabled={isUploading}
             />
-            
+
             {isUploading ? (
               <>
-                <Loader2 className="h-10 w-10 text-primary animate-spin" />
-                <p className="text-sm font-bold text-foreground">Uploading file...</p>
+                <Loader2 className="h-9 w-9 animate-spin text-brand" />
+                <p className="text-sm font-semibold text-foreground">Uploading file...</p>
                 <p className="text-xs text-muted-foreground">Storing your file securely under this project.</p>
               </>
             ) : (
               <>
-                <UploadCloud className="h-10 w-10 text-muted-foreground" />
-                <p className="text-sm font-bold text-foreground">
-                  Drag & drop a file here, or <span className="text-primary hover:underline">browse files</span>
+                <UploadCloud className="h-9 w-9 text-muted-foreground" strokeWidth={1.75} />
+                <p className="text-sm font-semibold text-foreground">
+                  Drag & drop a file here, or <span className="text-brand hover:underline">browse files</span>
                 </p>
-                <p className="text-xs text-muted-foreground max-w-sm">
+                <p className="max-w-sm text-xs text-muted-foreground">
                   Upload project references, feedback, or assets up to 10MB.
                 </p>
               </>
             )}
           </div>
 
-          {/* Files List Card */}
-          <Card className="border-border bg-card rounded-xl shadow-xs overflow-hidden">
+          <Card className="overflow-hidden border-border bg-card">
             <CardHeader className="border-b border-border pb-4">
-              <CardTitle className="text-base font-bold text-foreground flex items-center gap-2">
-                <FolderOpen className="h-5 w-5 text-primary" /> Project Files
+              <CardTitle className="flex items-center gap-2 font-heading text-base font-bold text-foreground">
+                <FolderOpen className="h-4 w-4 text-brand" strokeWidth={1.75} /> Project Files
               </CardTitle>
             </CardHeader>
             <CardContent className="p-0">
               {project.files.length === 0 ? (
-                <div className="text-center py-12 text-muted-foreground space-y-2">
-                  <FileText className="h-10 w-10 mx-auto text-muted-foreground/50" />
+                <div className="space-y-2 py-12 text-center text-muted-foreground">
+                  <FileText className="mx-auto h-9 w-9 text-muted-foreground/50" />
                   <p className="text-sm font-semibold text-foreground">No files shared yet</p>
                   <p className="text-xs text-muted-foreground">
                     Upload a file above to share it with the project owner.
@@ -465,35 +457,35 @@ export function ClientProjectPortal({ project }: ClientProjectPortalProps) {
                 </div>
               ) : (
                 <div className="overflow-x-auto">
-                  <table className="w-full text-left border-collapse">
+                  <table className="w-full border-collapse text-left">
                     <thead>
-                      <tr className="border-b border-border bg-muted/40 text-xs font-bold text-muted-foreground">
-                        <th className="py-3 px-4 font-bold">File Name</th>
-                        <th className="py-3 px-4 font-bold">Size</th>
-                        <th className="py-3 px-4 font-bold">Uploaded By</th>
-                        <th className="py-3 px-4 font-bold">Upload Date</th>
-                        <th className="py-3 px-4 font-bold text-right">Actions</th>
+                      <tr className="border-b border-border bg-secondary/50 text-xs font-medium text-muted-foreground">
+                        <th className="px-4 py-3">File Name</th>
+                        <th className="px-4 py-3">Size</th>
+                        <th className="px-4 py-3">Uploaded By</th>
+                        <th className="px-4 py-3">Upload Date</th>
+                        <th className="px-4 py-3 text-right">Actions</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-border text-xs">
                       {project.files.map((file) => (
-                        <tr key={file.id} className="hover:bg-muted/40 transition-colors">
-                          <td className="py-3.5 px-4 font-medium text-foreground">
-                            <div className="flex items-center gap-2 max-w-[250px] sm:max-w-md truncate">
-                              <FileText className="h-4 w-4 text-primary shrink-0" />
+                        <tr key={file.id} className="transition-colors hover:bg-secondary/40">
+                          <td className="px-4 py-3.5 font-medium text-foreground">
+                            <div className="flex max-w-[250px] items-center gap-2 truncate sm:max-w-md">
+                              <FileText className="h-4 w-4 shrink-0 text-brand" />
                               <span className="truncate" title={file.fileName}>{file.fileName}</span>
                             </div>
                           </td>
-                          <td className="py-3.5 px-4 text-muted-foreground">
+                          <td className="px-4 py-3.5 font-mono text-muted-foreground">
                             {formatBytes(file.fileSize)}
                           </td>
-                          <td className="py-3.5 px-4 text-muted-foreground">
+                          <td className="px-4 py-3.5 text-muted-foreground">
                             {file.uploader?.fullName || 'Workspace member'}
                           </td>
-                          <td className="py-3.5 px-4 text-muted-foreground">
+                          <td className="px-4 py-3.5 text-muted-foreground">
                             {formatDate(file.createdAt)}
                           </td>
-                          <td className="py-3.5 px-4 text-right">
+                          <td className="px-4 py-3.5 text-right">
                             <Button
                               variant="ghost"
                               size="icon"
@@ -516,49 +508,49 @@ export function ClientProjectPortal({ project }: ClientProjectPortalProps) {
       )}
 
       {activeTab === 'invoices' && (
-        <Card className="border-border bg-card rounded-xl shadow-xs overflow-hidden">
+        <Card className="overflow-hidden border-border bg-card">
           <CardHeader className="border-b border-border pb-4">
-            <CardTitle className="text-base font-bold text-foreground flex items-center gap-2">
-              <FileText className="h-5 w-5 text-primary" /> Project Invoices
+            <CardTitle className="flex items-center gap-2 font-heading text-base font-bold text-foreground">
+              <FileText className="h-4 w-4 text-brand" strokeWidth={1.75} /> Project Invoices
             </CardTitle>
           </CardHeader>
           <CardContent className="p-0">
             {project.invoices.length === 0 ? (
-              <div className="text-center py-12 text-muted-foreground space-y-2">
-                <Receipt className="h-10 w-10 mx-auto text-muted-foreground/50" />
+              <div className="space-y-2 py-12 text-center text-muted-foreground">
+                <Receipt className="mx-auto h-9 w-9 text-muted-foreground/50" />
                 <p className="text-sm font-semibold text-foreground">No invoices generated for this project</p>
               </div>
             ) : (
               <div className="overflow-x-auto">
-                <table className="w-full text-left border-collapse">
+                <table className="w-full border-collapse text-left">
                   <thead>
-                    <tr className="border-b border-border bg-muted/40 text-xs font-bold text-muted-foreground">
-                      <th className="py-3 px-4 font-bold">Invoice Number</th>
-                      <th className="py-3 px-4 font-bold">Due Date</th>
-                      <th className="py-3 px-4 font-bold">Status</th>
-                      <th className="py-3 px-4 font-bold text-right">Total Amount</th>
-                      <th className="py-3 px-4 font-bold text-right">Actions</th>
+                    <tr className="border-b border-border bg-secondary/50 text-xs font-medium text-muted-foreground">
+                      <th className="px-4 py-3">Invoice Number</th>
+                      <th className="px-4 py-3">Due Date</th>
+                      <th className="px-4 py-3">Status</th>
+                      <th className="px-4 py-3 text-right">Total Amount</th>
+                      <th className="px-4 py-3 text-right">Actions</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-border text-xs">
                     {project.invoices.map((invoice) => (
-                      <tr key={invoice.id} className="hover:bg-muted/40 transition-colors">
-                        <td className="py-3.5 px-4 font-mono font-bold text-foreground">
+                      <tr key={invoice.id} className="transition-colors hover:bg-secondary/40">
+                        <td className="px-4 py-3.5 font-mono font-semibold text-foreground">
                           {invoice.invoiceNumber}
                         </td>
-                        <td className="py-3.5 px-4 text-muted-foreground font-medium">
+                        <td className="px-4 py-3.5 font-medium text-muted-foreground">
                           {formatDate(invoice.dueDate)}
                         </td>
-                        <td className="py-3.5 px-4">
-                          <Badge variant="outline" className={`text-[11px] font-semibold uppercase tracking-wider px-2 border ${INVOICE_STATUS_COLORS[invoice.status]}`}>
+                        <td className="px-4 py-3.5">
+                          <Badge variant="outline" className={`px-2 text-[11px] font-medium ${INVOICE_STATUS_COLORS[invoice.status] || 'border-border bg-secondary text-foreground'}`}>
                             {invoice.status}
                           </Badge>
                         </td>
-                        <td className="py-3.5 px-4 text-right font-mono font-semibold tabular-nums text-foreground">
+                        <td className="px-4 py-3.5 text-right font-mono font-semibold tabular-nums text-foreground">
                           {formatCurrency(Number(invoice.totalAmount), invoice.currency)}
                         </td>
-                        <td className="py-3.5 px-4 text-right">
-                          <a 
+                        <td className="px-4 py-3.5 text-right">
+                          <a
                             href={`/api/v1/invoices/${invoice.id}/pdf?workspaceId=${project.workspaceId}`}
                             target="_blank"
                             rel="noreferrer"
@@ -566,7 +558,7 @@ export function ClientProjectPortal({ project }: ClientProjectPortalProps) {
                             <Button
                               variant="ghost"
                               size="icon"
-                              className="h-7 w-7 text-zinc-400 hover:text-slate-600 dark:hover:text-zinc-200"
+                              className="h-7 w-7 text-muted-foreground hover:text-foreground"
                               title="Download PDF"
                             >
                               <Download className="h-3.5 w-3.5" />

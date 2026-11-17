@@ -42,7 +42,7 @@ const styles = StyleSheet.create({
   logoPlaceholder: {
     fontSize: 14,
     fontWeight: 'bold',
-    color: '#2563eb', // primary blue accent
+    color: '#059669',
   },
   detailsContainer: {
     flexDirection: 'row',
@@ -153,7 +153,7 @@ const styles = StyleSheet.create({
   totalValue: {
     fontSize: 12,
     fontWeight: 'bold',
-    color: '#2563eb', // primary blue accent
+    color: '#09090b',
   },
   descriptionBox: {
     marginTop: 10,

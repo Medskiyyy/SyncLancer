@@ -3,7 +3,7 @@ import { auth } from '@/auth';
 import { Card } from '@/components/ui/card';
 import { RevenueChart } from '@/features/analytics/components/revenue-chart';
 import { ProjectStatusChart } from '@/features/analytics/components/project-status-chart';
-import { AnimatedGreeting, AnimatedKPIGrid, AnimatedQuickActions, AnimatedWorkloadActivity } from './dashboard-sections';
+import { AnimatedGreeting, AnimatedKPIGrid, AnimatedWorkloadActivity } from './dashboard-sections';
 import { WorkspaceService } from '@/features/workspace/services/workspace-service';
 import { AnalyticsService } from '@/features/analytics/services/analytics-service';
 
@@ -29,43 +29,39 @@ export default async function WorkspaceDashboardPage({ params }: PageProps) {
   const data = await analyticsService.getWorkspaceDashboardData(workspace.id, session.user.id);
 
   const kpis = [
-    { 
-      title: 'Revenue', 
-      value: data.totalRevenue, 
-      description: `${data.revenueChangePercent >= 0 ? '+' : ''}${data.revenueChangePercent}% from last month`, 
-      icon: 'revenue',
-      trendUp: data.revenueChangePercent >= 0,
+    {
+      title: 'Revenue',
+      value: data.totalRevenue,
+      description: `${data.revenueChangePercent >= 0 ? '+' : ''}${data.revenueChangePercent}% from last month`,
+      trendUp: data.revenueChangePercent > 0,
       prefix: '$',
     },
-    { 
-      title: 'Active Projects', 
-      value: data.activeProjectsCount, 
-      description: `${data.projectsChangeCount >= 0 ? '+' : ''}${data.projectsChangeCount} since last month`, 
-      icon: 'projects',
-      trendUp: data.projectsChangeCount >= 0,
+    {
+      title: 'Active Projects',
+      value: data.activeProjectsCount,
+      description: `${data.projectsChangeCount >= 0 ? '+' : ''}${data.projectsChangeCount} since last month`,
+      trendUp: data.projectsChangeCount > 0,
     },
-    { 
-      title: 'Active Clients', 
-      value: data.activeClientsCount, 
-      description: `${data.clientsChangeCount >= 0 ? '+' : ''}${data.clientsChangeCount} since last month`, 
-      icon: 'clients',
-      trendUp: data.clientsChangeCount >= 0,
+    {
+      title: 'Active Clients',
+      value: data.activeClientsCount,
+      description: `${data.clientsChangeCount >= 0 ? '+' : ''}${data.clientsChangeCount} since last month`,
+      trendUp: data.clientsChangeCount > 0,
     },
-    { 
-      title: 'Pending Invoices', 
-      value: data.pendingAmount, 
-      description: `${data.pendingCount} outstanding invoices`, 
-      icon: 'invoices',
+    {
+      title: 'Pending Invoices',
+      value: data.pendingAmount,
+      description: `${data.pendingCount} outstanding invoice${data.pendingCount === 1 ? '' : 's'}`,
       trendUp: false,
       prefix: '$',
     },
   ];
 
   const quickActions = [
-    { title: 'New Client', href: `/${workspaceSlug}/clients?add=true`, desc: 'Add client contact card', icon: 'clients' },
-    { title: 'New Proposal', href: `/${workspaceSlug}/proposals/new`, desc: 'Draft freelancer pitch', icon: 'proposals' },
-    { title: 'New Project', href: `/${workspaceSlug}/projects/new`, desc: 'Launch project dashboard', icon: 'projects' },
-    { title: 'New Invoice', href: `/${workspaceSlug}/invoices?create=true`, desc: 'Generate billing statement', icon: 'invoices' },
+    { title: 'Client', href: `/${workspaceSlug}/clients?add=true` },
+    { title: 'Proposal', href: `/${workspaceSlug}/proposals/new` },
+    { title: 'Project', href: `/${workspaceSlug}/projects/new` },
+    { title: 'Invoice', href: `/${workspaceSlug}/invoices?create=true`, primary: true },
   ];
 
   const targetHours = 40;
@@ -73,37 +69,39 @@ export default async function WorkspaceDashboardPage({ params }: PageProps) {
 
   return (
     <div className="space-y-6">
-      {/* Greeting Card with Entrance Animation */}
-      <AnimatedGreeting 
-        userName={session.user.name || ''} 
-        activeProjectsCount={data.activeProjectsCount} 
-        pendingCount={data.pendingCount} 
+      <AnimatedGreeting
+        workspaceName={workspace.name}
+        userName={session.user.name || ''}
+        activeProjectsCount={data.activeProjectsCount}
+        pendingCount={data.pendingCount}
+        quickActions={quickActions}
       />
 
-      {/* KPI Cards Row with Staggered Entrance & Count-up */}
       <AnimatedKPIGrid kpis={kpis} />
 
-      {/* Quick Actions Row with Staggered Entrance */}
-      <AnimatedQuickActions quickActions={quickActions} />
-
-      {/* Analytics Charts Grid */}
       <div className="grid gap-6 md:grid-cols-2">
-        {/* Revenue Trend Chart Card */}
-        <Card className="overflow-hidden p-6 flex flex-col">
-          <div className="border-b border-border pb-3 mb-5">
-            <h3 className="text-base font-bold text-zinc-900 dark:text-zinc-50 leading-tight font-heading">Revenue Over Time</h3>
-            <p className="text-muted-foreground text-xs mt-0.5 leading-normal">Monthly rolling billing totals across the last 12 months.</p>
+        <Card className="flex flex-col overflow-hidden p-6">
+          <div className="mb-5 border-b border-border pb-3">
+            <h3 className="font-heading text-base font-bold leading-tight text-foreground">
+              Revenue Over Time
+            </h3>
+            <p className="mt-0.5 text-xs leading-normal text-muted-foreground">
+              Monthly rolling billing totals across the last 12 months.
+            </p>
           </div>
           <div className="flex-1">
             <RevenueChart data={data.monthlyRevenueTrend} />
           </div>
         </Card>
 
-        {/* Project Statistics Chart Card */}
-        <Card className="overflow-hidden p-6 flex flex-col">
-          <div className="border-b border-border pb-3 mb-5">
-            <h3 className="text-base font-bold text-zinc-900 dark:text-zinc-50 leading-tight font-heading">Projects by Status</h3>
-            <p className="text-muted-foreground text-xs mt-0.5 leading-normal">Current project count distribution across delivery stages.</p>
+        <Card className="flex flex-col overflow-hidden p-6">
+          <div className="mb-5 border-b border-border pb-3">
+            <h3 className="font-heading text-base font-bold leading-tight text-foreground">
+              Projects by Status
+            </h3>
+            <p className="mt-0.5 text-xs leading-normal text-muted-foreground">
+              Current project count distribution across delivery stages.
+            </p>
           </div>
           <div className="flex-1">
             <ProjectStatusChart data={data.projectStatusDistribution} />
@@ -111,8 +109,7 @@ export default async function WorkspaceDashboardPage({ params }: PageProps) {
         </Card>
       </div>
 
-      {/* Workload & Recent Activity with Slide-in Entrance */}
-      <AnimatedWorkloadActivity 
+      <AnimatedWorkloadActivity
         hoursLogged={data.hoursLogged}
         targetHours={targetHours}
         loggedProgressPercent={loggedProgressPercent}

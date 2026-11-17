@@ -43,10 +43,10 @@ export default async function ClientProjectDetailPage({ params }: PageProps) {
 
   if (!clientUser || clientUser.client.workspaceId !== workspace.id) {
     return (
-      <div className="flex flex-col items-center justify-center py-16 text-center space-y-4">
-        <AlertCircle className="h-12 w-12 text-red-500" />
-        <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-50">Access Denied</h2>
-        <p className="text-sm text-gray-500 dark:text-zinc-400">
+      <div className="flex flex-col items-center justify-center space-y-4 py-16 text-center">
+        <AlertCircle className="h-10 w-10 text-destructive" strokeWidth={1.75} />
+        <h2 className="font-heading text-xl font-bold text-foreground">Access Denied</h2>
+        <p className="text-sm text-muted-foreground">
           You do not have a client profile linked in this workspace.
         </p>
       </div>
@@ -106,10 +106,9 @@ export default async function ClientProjectDetailPage({ params }: PageProps) {
 
   return (
     <div className="space-y-6">
-      {/* Breadcrumbs / Back button */}
       <div>
         <Link href={`/${workspaceSlug}/portal`}>
-          <Button variant="ghost" size="sm" className="text-slate-600 dark:text-zinc-400 font-semibold p-0 hover:bg-transparent">
+          <Button variant="ghost" size="sm" className="p-0 font-medium text-muted-foreground hover:bg-transparent hover:text-foreground">
             <ArrowLeft className="mr-1.5 h-4 w-4" /> Back to Dashboard
           </Button>
         </Link>

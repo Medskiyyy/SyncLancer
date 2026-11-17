@@ -144,40 +144,39 @@ export function ClientFilesPortal({ projects, files, workspaceId }: ClientFilesP
 
   return (
     <div className="space-y-6">
-      {/* File Upload card */}
-      <Card className="border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 rounded-xl shadow-sm overflow-hidden">
+      <Card className="overflow-hidden border-border bg-card">
         <CardHeader className="border-b border-border pb-4">
-          <CardTitle className="text-sm font-bold text-foreground flex items-center gap-2">
-            <UploadCloud className="h-4.5 w-4.5 text-primary" /> Share a File
+          <CardTitle className="flex items-center gap-2 font-heading text-sm font-bold text-foreground">
+            <UploadCloud className="h-4 w-4 text-brand" strokeWidth={1.75} /> Share a File
           </CardTitle>
-          <CardDescription className="text-xs">
+          <CardDescription className="text-xs text-muted-foreground">
             Link a file to one of your active projects and upload it.
           </CardDescription>
         </CardHeader>
-        <CardContent className="pt-5 space-y-4">
+        <CardContent className="space-y-4 pt-5">
           {projects.length === 0 ? (
-            <div className="flex items-start gap-2.5 p-3.5 bg-amber-50 dark:bg-amber-950/20 text-amber-900 dark:text-amber-300 rounded-lg border border-amber-100 dark:border-amber-900/60 text-xs">
-              <AlertCircle className="h-4.5 w-4.5 shrink-0 mt-0.5 text-amber-600 dark:text-amber-500" />
+            <div className="flex items-start gap-2.5 rounded-md border border-amber-500/20 bg-amber-500/10 p-3.5 text-xs text-amber-800 dark:text-amber-300">
+              <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-amber-600 dark:text-amber-400" />
               <div className="space-y-1">
-                <p className="font-bold">No Active Projects</p>
-                <p className="text-slate-600 dark:text-zinc-300 font-medium">
+                <p className="font-semibold">No Active Projects</p>
+                <p className="text-muted-foreground">
                   You must be linked to at least one project before you can upload files.
                 </p>
               </div>
             </div>
           ) : (
             <div className="space-y-4">
-              <div className="space-y-1.5 max-w-xs">
-                <label className="text-xs font-semibold text-zinc-700 dark:text-zinc-300">Target Project</label>
+              <div className="max-w-xs space-y-1.5">
+                <label className="text-xs font-medium text-foreground">Target Project</label>
                 <Select
                   value={selectedProjectId}
                   onValueChange={(val) => setSelectedProjectId(val || '')}
                   disabled={isUploading}
                 >
-                  <SelectTrigger className="bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 h-9 text-xs">
+                  <SelectTrigger className="h-9 text-xs">
                     <SelectValue placeholder="Select Project" />
                   </SelectTrigger>
-                  <SelectContent className="bg-white dark:bg-zinc-950 border-zinc-200 dark:border-zinc-800">
+                  <SelectContent>
                     {projects.map((p) => (
                       <SelectItem key={p.id} value={p.id}>
                         {p.name}
@@ -188,38 +187,38 @@ export function ClientFilesPortal({ projects, files, workspaceId }: ClientFilesP
               </div>
 
               {selectedProjectId && (
-                <div 
+                <div
                   onDragOver={handleDragOver}
                   onDragLeave={handleDragLeave}
                   onDrop={handleDrop}
-                  className={`border-2 border-dashed rounded-xl p-8 text-center transition-all cursor-pointer flex flex-col items-center justify-center space-y-3 ${
-                    isDragOver 
-                      ? 'border-primary bg-primary/5' 
-                      : 'border-border hover:border-primary/50 bg-card'
+                  className={`flex cursor-pointer flex-col items-center justify-center space-y-3 rounded-lg border-2 border-dashed p-8 text-center transition-colors ${
+                    isDragOver
+                      ? 'border-brand bg-secondary/70'
+                      : 'border-border bg-card hover:border-foreground/40'
                   }`}
                   onClick={() => fileInputRef.current?.click()}
                 >
-                  <input 
-                    type="file" 
-                    ref={fileInputRef} 
-                    onChange={handleFileChange} 
-                    className="hidden" 
+                  <input
+                    type="file"
+                    ref={fileInputRef}
+                    onChange={handleFileChange}
+                    className="hidden"
                     disabled={isUploading}
                   />
-                  
+
                   {isUploading ? (
                     <>
-                      <Loader2 className="h-10 w-10 text-primary animate-spin" />
-                      <p className="text-sm font-bold text-foreground">Uploading file...</p>
+                      <Loader2 className="h-9 w-9 animate-spin text-brand" />
+                      <p className="text-sm font-semibold text-foreground">Uploading file...</p>
                       <p className="text-xs text-muted-foreground">Storing your file securely.</p>
                     </>
                   ) : (
                     <>
-                      <UploadCloud className="h-10 w-10 text-muted-foreground" />
-                      <p className="text-sm font-bold text-foreground">
-                        Drag & drop a file here, or <span className="text-primary hover:underline">browse files</span>
+                      <UploadCloud className="h-9 w-9 text-muted-foreground" strokeWidth={1.75} />
+                      <p className="text-sm font-semibold text-foreground">
+                        Drag & drop a file here, or <span className="text-brand hover:underline">browse files</span>
                       </p>
-                      <p className="text-xs text-muted-foreground max-w-sm">
+                      <p className="max-w-sm text-xs text-muted-foreground">
                         Supports images, PDF, documents up to 10MB.
                       </p>
                     </>
@@ -231,62 +230,61 @@ export function ClientFilesPortal({ projects, files, workspaceId }: ClientFilesP
         </CardContent>
       </Card>
 
-      {/* Files List Card */}
-      <Card className="border-border bg-card rounded-xl shadow-xs overflow-hidden">
+      <Card className="overflow-hidden border-border bg-card">
         <CardHeader className="border-b border-border pb-4">
-          <CardTitle className="text-base font-bold text-foreground flex items-center gap-2">
-            <FolderOpen className="h-5 w-5 text-primary" /> Shared Files & Assets
+          <CardTitle className="flex items-center gap-2 font-heading text-base font-bold text-foreground">
+            <FolderOpen className="h-4 w-4 text-brand" strokeWidth={1.75} /> Shared Files & Assets
           </CardTitle>
-          <CardDescription className="text-xs">
+          <CardDescription className="text-xs text-muted-foreground">
             A listing of all project documents, mockups, and assets shared with you.
           </CardDescription>
         </CardHeader>
         <CardContent className="p-0">
           {files.length === 0 ? (
-            <div className="text-center py-12 text-muted-foreground space-y-2">
-              <FileText className="h-10 w-10 mx-auto text-muted-foreground/50" />
+            <div className="space-y-2 py-12 text-center text-muted-foreground">
+              <FileText className="mx-auto h-9 w-9 text-muted-foreground/50" />
               <p className="text-sm font-semibold text-foreground">No files shared yet</p>
-              <p className="text-xs text-muted-foreground font-medium">Select a project and upload a file above to begin.</p>
+              <p className="text-xs text-muted-foreground">Select a project and upload a file above to begin.</p>
             </div>
           ) : (
             <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse">
+              <table className="w-full border-collapse text-left">
                 <thead>
-                  <tr className="border-b border-border bg-muted/40 text-xs font-bold text-muted-foreground">
-                    <th className="py-3 px-4 font-bold">File Name</th>
-                    <th className="py-3 px-4 font-bold">Linked Project</th>
-                    <th className="py-3 px-4 font-bold">Size</th>
-                    <th className="py-3 px-4 font-bold">Uploaded By</th>
-                    <th className="py-3 px-4 font-bold">Upload Date</th>
-                    <th className="py-3 px-4 font-bold text-right">Actions</th>
+                  <tr className="border-b border-border bg-secondary/50 text-xs font-medium text-muted-foreground">
+                    <th className="px-4 py-3">File Name</th>
+                    <th className="px-4 py-3">Linked Project</th>
+                    <th className="px-4 py-3">Size</th>
+                    <th className="px-4 py-3">Uploaded By</th>
+                    <th className="px-4 py-3">Upload Date</th>
+                    <th className="px-4 py-3 text-right">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border text-xs">
                   {files.map((file) => (
-                    <tr key={file.id} className="hover:bg-muted/40 transition-colors">
-                      <td className="py-3.5 px-4 font-medium text-foreground">
-                        <div className="flex items-center gap-2 max-w-[250px] sm:max-w-md truncate">
-                          <FileText className="h-4 w-4 text-primary shrink-0" />
+                    <tr key={file.id} className="transition-colors hover:bg-secondary/40">
+                      <td className="px-4 py-3.5 font-medium text-foreground">
+                        <div className="flex max-w-[250px] items-center gap-2 truncate sm:max-w-md">
+                          <FileText className="h-4 w-4 shrink-0 text-brand" />
                           <span className="truncate" title={file.fileName}>{file.fileName}</span>
                         </div>
                       </td>
-                      <td className="py-3.5 px-4 text-slate-600 dark:text-zinc-400 font-medium">
+                      <td className="px-4 py-3.5 font-medium text-muted-foreground">
                         {file.project?.name || 'Workspace Document'}
                       </td>
-                      <td className="py-3.5 px-4 text-slate-600 dark:text-zinc-400">
+                      <td className="px-4 py-3.5 font-mono text-muted-foreground">
                         {formatBytes(file.fileSize)}
                       </td>
-                      <td className="py-3.5 px-4 text-slate-600 dark:text-zinc-400 font-medium">
+                      <td className="px-4 py-3.5 font-medium text-muted-foreground">
                         {file.uploader?.fullName || 'Workspace member'}
                       </td>
-                      <td className="py-3.5 px-4 text-slate-600 dark:text-zinc-400 font-medium">
+                      <td className="px-4 py-3.5 text-muted-foreground">
                         {formatDate(file.createdAt)}
                       </td>
-                      <td className="py-3.5 px-4 text-right">
+                      <td className="px-4 py-3.5 text-right">
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="h-7 w-7 text-zinc-400 hover:text-slate-600 dark:hover:text-zinc-200"
+                          className="h-7 w-7 text-muted-foreground hover:text-foreground"
                           onClick={() => handleDownload(file.id)}
                           title="Download file"
                         >

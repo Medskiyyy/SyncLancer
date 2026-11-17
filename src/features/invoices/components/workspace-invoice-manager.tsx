@@ -9,7 +9,6 @@ import {
   Download, 
   Send, 
   CheckCircle, 
-  FileText, 
   Receipt, 
   AlertCircle,
   PlusCircle,
@@ -98,11 +97,11 @@ const toDateInputValue = (offsetDays: number) => {
 };
 
 const STATUS_COLORS: Record<string, string> = {
-  DRAFT: 'bg-zinc-100/80 text-slate-600 border-zinc-200/50 dark:bg-zinc-800/40 dark:text-zinc-400 dark:border-zinc-800 shadow-none',
-  SENT: 'bg-blue-500/10 text-blue-600 dark:text-blue-500 border-blue-500/20 shadow-none',
-  PAID: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-500 border-emerald-500/20 shadow-none',
-  OVERDUE: 'bg-red-500/10 text-red-600 dark:text-red-500 border-red-500/20 shadow-none',
-  CANCELLED: 'bg-zinc-200/50 text-zinc-500 border-zinc-200 shadow-none dark:bg-zinc-800/20 dark:text-gray-500 dark:border-zinc-800',
+  DRAFT: 'border-border bg-secondary text-foreground shadow-none',
+  SENT: 'border-border bg-secondary text-foreground shadow-none',
+  PAID: 'border-emerald-500/20 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 shadow-none',
+  OVERDUE: 'border-red-500/20 bg-red-500/10 text-red-700 dark:text-red-400 shadow-none',
+  CANCELLED: 'border-red-500/20 bg-red-500/10 text-red-700 dark:text-red-400 shadow-none',
 };
 
 export function WorkspaceInvoiceManager({ 
@@ -302,89 +301,58 @@ export function WorkspaceInvoiceManager({
   const draftInvoices = invoices.filter(inv => inv.status === 'DRAFT').reduce((sum, inv) => sum + inv.totalAmount, 0);
 
   return (
-    <FadeIn direction="up" delay={0.02} duration={0.35} className="space-y-6">
-      {/* KPI Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-        <Card className="border border-border bg-card p-5 h-[120px] flex flex-col justify-between shadow-xs">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Total Invoiced</span>
-            <div className="p-1.5 bg-muted/60 border border-border rounded-lg">
-              <Receipt className="h-4 w-4 text-muted-foreground" />
-            </div>
+    <FadeIn direction="up" delay={0.02} duration={0.3} className="space-y-6">
+      <div className="grid grid-cols-1 divide-y divide-border overflow-hidden rounded-lg border border-border bg-card sm:grid-cols-2 sm:divide-x xl:grid-cols-4 xl:divide-y-0">
+        <div className="p-5">
+          <div className="text-xs font-medium text-muted-foreground">Total Invoiced</div>
+          <div className="mt-2.5 font-heading text-2xl font-bold tabular-nums tracking-tight text-foreground">
+            {formatCurrency(totalInvoiced, 'USD')}
           </div>
-          <div className="flex flex-col">
-            <span className="text-2xl font-semibold tabular-nums tracking-tight text-foreground font-mono">
-              {formatCurrency(totalInvoiced, 'USD')}
-            </span>
-            <span className="text-xs text-muted-foreground mt-0.5">Cumulative billing volume</span>
-          </div>
-        </Card>
+          <p className="mt-1 text-xs text-muted-foreground">Cumulative billing volume</p>
+        </div>
 
-        <Card className="border border-border bg-card p-5 h-[120px] flex flex-col justify-between shadow-xs">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Paid Amount</span>
-            <div className="p-1.5 bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-900/40 rounded-lg">
-              <CheckCircle className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
-            </div>
+        <div className="p-5">
+          <div className="text-xs font-medium text-muted-foreground">Paid Amount</div>
+          <div className="mt-2.5 font-heading text-2xl font-bold tabular-nums tracking-tight text-foreground">
+            {formatCurrency(paidInvoices, 'USD')}
           </div>
-          <div className="flex flex-col">
-            <span className="text-2xl font-semibold tabular-nums tracking-tight text-foreground font-mono">
-              {formatCurrency(paidInvoices, 'USD')}
-            </span>
-            <span className="text-xs text-emerald-600 dark:text-emerald-400 mt-0.5">Received payments</span>
-          </div>
-        </Card>
+          <p className="mt-1 text-xs font-medium text-brand">Received payments</p>
+        </div>
 
-        <Card className="border border-border bg-card p-5 h-[120px] flex flex-col justify-between shadow-xs">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Outstanding</span>
-            <div className="p-1.5 bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900/40 rounded-lg">
-              <AlertCircle className="h-4 w-4 text-amber-600 dark:text-amber-400" />
-            </div>
+        <div className="p-5">
+          <div className="text-xs font-medium text-muted-foreground">Outstanding</div>
+          <div className="mt-2.5 font-heading text-2xl font-bold tabular-nums tracking-tight text-foreground">
+            {formatCurrency(outstandingInvoices, 'USD')}
           </div>
-          <div className="flex flex-col">
-            <span className="text-2xl font-semibold tabular-nums tracking-tight text-foreground font-mono">
-              {formatCurrency(outstandingInvoices, 'USD')}
-            </span>
-            <span className="text-xs text-amber-600 dark:text-amber-400 mt-0.5">Awaiting settlement</span>
-          </div>
-        </Card>
+          <p className="mt-1 text-xs text-amber-600 dark:text-amber-400">Awaiting settlement</p>
+        </div>
 
-        <Card className="border border-border bg-card p-5 h-[120px] flex flex-col justify-between shadow-xs">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Drafts</span>
-            <div className="p-1.5 bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-900/40 rounded-lg">
-              <FileText className="h-4 w-4 text-primary" />
-            </div>
+        <div className="p-5">
+          <div className="text-xs font-medium text-muted-foreground">Drafts</div>
+          <div className="mt-2.5 font-heading text-2xl font-bold tabular-nums tracking-tight text-foreground">
+            {formatCurrency(draftInvoices, 'USD')}
           </div>
-          <div className="flex flex-col">
-            <span className="text-2xl font-semibold tabular-nums tracking-tight text-foreground font-mono">
-              {formatCurrency(draftInvoices, 'USD')}
-            </span>
-            <span className="text-xs text-primary mt-0.5">Unsent invoices</span>
-          </div>
-        </Card>
+          <p className="mt-1 text-xs text-muted-foreground">Unsent drafts</p>
+        </div>
       </div>
 
-      {/* Top action block */}
-      <div className="flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center">
-        {/* Filters */}
-        <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto">
-          <div className="relative flex-1 sm:flex-initial min-w-[240px]">
-            <Search className="absolute left-3 top-3 h-4 w-4 text-zinc-400" />
-            <Input 
-              type="text" 
-              placeholder="Search invoices..." 
+      <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
+        <div className="flex w-full flex-wrap items-center gap-3 sm:w-auto">
+          <div className="relative min-w-[240px] flex-1 sm:flex-initial">
+            <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+            <Input
+              type="text"
+              placeholder="Search invoices..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-9 h-10 text-sm border-border/60 bg-white dark:bg-zinc-900 text-zinc-900 dark:text-gray-100"
+              className="h-9 pl-9 text-sm"
             />
           </div>
-          
+
           <Select value={statusFilter} onValueChange={(val) => setStatusFilter(val || 'ALL')}>
-            <SelectTrigger className="w-[150px] h-10 text-sm border-border/60 bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100">
+            <SelectTrigger className="h-9 w-[150px] text-sm">
               <div className="flex items-center gap-2">
-                <Filter className="h-4 w-4 text-zinc-400" />
+                <Filter className="h-3.5 w-3.5 text-muted-foreground" />
                 <SelectValue placeholder="All Status" />
               </div>
             </SelectTrigger>
@@ -399,26 +367,24 @@ export function WorkspaceInvoiceManager({
           </Select>
         </div>
 
-        {/* Action buttons */}
-        <Button 
+        <Button
           onClick={() => setIsCreateOpen(true)}
           variant="default"
-          className="w-full sm:w-auto h-10 px-4 font-semibold text-sm flex items-center gap-2 shadow-xs cursor-pointer"
+          className="w-full gap-2 sm:w-auto"
         >
           <Plus className="h-4 w-4" /> Create Invoice
         </Button>
       </div>
 
-      {/* Invoices List Card */}
-      <Card variant="elevated" className="overflow-hidden">
+      <Card className="overflow-hidden">
         <CardContent className="p-0">
           {filteredInvoices.length === 0 ? (
-            <div className="text-center py-16 text-zinc-400 dark:text-zinc-500 text-sm flex flex-col items-center justify-center">
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-zinc-50 dark:bg-zinc-900 text-zinc-400 mb-4 border border-border/60">
-                <Receipt className="h-6 w-6 text-primary" />
+            <div className="flex flex-col items-center justify-center py-16 text-center text-sm text-muted-foreground">
+              <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg border border-border bg-secondary text-muted-foreground">
+                <Receipt className="h-6 w-6 text-brand" strokeWidth={1.75} />
               </div>
-              <CardTitle className="text-base font-bold text-zinc-900 dark:text-zinc-50 font-heading">No invoices found</CardTitle>
-              <CardDescription className="max-w-sm mt-2 text-sm text-zinc-500 dark:text-zinc-400">
+              <CardTitle className="font-heading text-base font-bold text-foreground">No invoices found</CardTitle>
+              <CardDescription className="mt-2 max-w-sm text-sm text-muted-foreground">
                 {searchTerm || statusFilter !== 'ALL'
                   ? 'Try adjusting your search query or status filter.'
                   : 'Generate billing drafts and send payment invoices to your clients.'}
@@ -428,42 +394,42 @@ export function WorkspaceInvoiceManager({
             <div className="overflow-x-auto">
               <table className="w-full border-collapse text-left text-sm">
                 <thead>
-                  <tr className="border-b border-border/40 text-xs font-semibold text-zinc-500 dark:text-zinc-400 bg-zinc-50/30 dark:bg-zinc-950/20 h-[48px]">
-                    <th className="px-6 align-middle font-medium">Invoice No</th>
-                    <th className="px-6 align-middle font-medium">Client</th>
-                    <th className="px-6 align-middle font-medium">Project</th>
-                    <th className="px-6 align-middle font-medium">Due Date</th>
-                    <th className="px-6 align-middle font-medium">Status</th>
-                    <th className="px-6 align-middle font-medium text-right">Amount</th>
-                    <th className="px-6 align-middle font-medium text-right">Actions</th>
+                  <tr className="h-11 border-b border-border bg-secondary/50 text-xs font-medium text-muted-foreground">
+                    <th className="px-6 align-middle">Invoice No</th>
+                    <th className="px-6 align-middle">Client</th>
+                    <th className="px-6 align-middle">Project</th>
+                    <th className="px-6 align-middle">Due Date</th>
+                    <th className="px-6 align-middle">Status</th>
+                    <th className="px-6 text-right align-middle">Amount</th>
+                    <th className="px-6 text-right align-middle">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-border/40 bg-transparent">
+                <tbody className="divide-y divide-border bg-transparent">
                   {filteredInvoices.map((invoice) => (
-                    <tr key={invoice.id} className="hover:bg-zinc-50/50 dark:hover:bg-zinc-900/20 transition-colors h-[60px]">
+                    <tr key={invoice.id} className="h-[58px] transition-colors hover:bg-secondary/40">
                       <td className="px-6 align-middle font-mono font-semibold text-foreground">
                         {invoice.invoiceNumber}
                       </td>
                       <td className="px-6 align-middle font-semibold text-foreground">
                         {invoice.client.companyName}
                       </td>
-                      <td className="px-6 align-middle text-muted-foreground font-medium">
+                      <td className="px-6 align-middle font-medium text-muted-foreground">
                         {invoice.project?.name || <span className="text-xs text-muted-foreground">General Billing</span>}
                       </td>
-                      <td className="px-6 align-middle text-muted-foreground text-xs">
+                      <td className="px-6 align-middle text-xs text-muted-foreground">
                         {new Date(invoice.dueDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                       </td>
                       <td className="px-6 align-middle">
-                        <Badge className={cn("text-[11px] font-medium px-2 py-0.5 rounded-full border shadow-none", STATUS_COLORS[invoice.status] || 'bg-slate-100 text-slate-800')}>
+                        <Badge className={cn('rounded-[5px] border px-2 py-0.5 text-[11px] font-medium shadow-none', STATUS_COLORS[invoice.status] || 'border-border bg-secondary text-foreground')}>
                           {invoice.status}
                         </Badge>
                       </td>
-                      <td className="px-6 align-middle text-right font-mono font-semibold tabular-nums text-foreground">
+                      <td className="px-6 text-right align-middle font-mono font-semibold tabular-nums text-foreground">
                         {formatCurrency(invoice.totalAmount, invoice.currency)}
                       </td>
-                      <td className="px-6 align-middle text-right">
+                      <td className="px-6 text-right align-middle">
                         <div className="flex items-center justify-end gap-1">
-                           <a 
+                          <a
                             href={`/api/v1/invoices/${invoice.id}/pdf?workspaceId=${workspaceId}`}
                             target="_blank"
                             rel="noreferrer"
@@ -471,20 +437,20 @@ export function WorkspaceInvoiceManager({
                             <Button
                               variant="ghost"
                               size="icon"
-                              className="cursor-pointer h-8 w-8 text-slate-400 hover:text-slate-900 rounded-md"
+                              className="h-8 w-8 text-muted-foreground hover:text-foreground"
                               title="Download PDF"
                             >
                               <Download className="h-4 w-4" />
                             </Button>
                           </a>
-                          
+
                           {invoice.status === 'DRAFT' && (
                             <Button
                               variant="ghost"
                               size="icon"
                               onClick={() => handleSendInvoice(invoice.id, invoice.projectId)}
                               disabled={isLoading}
-                              className="cursor-pointer h-8 w-8 text-slate-400 hover:text-blue-600 rounded-md"
+                              className="h-8 w-8 text-muted-foreground hover:text-foreground"
                               title="Send to Client"
                             >
                               <Send className="h-4 w-4" />
@@ -497,7 +463,7 @@ export function WorkspaceInvoiceManager({
                               size="icon"
                               onClick={() => handleMarkAsPaid(invoice.id, invoice.projectId)}
                               disabled={isLoading}
-                              className="cursor-pointer h-8 w-8 text-slate-400 hover:text-emerald-700 rounded-md"
+                              className="h-8 w-8 text-muted-foreground hover:text-brand"
                               title="Mark as Paid"
                             >
                               <CheckCircle className="h-4 w-4" />
@@ -512,7 +478,7 @@ export function WorkspaceInvoiceManager({
                               setInvoiceToDelete(invoice);
                               setIsDeleteOpen(true);
                             }}
-                            className="cursor-pointer h-8 w-8 text-slate-400 hover:bg-red-50 hover:text-red-700 rounded-md"
+                            className="h-8 w-8 text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
                             title="Delete"
                           >
                             <Trash2 className="h-4 w-4" />
@@ -528,25 +494,23 @@ export function WorkspaceInvoiceManager({
         </CardContent>
       </Card>
 
-      {/* Delete Confirmation Modal */}
       <Dialog open={isDeleteOpen} onOpenChange={setIsDeleteOpen}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="border-border bg-popover sm:max-w-md">
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2 text-destructive text-base font-bold">
+            <DialogTitle className="flex items-center gap-2 font-heading text-base font-bold text-destructive">
               <AlertCircle className="h-5 w-5" /> Delete Invoice
             </DialogTitle>
-            <DialogDescription className="text-zinc-500 text-xs">
-              Are you sure you want to delete invoice <span className="font-bold text-zinc-700 dark:text-zinc-300">#{invoiceToDelete?.invoiceNumber}</span>? 
+            <DialogDescription className="text-xs text-muted-foreground">
+              Are you sure you want to delete invoice <span className="font-semibold text-foreground">#{invoiceToDelete?.invoiceNumber}</span>?
               This action cannot be undone.
             </DialogDescription>
           </DialogHeader>
-          <DialogFooter className="flex sm:justify-end gap-2">
+          <DialogFooter className="flex gap-2 sm:justify-end">
             <Button
               type="button"
               variant="ghost"
               size="sm"
               onClick={() => setIsDeleteOpen(false)}
-              className="cursor-pointer text-xs"
             >
               Cancel
             </Button>
@@ -556,7 +520,6 @@ export function WorkspaceInvoiceManager({
               size="sm"
               disabled={isLoading}
               onClick={handleDeleteInvoice}
-              className="cursor-pointer text-xs font-semibold"
             >
               Delete Invoice
             </Button>
@@ -564,21 +527,19 @@ export function WorkspaceInvoiceManager({
         </DialogContent>
       </Dialog>
 
-      {/* Create Invoice Modal Dialog */}
       <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
-        <DialogContent className="sm:max-w-2xl max-h-[85vh] overflow-y-auto">
+        <DialogContent className="max-h-[85vh] overflow-y-auto border-border bg-popover sm:max-w-2xl">
           <DialogHeader>
-            <DialogTitle className="text-base font-bold text-zinc-900 dark:text-zinc-50">Create New Invoice</DialogTitle>
-            <DialogDescription className="text-zinc-500 text-xs">
-              Fill in the form to generate a manual invoice. It will start in **DRAFT** status.
+            <DialogTitle className="font-heading text-base font-bold text-foreground">Create New Invoice</DialogTitle>
+            <DialogDescription className="text-xs text-muted-foreground">
+              Fill in the form to generate a manual invoice. It will start in DRAFT status.
             </DialogDescription>
           </DialogHeader>
 
           <form onSubmit={handleCreateInvoice} className="space-y-4 pt-2 text-xs">
-            {/* Top row: Client and Project selection */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div className="space-y-1.5">
-                <label className="font-bold text-zinc-700 dark:text-zinc-400">Select Client *</label>
+                <label className="font-medium text-foreground">Select Client *</label>
                 <Select
                   value={selectedClientId}
                   onValueChange={(val) => {
@@ -600,17 +561,17 @@ export function WorkspaceInvoiceManager({
               </div>
 
               <div className="space-y-1.5">
-                <label className="font-bold text-zinc-700 dark:text-zinc-400">Linked Project (Optional)</label>
-                <Select 
-                  value={selectedProjectId} 
+                <label className="font-medium text-foreground">Linked Project (Optional)</label>
+                <Select
+                  value={selectedProjectId}
                   onValueChange={(val) => setSelectedProjectId(val || 'none')}
                   disabled={!selectedClientId}
                 >
                   <SelectTrigger className="h-9 text-xs">
-                    <SelectValue placeholder={selectedClientId ? "Choose a project..." : "Select client first"}>
-                      {selectedProjectId && selectedProjectId !== 'none' 
-                        ? (filteredProjects.find(p => p.id === selectedProjectId)?.name || selectedProjectId) 
-                        : selectedProjectId === 'none' ? "No Project (General Billing)" : undefined}
+                    <SelectValue placeholder={selectedClientId ? 'Choose a project...' : 'Select client first'}>
+                      {selectedProjectId && selectedProjectId !== 'none'
+                        ? (filteredProjects.find(p => p.id === selectedProjectId)?.name || selectedProjectId)
+                        : selectedProjectId === 'none' ? 'No Project (General Billing)' : undefined}
                     </SelectValue>
                   </SelectTrigger>
                   <SelectContent className="text-xs">
@@ -623,21 +584,20 @@ export function WorkspaceInvoiceManager({
               </div>
             </div>
 
-            {/* Middle row: Due Date, Currency, Tax Rate */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
               <div className="space-y-1.5">
-                <label className="font-bold text-zinc-700 dark:text-zinc-400">Due Date *</label>
-                <Input 
-                  type="date" 
-                  value={dueDate} 
-                  onChange={(e) => setDueDate(e.target.value)} 
-                  className="h-9 text-xs"
+                <label className="font-medium text-foreground">Due Date *</label>
+                <Input
+                  type="date"
+                  value={dueDate}
+                  onChange={(e) => setDueDate(e.target.value)}
+                  className="text-xs"
                   required
                 />
               </div>
 
               <div className="space-y-1.5">
-                <label className="font-bold text-zinc-700 dark:text-zinc-400">Currency</label>
+                <label className="font-medium text-foreground">Currency</label>
                 <Select value={currency} onValueChange={(val) => setCurrency(val || 'USD')}>
                   <SelectTrigger className="h-9 text-xs">
                     <SelectValue placeholder="USD" />
@@ -652,91 +612,85 @@ export function WorkspaceInvoiceManager({
               </div>
 
               <div className="space-y-1.5">
-                <label className="font-bold text-zinc-700 dark:text-zinc-400">Tax Rate (%)</label>
-                <Input 
-                  type="number" 
-                  min="0" 
-                  max="100" 
-                  value={taxRate} 
-                  onChange={(e) => setTaxRate(parseFloat(e.target.value) || 0)} 
-                  className="h-9 text-xs"
+                <label className="font-medium text-foreground">Tax Rate (%)</label>
+                <Input
+                  type="number"
+                  min="0"
+                  max="100"
+                  value={taxRate}
+                  onChange={(e) => setTaxRate(parseFloat(e.target.value) || 0)}
+                  className="text-xs"
                 />
               </div>
             </div>
 
-            {/* Line Items builder */}
             <div className="space-y-3 pt-2">
-              <div className="flex justify-between items-center">
-                <label className="font-bold text-sm text-zinc-800 dark:text-zinc-200">Invoice Line Items</label>
-                <Button 
-                  type="button" 
-                  variant="ghost" 
+              <div className="flex items-center justify-between">
+                <label className="text-sm font-semibold text-foreground">Invoice Line Items</label>
+                <Button
+                  type="button"
+                  variant="ghost"
                   size="sm"
                   onClick={handleAddItem}
-                  className="cursor-pointer text-primary text-xs font-semibold flex items-center gap-1"
+                  className="gap-1 text-xs font-medium text-foreground"
                 >
-                  <PlusCircle className="h-4 w-4" /> Add Item
+                  <PlusCircle className="h-4 w-4 text-brand" /> Add Item
                 </Button>
               </div>
 
               <div className="space-y-3">
                 {items.map((item, idx) => (
-                  <div key={idx} className="p-3 border border-gray-100 dark:border-zinc-800 rounded-lg space-y-3 bg-zinc-50/30">
-                    <div className="grid grid-cols-1 sm:grid-cols-12 gap-3">
-                      {/* Name */}
-                      <div className="sm:col-span-6 space-y-1">
-                        <Input 
-                          type="text" 
-                          placeholder="Item name * (e.g. Frontend Development)" 
+                  <div key={idx} className="space-y-3 rounded-md border border-border bg-secondary/40 p-3">
+                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-12">
+                      <div className="space-y-1 sm:col-span-6">
+                        <Input
+                          type="text"
+                          placeholder="Item name * (e.g. Frontend Development)"
                           value={item.name}
                           onChange={(e) => handleItemChange(idx, 'name', e.target.value)}
-                          className="h-9 text-xs"
+                          className="text-xs"
                           required
                         />
                       </div>
-                      {/* Qty */}
-                      <div className="sm:col-span-2 space-y-1">
-                        <Input 
-                          type="number" 
-                          placeholder="Qty" 
+                      <div className="space-y-1 sm:col-span-2">
+                        <Input
+                          type="number"
+                          placeholder="Qty"
                           min="1"
                           value={item.quantity}
                           onChange={(e) => handleItemChange(idx, 'quantity', e.target.value)}
-                          className="h-9 text-xs"
+                          className="text-xs"
                           required
                         />
                       </div>
-                      {/* Price */}
-                      <div className="sm:col-span-3 space-y-1">
-                        <Input 
-                          type="number" 
-                          placeholder="Unit Price" 
+                      <div className="space-y-1 sm:col-span-3">
+                        <Input
+                          type="number"
+                          placeholder="Unit Price"
                           min="0"
                           step="0.01"
                           value={item.unitPrice === 0 ? '' : item.unitPrice}
                           onChange={(e) => handleItemChange(idx, 'unitPrice', e.target.value)}
-                          className="h-9 text-xs"
+                          className="text-xs"
                           required
                         />
                       </div>
-                      {/* Delete item */}
-                      <div className="sm:col-span-1 flex items-center justify-center">
+                      <div className="flex items-center justify-center sm:col-span-1">
                         <Button
                           type="button"
                           variant="ghost"
                           size="icon"
                           onClick={() => handleRemoveItem(idx)}
                           disabled={items.length === 1}
-                          className="cursor-pointer h-9 w-9 text-zinc-400 hover:text-destructive hover:bg-destructive/10"
+                          className="text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
                         >
-                          <MinusCircle className="h-4.5 w-4.5" />
+                          <MinusCircle className="h-4 w-4" />
                         </Button>
                       </div>
                     </div>
-                    {/* Description */}
                     <div>
-                      <Textarea 
-                        placeholder="Description (optional)" 
+                      <Textarea
+                        placeholder="Description (optional)"
                         value={item.description}
                         onChange={(e) => handleItemChange(idx, 'description', e.target.value)}
                         className="min-h-[50px] py-2 text-xs"
@@ -747,41 +701,37 @@ export function WorkspaceInvoiceManager({
               </div>
             </div>
 
-            {/* Summary block */}
-            <div className="border-t border-gray-100 dark:border-zinc-800 pt-4 flex flex-col items-end gap-1.5 text-slate-600 dark:text-zinc-400">
+            <div className="flex flex-col items-end gap-1.5 border-t border-border pt-4 text-muted-foreground">
               <div className="flex gap-4">
                 <span>Subtotal:</span>
-                <span className="font-bold text-zinc-900 dark:text-zinc-100">{formatCurrency(subtotal, currency)}</span>
+                <span className="font-mono font-semibold tabular-nums text-foreground">{formatCurrency(subtotal, currency)}</span>
               </div>
               <div className="flex gap-4">
                 <span>Tax ({taxRate}%):</span>
-                <span className="font-bold text-zinc-900 dark:text-zinc-100">{formatCurrency(taxAmount, currency)}</span>
+                <span className="font-mono font-semibold tabular-nums text-foreground">{formatCurrency(taxAmount, currency)}</span>
               </div>
-              <div className="flex gap-4 text-sm font-black border-t border-gray-100 dark:border-zinc-800 pt-1.5 text-zinc-900 dark:text-zinc-50">
+              <div className="flex gap-4 border-t border-border pt-1.5 text-sm font-bold text-foreground">
                 <span>Total Due:</span>
-                <span>{formatCurrency(totalAmount, currency)}</span>
+                <span className="font-mono tabular-nums">{formatCurrency(totalAmount, currency)}</span>
               </div>
             </div>
 
-            {/* Actions */}
-            <DialogFooter className="pt-4 border-t border-gray-100 dark:border-zinc-800">
+            <DialogFooter className="border-t border-border pt-4">
               <Button
                 type="button"
                 variant="ghost"
                 onClick={() => setIsCreateOpen(false)}
-                className="cursor-pointer text-xs"
               >
                 Cancel
               </Button>
               <Button
                 type="submit"
                 disabled={isLoading}
-                className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold text-xs rounded-lg px-4 h-9 shadow-sm"
               >
-              {isLoading ? 'Creating...' : 'Create Draft Invoice'}
-            </Button>
-          </DialogFooter>
-        </form>
+                {isLoading ? 'Creating...' : 'Create Draft Invoice'}
+              </Button>
+            </DialogFooter>
+          </form>
         </DialogContent>
       </Dialog>
     </FadeIn>

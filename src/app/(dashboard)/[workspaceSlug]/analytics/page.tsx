@@ -6,7 +6,6 @@ import { ProjectStatusChart } from '@/features/analytics/components/project-stat
 import { WorkspaceService } from '@/features/workspace/services/workspace-service';
 import { AnalyticsService } from '@/features/analytics/services/analytics-service';
 import { AnimatedAnalyticsGrid } from './analytics-sections';
-import { FadeIn } from '@/components/ui/motion';
 import { FolderKanban, TrendingUp } from 'lucide-react';
 
 const workspaceService = new WorkspaceService();
@@ -28,88 +27,74 @@ export default async function WorkspaceAnalyticsPage({ params }: PageProps) {
     notFound();
   }
 
-  // Load analytics dashboard data
   const data = await analyticsService.getWorkspaceDashboardData(workspace.id, session.user.id);
 
   const metrics = [
-    { 
-      title: 'Total Revenue', 
-      value: data.totalRevenue, 
-      description: `${data.revenueChangePercent >= 0 ? '+' : ''}${data.revenueChangePercent}% from last month`, 
-      icon: 'revenue',
+    {
+      title: 'Total Revenue',
+      value: data.totalRevenue,
+      description: `${data.revenueChangePercent >= 0 ? '+' : ''}${data.revenueChangePercent}% from last month`,
       prefix: '$',
     },
-    { 
-      title: 'Pending Invoices', 
-      value: data.pendingAmount, 
-      description: `${data.pendingCount} outstanding invoices`, 
-      icon: 'invoices',
+    {
+      title: 'Pending Invoices',
+      value: data.pendingAmount,
+      description: `${data.pendingCount} outstanding invoice${data.pendingCount === 1 ? '' : 's'}`,
       prefix: '$',
     },
-    { 
-      title: 'Active Projects', 
-      value: data.activeProjectsCount, 
-      description: `${data.projectsChangeCount >= 0 ? '+' : ''}${data.projectsChangeCount} since last month`, 
-      icon: 'projects',
+    {
+      title: 'Active Projects',
+      value: data.activeProjectsCount,
+      description: `${data.projectsChangeCount >= 0 ? '+' : ''}${data.projectsChangeCount} since last month`,
     },
-    { 
-      title: 'Active Clients', 
-      value: data.activeClientsCount, 
-      description: `${data.clientsChangeCount >= 0 ? '+' : ''}${data.clientsChangeCount} since last month`, 
-      icon: 'clients',
+    {
+      title: 'Active Clients',
+      value: data.activeClientsCount,
+      description: `${data.clientsChangeCount >= 0 ? '+' : ''}${data.clientsChangeCount} since last month`,
     },
   ];
 
   return (
     <div className="space-y-6">
-      {/* Page Title Header */}
-      <FadeIn direction="up" delay={0.02} duration={0.35}>
-        <div className="pb-6 border-b border-border/60">
-          <h1 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50 font-heading">Analytics</h1>
-          <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1">
-            Review revenue, outstanding invoices, client activity, and project distribution.
-          </p>
-        </div>
-      </FadeIn>
+      <div className="border-b border-border pb-5">
+        <h1 className="font-heading text-2xl font-bold tracking-tight text-foreground">Analytics</h1>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Review revenue, outstanding invoices, client activity, and project distribution.
+        </p>
+      </div>
 
-      {/* KPI Cards Grid */}
       <AnimatedAnalyticsGrid metrics={metrics} />
 
-      {/* Main Charts Block */}
       <div className="grid gap-6 md:grid-cols-2">
-        {/* Revenue Trend Line Chart */}
-        <FadeIn direction="up" delay={0.2} duration={0.4}>
-          <Card className="overflow-hidden">
-            <CardHeader className="border-b border-border/40 pb-4">
-              <CardTitle className="text-sm font-bold text-zinc-900 dark:text-zinc-50 flex items-center gap-2 font-heading">
-                <TrendingUp className="h-4.5 w-4.5 text-primary" /> Revenue Over Time
-              </CardTitle>
-              <CardDescription className="text-zinc-500 dark:text-zinc-400 text-xs">
-                Rolling monthly revenue trend for paid invoices (last 12 months)
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="pt-6 pb-2">
-              <RevenueChart data={data.monthlyRevenueTrend} />
-            </CardContent>
-          </Card>
-        </FadeIn>
+        <Card className="overflow-hidden">
+          <CardHeader className="border-b border-border pb-4">
+            <CardTitle className="flex items-center gap-2 font-heading text-base font-bold text-foreground">
+              <TrendingUp className="h-4 w-4 text-brand" strokeWidth={1.75} />
+              <span>Revenue Over Time</span>
+            </CardTitle>
+            <CardDescription className="text-xs text-muted-foreground">
+              Rolling monthly revenue trend for paid invoices (last 12 months)
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="pt-6 pb-2">
+            <RevenueChart data={data.monthlyRevenueTrend} />
+          </CardContent>
+        </Card>
 
-        {/* Project status bar/pie chart */}
-        <FadeIn direction="up" delay={0.25} duration={0.4}>
-          <Card className="overflow-hidden">
-            <CardHeader className="border-b border-border/40 pb-4">
-              <CardTitle className="text-sm font-bold text-zinc-900 dark:text-zinc-50 flex items-center gap-2 font-heading">
-                <FolderKanban className="h-4.5 w-4.5 text-primary" /> Projects by Status
-              </CardTitle>
-              <CardDescription className="text-zinc-500 dark:text-zinc-400 text-xs">
-                Distribution of project workload across lifecycle statuses
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="pt-6 pb-2">
-              <ProjectStatusChart data={data.projectStatusDistribution} />
-            </CardContent>
-          </Card>
-        </FadeIn>
+        <Card className="overflow-hidden">
+          <CardHeader className="border-b border-border pb-4">
+            <CardTitle className="flex items-center gap-2 font-heading text-base font-bold text-foreground">
+              <FolderKanban className="h-4 w-4 text-brand" strokeWidth={1.75} />
+              <span>Projects by Status</span>
+            </CardTitle>
+            <CardDescription className="text-xs text-muted-foreground">
+              Distribution of project workload across lifecycle statuses
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="pt-6 pb-2">
+            <ProjectStatusChart data={data.projectStatusDistribution} />
+          </CardContent>
+        </Card>
       </div>
     </div>
   );

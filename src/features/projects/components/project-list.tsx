@@ -42,12 +42,12 @@ interface ProjectListProps {
 }
 
 const STATUS_THEMES: Record<string, string> = {
-  DRAFT: 'bg-zinc-100/80 text-slate-600 border-zinc-200/50 dark:bg-zinc-800/40 dark:text-zinc-400 dark:border-zinc-800 shadow-none',
-  ACTIVE: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-500 border-emerald-500/20 shadow-none',
-  ON_HOLD: 'bg-amber-500/10 text-amber-600 dark:text-amber-500 border-amber-500/20 shadow-none',
-  REVIEW: 'bg-violet-500/10 text-violet-600 dark:text-violet-500 border-violet-500/20 shadow-none',
-  COMPLETED: 'bg-primary/10 text-primary border-primary/20 shadow-none',
-  CANCELLED: 'bg-red-500/10 text-red-600 dark:text-red-500 border-red-500/20 shadow-none',
+  DRAFT: 'border-border bg-secondary text-foreground shadow-none',
+  ACTIVE: 'border-emerald-500/20 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 shadow-none',
+  ON_HOLD: 'border-amber-500/20 bg-amber-500/10 text-amber-700 dark:text-amber-400 shadow-none',
+  REVIEW: 'border-border bg-secondary text-foreground shadow-none',
+  COMPLETED: 'border-emerald-500/20 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 shadow-none',
+  CANCELLED: 'border-red-500/20 bg-red-500/10 text-red-700 dark:text-red-400 shadow-none',
 };
 
 export function ProjectList({ initialProjects, workspaceId, workspaceSlug }: ProjectListProps) {
@@ -110,43 +110,41 @@ export function ProjectList({ initialProjects, workspaceId, workspaceSlug }: Pro
   };
 
   return (
-    <FadeIn direction="up" delay={0.02} duration={0.35} className="space-y-6">
-      {/* Header Banner */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-6 border-b border-border/60">
+    <FadeIn direction="up" delay={0.02} duration={0.3} className="space-y-6">
+      <div className="flex flex-col gap-4 border-b border-border pb-5 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50 font-heading">Projects</h1>
-          <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1">
+          <h1 className="font-heading text-2xl font-bold tracking-tight text-foreground">Projects</h1>
+          <p className="mt-1 text-sm text-muted-foreground">
             Manage active client engagements, budgets, milestones, and deliverables.
           </p>
         </div>
         <Link href={`/${workspaceSlug}/projects/new`}>
-          <Button variant="default" className="cursor-pointer font-medium text-sm h-10 px-4">
+          <Button variant="default">
             <Plus className="mr-2 h-4 w-4" /> New Project
           </Button>
         </Link>
       </div>
 
-      {/* Search & Filters */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="relative w-full max-w-sm">
-          <Search className="absolute left-3 top-3 h-4 w-4 text-zinc-400" />
+          <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder="Search projects..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-9 bg-white dark:bg-zinc-900 text-sm h-10 rounded-lg border-border/60"
+            className="h-9 pl-9 text-sm"
           />
         </div>
-        <div className="flex bg-zinc-100 dark:bg-zinc-900 p-1 rounded-lg border border-border/40 self-start max-w-full overflow-x-auto">
+        <div className="flex max-w-full self-start overflow-x-auto rounded-md border border-border bg-secondary p-1">
           {['ALL', 'ACTIVE', 'ON_HOLD', 'REVIEW', 'COMPLETED'].map((status) => (
             <button
               key={status}
               onClick={() => setStatusFilter(status)}
               className={cn(
-                "px-3 py-1.5 text-xs font-semibold rounded-md transition-all cursor-pointer whitespace-nowrap",
+                'whitespace-nowrap rounded-[4px] px-3 py-1.5 text-xs font-semibold transition-colors cursor-pointer',
                 statusFilter === status
-                  ? "bg-white dark:bg-zinc-950 text-primary dark:text-primary shadow-xs"
-                  : "text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200"
+                  ? 'bg-background text-foreground shadow-xs'
+                  : 'text-muted-foreground hover:text-foreground'
               )}
             >
               {status}
@@ -155,96 +153,95 @@ export function ProjectList({ initialProjects, workspaceId, workspaceSlug }: Pro
         </div>
       </div>
 
-      {/* Grid List */}
       {filteredProjects.length === 0 ? (
-        <Card variant="elevated" className="flex flex-col items-center justify-center p-12 text-center border-dashed border-border bg-muted/30">
-          <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-muted text-muted-foreground mb-4 border border-border">
-            <Briefcase className="h-6 w-6 text-primary" />
+        <Card className="flex flex-col items-center justify-center border-dashed border-border bg-secondary/40 p-12 text-center">
+          <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg border border-border bg-background text-muted-foreground">
+            <Briefcase className="h-6 w-6 text-brand" strokeWidth={1.75} />
           </div>
-          <CardTitle className="text-base font-bold text-zinc-900 dark:text-zinc-50 font-heading">No projects found</CardTitle>
-          <CardDescription className="max-w-sm mt-2 text-sm text-zinc-500 dark:text-zinc-400">
+          <CardTitle className="font-heading text-base font-bold text-foreground">No projects found</CardTitle>
+          <CardDescription className="mt-2 max-w-sm text-sm text-muted-foreground">
             {searchQuery || statusFilter !== 'ALL'
               ? 'Try adjusting your search query or filters.'
               : 'Create a project scope to track milestones, tasks, files and log billable times.'}
           </CardDescription>
           {!searchQuery && statusFilter === 'ALL' && (
             <Link href={`/${workspaceSlug}/projects/new`}>
-              <Button variant="default" className="mt-5 flex items-center gap-2 cursor-pointer font-medium text-sm h-10 px-4">
+              <Button variant="default" className="mt-5 gap-2">
                 <Plus className="h-4 w-4" /> Create Project
               </Button>
             </Link>
           )}
         </Card>
       ) : (
-        <Card variant="elevated" className="overflow-hidden">
+        <Card className="overflow-hidden">
           <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse text-sm">
+            <table className="w-full border-collapse text-left text-sm">
               <thead>
-                <tr className="border-b border-border/40 text-xs font-semibold text-zinc-500 dark:text-zinc-400 bg-zinc-50/30 dark:bg-zinc-950/20 h-[48px]">
-                  <th className="px-6 align-middle font-medium">Project Name</th>
-                  <th className="px-6 align-middle font-medium">Client</th>
-                  <th className="px-6 align-middle font-medium">Status</th>
-                  <th className="px-6 align-middle font-medium">Budget</th>
-                  <th className="px-6 align-middle font-medium">Progress</th>
-                  <th className="px-6 align-middle font-medium">Due Date</th>
-                  <th className="px-6 align-middle font-medium text-right">Actions</th>
+                <tr className="h-11 border-b border-border bg-secondary/50 text-xs font-medium text-muted-foreground">
+                  <th className="px-6 align-middle">Project Name</th>
+                  <th className="px-6 align-middle">Client</th>
+                  <th className="px-6 align-middle">Status</th>
+                  <th className="px-6 align-middle">Budget</th>
+                  <th className="px-6 align-middle">Progress</th>
+                  <th className="px-6 align-middle">Due Date</th>
+                  <th className="px-6 text-right align-middle">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-border/40 bg-transparent">
+              <tbody className="divide-y divide-border bg-transparent">
                 {filteredProjects.map((project) => {
                   return (
-                    <tr key={project.id} className="hover:bg-muted/50 transition-colors h-[60px]">
+                    <tr key={project.id} className="h-[58px] transition-colors hover:bg-secondary/40">
                       <td className="px-6 align-middle">
-                        <Link href={`/${workspaceSlug}/projects/${project.id}`} className="font-semibold text-zinc-900 dark:text-zinc-100 hover:text-primary dark:hover:text-primary transition-colors hover:underline">
+                        <Link href={`/${workspaceSlug}/projects/${project.id}`} className="font-semibold text-foreground underline-offset-4 hover:underline">
                           {project.name}
                         </Link>
                       </td>
-                      <td className="px-6 align-middle text-slate-600 dark:text-zinc-400 font-medium">
-                        {project.client?.companyName || '—'}
+                      <td className="px-6 align-middle font-medium text-muted-foreground">
+                        {project.client?.companyName || '-'}
                       </td>
                       <td className="px-6 align-middle">
-                        <Badge className={cn("text-[10px] font-semibold px-2 py-0.5 rounded-full border shadow-none", STATUS_THEMES[project.status] || 'bg-zinc-100 text-zinc-800')}>
+                        <Badge className={cn('rounded-[5px] border px-2 py-0.5 text-[11px] font-medium shadow-none', STATUS_THEMES[project.status] || 'border-border bg-secondary text-foreground')}>
                           {project.status}
                         </Badge>
                       </td>
-                      <td className="px-6 align-middle font-mono font-semibold text-zinc-900 dark:text-zinc-50">
+                      <td className="px-6 align-middle font-mono font-semibold tabular-nums text-foreground">
                         {formatCurrency(project.budget, project.currency)}
                       </td>
-                      <td className="px-6 align-middle min-w-[140px]">
-                        <div className="flex items-center gap-2 max-w-[150px]">
-                          <div className="w-full bg-zinc-100 dark:bg-zinc-800 rounded-full h-1.5 overflow-hidden">
-                            <div 
-                              className="bg-primary h-full rounded-full transition-all duration-300" 
+                      <td className="min-w-[140px] px-6 align-middle">
+                        <div className="flex max-w-[150px] items-center gap-2">
+                          <div className="h-1.5 w-full overflow-hidden rounded-full bg-secondary">
+                            <div
+                              className="h-full rounded-full bg-brand transition-all duration-300"
                               style={{ width: `${project.progress}%` }}
                             />
                           </div>
-                          <span className="font-mono text-xs font-semibold text-zinc-700 dark:text-zinc-400">{project.progress}%</span>
+                          <span className="font-mono text-xs font-semibold tabular-nums text-muted-foreground">{project.progress}%</span>
                         </div>
                       </td>
-                      <td className="px-6 align-middle text-zinc-500 dark:text-zinc-400 text-xs">
+                      <td className="px-6 align-middle text-xs text-muted-foreground">
                         {formatDate(project.deadline)}
                       </td>
-                      <td className="px-6 align-middle text-right">
+                      <td className="px-6 text-right align-middle">
                         <div className="flex items-center justify-end gap-1">
                           <Link href={`/${workspaceSlug}/projects/${project.id}`}>
-                            <Button variant="ghost" size="icon" title="View details" className="h-8 w-8 text-zinc-400 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 rounded-md cursor-pointer">
+                            <Button variant="ghost" size="icon" title="View details" className="h-8 w-8 text-muted-foreground hover:text-foreground">
                               <ExternalLink className="h-4 w-4" />
                             </Button>
                           </Link>
                           <Link href={`/${workspaceSlug}/projects/${project.id}/edit`}>
-                            <Button variant="ghost" size="icon" title="Edit project" className="h-8 w-8 text-zinc-400 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 rounded-md cursor-pointer">
+                            <Button variant="ghost" size="icon" title="Edit project" className="h-8 w-8 text-muted-foreground hover:text-foreground">
                               <Edit className="h-4 w-4" />
                             </Button>
                           </Link>
-                          <Button 
-                            variant="ghost" 
-                            size="icon" 
-                            title="Delete project" 
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            title="Delete project"
                             onClick={() => {
                               setDeletingProject(project);
                               setIsDeleteOpen(true);
                             }}
-                            className="h-8 w-8 text-zinc-400 hover:bg-destructive/10 hover:text-destructive rounded-md cursor-pointer"
+                            className="h-8 w-8 text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
                           >
                             <Trash2 className="h-4 w-4" />
                           </Button>
@@ -259,20 +256,19 @@ export function ProjectList({ initialProjects, workspaceId, workspaceSlug }: Pro
         </Card>
       )}
 
-      {/* Delete Dialog */}
       <Dialog open={isDeleteOpen} onOpenChange={setIsDeleteOpen}>
-        <DialogContent className="sm:max-w-md p-6 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl">
+        <DialogContent className="rounded-lg border border-border bg-popover p-6 sm:max-w-md">
           <DialogHeader>
-            <DialogTitle className="text-base font-bold text-zinc-900 dark:text-zinc-50 flex items-center gap-2">
+            <DialogTitle className="flex items-center gap-2 font-heading text-base font-bold text-foreground">
               <Trash2 className="h-4 w-4 text-destructive" />
               <span>Delete Project</span>
             </DialogTitle>
-            <DialogDescription className="text-zinc-400 dark:text-gray-500 text-xs mt-2">
-              Are you sure you want to delete project <strong className="text-gray-800 dark:text-zinc-100">&ldquo;{deletingProject?.name}&rdquo;</strong>? 
+            <DialogDescription className="mt-2 text-xs text-muted-foreground">
+              Are you sure you want to delete project <strong className="text-foreground">&ldquo;{deletingProject?.name}&rdquo;</strong>?
               This will hide this project and remove it from active plan limits, but will not delete related invoices or uploaded files.
             </DialogDescription>
           </DialogHeader>
-          <DialogFooter className="mt-4 flex flex-col sm:flex-row gap-2 sm:justify-end">
+          <DialogFooter className="mt-4 flex flex-col gap-2 sm:flex-row sm:justify-end">
             <Button
               variant="outline"
               disabled={isLoading}
@@ -280,7 +276,6 @@ export function ProjectList({ initialProjects, workspaceId, workspaceSlug }: Pro
                 setIsDeleteOpen(false);
                 setDeletingProject(null);
               }}
-              className="cursor-pointer text-xs h-9 font-semibold bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800"
             >
               Cancel
             </Button>
@@ -288,7 +283,6 @@ export function ProjectList({ initialProjects, workspaceId, workspaceSlug }: Pro
               variant="destructive"
               disabled={isLoading}
               onClick={handleDelete}
-              className="cursor-pointer text-xs h-9 font-semibold"
             >
               {isLoading ? 'Deleting...' : 'Delete Project'}
             </Button>

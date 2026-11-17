@@ -80,36 +80,33 @@ interface TaskFormValues {
   dueDate: Date | string;
 }
 
-// Column definitions
-const COLUMNS: { label: string; status: TaskStatus; color: string }[] = [
-  { label: 'Backlog', status: TaskStatus.BACKLOG, color: 'bg-muted/50 dark:bg-muted/20 border-border border-t-2 border-t-slate-400' },
-  { label: 'To Do', status: TaskStatus.TODO, color: 'bg-muted/50 dark:bg-muted/20 border-border border-t-2 border-t-blue-500' },
-  { label: 'In Progress', status: TaskStatus.IN_PROGRESS, color: 'bg-muted/50 dark:bg-muted/20 border-border border-t-2 border-t-amber-500' },
-  { label: 'Review', status: TaskStatus.REVIEW, color: 'bg-muted/50 dark:bg-muted/20 border-border border-t-2 border-t-slate-600 dark:border-t-slate-300' },
-  { label: 'Done', status: TaskStatus.DONE, color: 'bg-muted/50 dark:bg-muted/20 border-border border-t-2 border-t-emerald-500' },
+const COLUMNS: { label: string; status: TaskStatus; dot?: string }[] = [
+  { label: 'Backlog', status: TaskStatus.BACKLOG },
+  { label: 'To Do', status: TaskStatus.TODO },
+  { label: 'In Progress', status: TaskStatus.IN_PROGRESS },
+  { label: 'Review', status: TaskStatus.REVIEW },
+  { label: 'Done', status: TaskStatus.DONE, dot: 'bg-brand' },
 ];
 
 const PRIORITY_COLORS: Record<string, string> = {
-  LOW: 'text-slate-600 bg-slate-50 border-slate-200 dark:bg-slate-900 dark:border-slate-800 dark:text-slate-400',
-  MEDIUM: 'text-blue-700 bg-blue-50 border-blue-200 dark:bg-blue-950/30 dark:border-blue-900/40 dark:text-blue-400',
-  HIGH: 'text-amber-700 bg-amber-50 border-amber-200 dark:bg-amber-950/30 dark:border-amber-900/40 dark:text-amber-400',
-  URGENT: 'text-red-700 bg-red-50 border-red-200 dark:bg-red-950/30 dark:border-red-900/40 dark:text-red-400',
+  LOW: 'border-border bg-secondary text-muted-foreground',
+  MEDIUM: 'border-border bg-background text-foreground',
+  HIGH: 'border-amber-500/20 bg-amber-500/10 text-amber-700 dark:text-amber-400',
+  URGENT: 'border-red-500/20 bg-red-500/10 text-red-700 dark:text-red-400',
 };
 
-// Droppable Column Component
 function DroppableColumn({ id, children, className }: { id: string; children: React.ReactNode; className?: string }) {
   const { setNodeRef, isOver } = useDroppable({ id });
   return (
     <div
       ref={setNodeRef}
-      className={`${className} transition-all duration-200 ${isOver ? 'ring-2 ring-primary/30 bg-primary/5' : ''}`}
+      className={`${className} transition-colors duration-150 ${isOver ? 'border-foreground/40 bg-secondary' : ''}`}
     >
       {children}
     </div>
   );
 }
 
-// Draggable Task Card Component
 function DraggableTaskCard({
   task,
   onEdit,
@@ -135,27 +132,27 @@ function DraggableTaskCard({
     <div
       ref={setNodeRef}
       style={style}
-      className={`group relative rounded-lg border border-slate-200 bg-white p-3 shadow-sm hover:shadow-md dark:border-slate-800 dark:bg-slate-900 transition-colors duration-150 ${
+      className={`group relative rounded-md border border-border bg-card p-3 transition-colors hover:border-foreground/30 ${
         isDragging ? 'opacity-50 shadow-lg z-50' : ''
       }`}
     >
       <div className="space-y-2.5">
         <div className="flex items-start justify-between gap-2">
-          <div className="flex items-start gap-2 flex-1 min-w-0">
+          <div className="flex min-w-0 flex-1 items-start gap-2">
             <button
               {...attributes}
               {...listeners}
-              className="mt-0.5 cursor-grab active:cursor-grabbing text-slate-300 hover:text-slate-500 dark:text-slate-600 dark:hover:text-slate-400 shrink-0"
+              className="mt-0.5 shrink-0 cursor-grab text-muted-foreground hover:text-foreground active:cursor-grabbing"
             >
               <GripVertical className="h-4 w-4" />
             </button>
-            <h4 className="font-semibold text-sm text-slate-900 dark:text-slate-50 truncate">{task.title}</h4>
+            <h4 className="truncate text-sm font-semibold text-foreground">{task.title}</h4>
           </div>
-          <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
+          <div className="flex shrink-0 items-center gap-0.5 opacity-0 transition-opacity group-hover:opacity-100">
             <Button
               variant="ghost"
               size="icon"
-              className="h-6 w-6 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
+              className="h-6 w-6 text-muted-foreground hover:text-foreground"
               onClick={() => onEdit(task)}
             >
               <Edit2 className="h-3 w-3" />
@@ -163,7 +160,7 @@ function DraggableTaskCard({
             <Button
               variant="ghost"
               size="icon"
-              className="h-6 w-6 text-red-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/20"
+              className="h-6 w-6 text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
               onClick={() => onDelete(task.id)}
             >
               <Trash2 className="h-3 w-3" />
@@ -172,22 +169,22 @@ function DraggableTaskCard({
         </div>
 
         {task.description && (
-          <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-2 pl-6">{task.description}</p>
+          <p className="line-clamp-2 pl-6 text-xs text-muted-foreground">{task.description}</p>
         )}
 
         <div className="flex items-center justify-between pl-6">
           <div className="flex items-center gap-2">
-            <Badge variant="outline" className={`text-[11px] px-1.5 border tracking-wide uppercase font-semibold ${PRIORITY_COLORS[task.priority]}`}>
+            <Badge variant="outline" className={`px-1.5 text-[11px] font-medium ${PRIORITY_COLORS[task.priority]}`}>
               {task.priority}
             </Badge>
             {task.milestone && (
-              <span className="text-[11px] text-slate-500 dark:text-slate-400 flex items-center gap-1">
+              <span className="flex items-center gap-1 text-[11px] text-muted-foreground">
                 <Layers className="h-3 w-3" />
                 {task.milestone.title}
               </span>
             )}
           </div>
-          <span className="font-mono text-[11px] tabular-nums text-slate-500 dark:text-slate-400 flex items-center gap-1">
+          <span className="flex items-center gap-1 font-mono text-[11px] tabular-nums text-muted-foreground">
             <Calendar className="h-3 w-3" />
             {formatDate(task.dueDate)}
           </span>
@@ -386,7 +383,6 @@ export function TaskKanbanBoard({ initialTasks, milestones, projectId, workspace
 
   const deletingTask = tasks.find((t) => t.id === deletingTaskId);
 
-  // Task form fields used by both Add and Edit dialogs
   const renderTaskFormFields = (form: typeof addForm, isEdit: boolean) => (
     <>
       <FormField
@@ -394,9 +390,9 @@ export function TaskKanbanBoard({ initialTasks, milestones, projectId, workspace
         name="title"
         render={({ field }) => (
           <FormItem>
-            <FormLabel className="text-slate-700 dark:text-slate-300 font-medium">Title</FormLabel>
+            <FormLabel className="text-xs font-medium text-foreground">Title</FormLabel>
             <FormControl>
-              <Input placeholder="e.g. Design homepage layout" disabled={isLoading} {...field} className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800" />
+              <Input placeholder="e.g. Design homepage layout" disabled={isLoading} {...field} />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -407,9 +403,9 @@ export function TaskKanbanBoard({ initialTasks, milestones, projectId, workspace
         name="description"
         render={({ field }) => (
           <FormItem>
-            <FormLabel className="text-slate-700 dark:text-slate-300 font-medium">Description</FormLabel>
+            <FormLabel className="text-xs font-medium text-foreground">Description</FormLabel>
             <FormControl>
-              <Textarea placeholder="Task details..." disabled={isLoading} {...field} className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 min-h-[80px]" />
+              <Textarea placeholder="Task details..." disabled={isLoading} {...field} className="min-h-[80px]" />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -421,14 +417,14 @@ export function TaskKanbanBoard({ initialTasks, milestones, projectId, workspace
           name="priority"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="text-slate-700 dark:text-slate-300 font-medium">Priority</FormLabel>
+              <FormLabel className="text-xs font-medium text-foreground">Priority</FormLabel>
               <Select onValueChange={field.onChange} value={field.value}>
                 <FormControl>
-                  <SelectTrigger className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800">
+                  <SelectTrigger>
                     <SelectValue placeholder="Select Priority" />
                   </SelectTrigger>
                 </FormControl>
-                <SelectContent className="bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800">
+                <SelectContent>
                   {Object.values(Priority).map((p) => (
                     <SelectItem key={p} value={p}>{p}</SelectItem>
                   ))}
@@ -443,9 +439,9 @@ export function TaskKanbanBoard({ initialTasks, milestones, projectId, workspace
           name="dueDate"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="text-slate-700 dark:text-slate-300 font-medium">Due Date</FormLabel>
+              <FormLabel className="text-xs font-medium text-foreground">Due Date</FormLabel>
               <FormControl>
-                <Input type="date" disabled={isLoading} {...field} value={formatDateForInput(field.value)} className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800" />
+                <Input type="date" disabled={isLoading} {...field} value={formatDateForInput(field.value)} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -459,14 +455,14 @@ export function TaskKanbanBoard({ initialTasks, milestones, projectId, workspace
             name="status"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-slate-700 dark:text-slate-300 font-medium">Status</FormLabel>
+                <FormLabel className="text-xs font-medium text-foreground">Status</FormLabel>
                 <Select onValueChange={field.onChange} value={field.value}>
                   <FormControl>
-                    <SelectTrigger className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800">
+                    <SelectTrigger>
                       <SelectValue placeholder="Select Status" />
                     </SelectTrigger>
                   </FormControl>
-                  <SelectContent className="bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800">
+                  <SelectContent>
                     {Object.values(TaskStatus).map((s) => (
                       <SelectItem key={s} value={s}>{s.replace('_', ' ')}</SelectItem>
                     ))}
@@ -482,14 +478,14 @@ export function TaskKanbanBoard({ initialTasks, milestones, projectId, workspace
           name="milestoneId"
           render={({ field }) => (
             <FormItem className={!isEdit ? 'col-span-2' : ''}>
-              <FormLabel className="text-slate-700 dark:text-slate-300 font-medium">Milestone</FormLabel>
+              <FormLabel className="text-xs font-medium text-foreground">Milestone</FormLabel>
               <Select onValueChange={field.onChange} value={field.value || ''}>
                 <FormControl>
-                  <SelectTrigger className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800">
+                  <SelectTrigger>
                     <SelectValue placeholder="None (Unassigned)" />
                   </SelectTrigger>
                 </FormControl>
-                <SelectContent className="bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800">
+                <SelectContent>
                   <SelectItem value="none">None (Unassigned)</SelectItem>
                   {milestones.map((m) => (
                     <SelectItem key={m.id} value={m.id}>{m.title}</SelectItem>
@@ -506,42 +502,40 @@ export function TaskKanbanBoard({ initialTasks, milestones, projectId, workspace
 
   return (
     <div className="space-y-4">
-      {/* Board Header */}
       <div className="flex items-center justify-between">
         <div>
-          <p className="text-xs text-slate-500 dark:text-slate-400">
-            {tasks.length} task{tasks.length !== 1 ? 's' : ''} • {tasks.filter(t => t.status === TaskStatus.DONE).length} completed
+          <p className="text-xs text-muted-foreground">
+            {tasks.length} task{tasks.length !== 1 ? 's' : ''} · {tasks.filter(t => t.status === TaskStatus.DONE).length} completed
           </p>
         </div>
-        <Button
-          onClick={() => setIsAddOpen(true)}
-          className="bg-primary hover:bg-primary/90 text-primary-foreground text-xs font-semibold shadow-sm"
-        >
+        <Button onClick={() => setIsAddOpen(true)} size="sm">
           <Plus className="mr-1.5 h-3.5 w-3.5" /> Add Task
         </Button>
       </div>
 
-      {/* Kanban Board */}
       <DndContext sensors={sensors} collisionDetection={closestCorners} onDragStart={onDragStart} onDragEnd={onDragEnd}>
-        <div className="flex gap-4 overflow-x-auto pb-4 w-full scrollbar-thin">
+        <div className="flex w-full gap-4 overflow-x-auto pb-4 scrollbar-thin">
           {COLUMNS.map((col) => {
             const columnTasks = tasks.filter((t) => t.status === col.status);
             return (
               <DroppableColumn
                 key={col.status}
                 id={col.status}
-                className={`flex flex-col rounded-xl border p-3.5 min-h-[480px] w-[280px] shrink-0 ${col.color}`}
+                className="flex min-h-[480px] w-[280px] shrink-0 flex-col rounded-lg border border-border bg-secondary/50 p-3"
               >
-                <div className="flex items-center justify-between mb-3 px-1">
-                  <span className="font-semibold text-xs text-foreground uppercase tracking-wider">{col.label}</span>
-                  <Badge variant="secondary" className="rounded-full font-mono text-[11px] font-semibold h-5 min-w-[20px] flex items-center justify-center">
+                <div className="mb-3 flex items-center justify-between px-1">
+                  <span className="inline-flex items-center gap-2 text-xs font-semibold text-foreground">
+                    {col.dot && <span className={`h-1.5 w-1.5 rounded-full ${col.dot}`} />}
+                    <span>{col.label}</span>
+                  </span>
+                  <span className="flex h-5 min-w-[20px] items-center justify-center rounded-[4px] border border-border bg-background px-1.5 font-mono text-[11px] font-medium text-muted-foreground">
                     {columnTasks.length}
-                  </Badge>
+                  </span>
                 </div>
 
                 <div className="flex-1 space-y-2.5 overflow-y-auto">
                   {columnTasks.length === 0 ? (
-                    <div className="flex items-center justify-center h-24 rounded-lg border border-dashed border-slate-200 dark:border-slate-800 text-xs text-slate-400 dark:text-slate-600">
+                    <div className="flex h-24 items-center justify-center rounded-md border border-dashed border-border text-xs text-muted-foreground">
                       Drop tasks here
                     </div>
                   ) : (
@@ -563,14 +557,13 @@ export function TaskKanbanBoard({ initialTasks, milestones, projectId, workspace
           })}
         </div>
 
-        {/* Drag Overlay */}
         <DragOverlay>
           {activeTask ? (
-            <div className="rounded-lg border border-primary/40 bg-card p-3 shadow-xl opacity-95 w-[240px]">
+            <div className="w-[240px] rounded-md border border-foreground/40 bg-card p-3 opacity-95 shadow-xl">
               <div className="space-y-2">
-                <h4 className="font-semibold text-sm text-foreground">{activeTask.title}</h4>
+                <h4 className="text-sm font-semibold text-foreground">{activeTask.title}</h4>
                 <div className="flex items-center gap-2">
-                  <Badge variant="outline" className={`text-[11px] px-1.5 border tracking-wide uppercase font-semibold ${PRIORITY_COLORS[activeTask.priority]}`}>
+                  <Badge variant="outline" className={`px-1.5 text-[11px] font-medium ${PRIORITY_COLORS[activeTask.priority]}`}>
                     {activeTask.priority}
                   </Badge>
                 </div>
@@ -580,12 +573,11 @@ export function TaskKanbanBoard({ initialTasks, milestones, projectId, workspace
         </DragOverlay>
       </DndContext>
 
-      {/* Add Task Dialog */}
       <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
-        <DialogContent className="border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 sm:max-w-md">
+        <DialogContent className="border-border bg-popover sm:max-w-md">
           <DialogHeader>
-            <DialogTitle className="text-slate-900 dark:text-slate-100">Add Task</DialogTitle>
-            <DialogDescription className="text-slate-500 dark:text-slate-400">
+            <DialogTitle className="font-heading text-foreground">Add Task</DialogTitle>
+            <DialogDescription className="text-muted-foreground">
               Create a new task for this project.
             </DialogDescription>
           </DialogHeader>
@@ -593,10 +585,10 @@ export function TaskKanbanBoard({ initialTasks, milestones, projectId, workspace
             <form onSubmit={addForm.handleSubmit(handleCreateTask)} className="space-y-4">
               {renderTaskFormFields(addForm, false)}
               <DialogFooter className="pt-2">
-                <Button type="button" variant="outline" onClick={() => setIsAddOpen(false)} className="border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 font-medium">
+                <Button type="button" variant="outline" onClick={() => setIsAddOpen(false)}>
                   Cancel
                 </Button>
-                <Button type="submit" disabled={isLoading} className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold">
+                <Button type="submit" disabled={isLoading}>
                   {isLoading ? 'Creating...' : 'Create Task'}
                 </Button>
               </DialogFooter>
@@ -605,12 +597,11 @@ export function TaskKanbanBoard({ initialTasks, milestones, projectId, workspace
         </DialogContent>
       </Dialog>
 
-      {/* Edit Task Dialog */}
       <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
-        <DialogContent className="border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 sm:max-w-md">
+        <DialogContent className="border-border bg-popover sm:max-w-md">
           <DialogHeader>
-            <DialogTitle className="text-slate-900 dark:text-slate-100">Edit Task</DialogTitle>
-            <DialogDescription className="text-slate-500 dark:text-slate-400">
+            <DialogTitle className="font-heading text-foreground">Edit Task</DialogTitle>
+            <DialogDescription className="text-muted-foreground">
               Update task details, priority, and assignment.
             </DialogDescription>
           </DialogHeader>
@@ -618,10 +609,10 @@ export function TaskKanbanBoard({ initialTasks, milestones, projectId, workspace
             <form onSubmit={editForm.handleSubmit(handleUpdateTask)} className="space-y-4">
               {renderTaskFormFields(editForm, true)}
               <DialogFooter className="pt-2">
-                <Button type="button" variant="outline" onClick={() => setIsEditOpen(false)} className="border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 font-medium">
+                <Button type="button" variant="outline" onClick={() => setIsEditOpen(false)}>
                   Cancel
                 </Button>
-                <Button type="submit" disabled={isLoading} className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold">
+                <Button type="submit" disabled={isLoading}>
                   {isLoading ? 'Saving...' : 'Save Changes'}
                 </Button>
               </DialogFooter>
@@ -630,22 +621,20 @@ export function TaskKanbanBoard({ initialTasks, milestones, projectId, workspace
         </DialogContent>
       </Dialog>
 
-      {/* Delete Task Confirmation */}
       <Dialog open={isDeleteOpen} onOpenChange={setIsDeleteOpen}>
-        <DialogContent className="border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 sm:max-w-md">
+        <DialogContent className="border-border bg-popover sm:max-w-md">
           <DialogHeader>
-            <DialogTitle className="text-slate-900 dark:text-slate-100">Delete Task</DialogTitle>
-            <DialogDescription className="text-slate-500 dark:text-slate-400">
-              Are you sure you want to delete task <strong className="text-slate-900 dark:text-slate-100">&quot;{deletingTask?.title}&quot;</strong>?
+            <DialogTitle className="font-heading text-foreground">Delete Task</DialogTitle>
+            <DialogDescription className="text-muted-foreground">
+              Are you sure you want to delete task <strong className="text-foreground">&quot;{deletingTask?.title}&quot;</strong>?
               This action cannot be undone.
             </DialogDescription>
           </DialogHeader>
-          <DialogFooter className="mt-4 flex flex-col sm:flex-row gap-2 sm:justify-end">
+          <DialogFooter className="mt-4 flex flex-col gap-2 sm:flex-row sm:justify-end">
             <Button
               variant="outline"
               disabled={isLoading}
               onClick={() => { setIsDeleteOpen(false); setDeletingTaskId(null); }}
-              className="border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300"
             >
               Cancel
             </Button>
@@ -653,7 +642,6 @@ export function TaskKanbanBoard({ initialTasks, milestones, projectId, workspace
               variant="destructive"
               disabled={isLoading}
               onClick={handleDeleteTask}
-              className="bg-red-600 hover:bg-red-700 text-white font-medium"
             >
               {isLoading ? 'Deleting...' : 'Delete'}
             </Button>

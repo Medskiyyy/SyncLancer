@@ -75,31 +75,31 @@ export function ProposalList({ initialProposals, workspaceId, workspaceSlug }: P
     switch (status) {
       case 'APPROVED':
         return (
-          <Badge className="text-[11px] font-semibold px-2 py-0.5 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-600/20" variant="secondary">
+          <Badge className="border border-emerald-500/20 bg-emerald-500/10 px-2 py-0.5 text-[11px] font-medium text-emerald-700 dark:text-emerald-400" variant="secondary">
             Approved
           </Badge>
         );
       case 'SENT':
         return (
-          <Badge className="text-[11px] font-semibold px-2 py-0.5 bg-blue-500/10 text-blue-700 dark:text-blue-400 border border-blue-600/20" variant="secondary">
+          <Badge className="border border-border bg-secondary px-2 py-0.5 text-[11px] font-medium text-foreground" variant="secondary">
             Sent
           </Badge>
         );
       case 'REJECTED':
         return (
-          <Badge className="text-[11px] font-semibold px-2 py-0.5 bg-red-500/10 text-red-700 dark:text-red-400 border border-red-600/20" variant="secondary">
+          <Badge className="border border-red-500/20 bg-red-500/10 px-2 py-0.5 text-[11px] font-medium text-red-700 dark:text-red-400" variant="secondary">
             Rejected
           </Badge>
         );
       case 'EXPIRED':
         return (
-          <Badge className="text-[11px] font-semibold px-2 py-0.5 bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 border border-zinc-200/40" variant="secondary">
+          <Badge className="border border-border bg-secondary px-2 py-0.5 text-[11px] font-medium text-muted-foreground" variant="secondary">
             Expired
           </Badge>
         );
       default:
         return (
-          <Badge className="text-[11px] font-semibold px-2 py-0.5 bg-zinc-50 dark:bg-zinc-950 text-zinc-600 dark:text-zinc-400 border border-zinc-200/60 dark:border-zinc-800" variant="secondary">
+          <Badge className="border border-border bg-secondary px-2 py-0.5 text-[11px] font-medium text-muted-foreground" variant="secondary">
             Draft
           </Badge>
         );
@@ -107,34 +107,32 @@ export function ProposalList({ initialProposals, workspaceId, workspaceSlug }: P
   };
 
   return (
-    <div className="space-y-6 animate-in fade-in-50 duration-300">
-      {/* Page Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-zinc-200/60 dark:border-zinc-800/80 pb-5">
+    <div className="space-y-6">
+      <div className="flex flex-col gap-4 border-b border-border pb-5 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight text-zinc-900 dark:text-zinc-50">Proposals</h1>
-          <p className="text-sm text-zinc-500 dark:text-zinc-400">
+          <h1 className="font-heading text-2xl font-bold tracking-tight text-foreground">Proposals</h1>
+          <p className="mt-1 text-sm text-muted-foreground">
             Create professional quotations, manage pricing sheets, and review client approvals.
           </p>
         </div>
         <Link href={`/${workspaceSlug}/proposals/new`}>
-          <Button className="cursor-pointer font-semibold text-xs h-9">
+          <Button>
             <Plus className="mr-1.5 h-4 w-4" /> Create Proposal
           </Button>
         </Link>
       </div>
 
-      {/* Filters & Search */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex bg-zinc-100 dark:bg-zinc-800 p-0.5 rounded-lg border border-zinc-200/50 dark:border-zinc-700/50 self-start overflow-x-auto max-w-full">
+        <div className="flex max-w-full self-start overflow-x-auto rounded-md border border-border bg-secondary p-1">
           {['all', 'DRAFT', 'SENT', 'APPROVED', 'REJECTED'].map((status) => (
             <button
               key={status}
               onClick={() => setStatusFilter(status)}
               className={cn(
-                "px-3.5 py-1.5 text-xs font-semibold rounded-md transition-all cursor-pointer whitespace-nowrap",
+                'whitespace-nowrap rounded-[4px] px-3.5 py-1.5 text-xs font-semibold transition-colors cursor-pointer',
                 statusFilter === status
-                  ? "bg-white dark:bg-zinc-900 text-zinc-950 dark:text-zinc-50 shadow-xs"
-                  : "text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-200"
+                  ? 'bg-background text-foreground shadow-xs'
+                  : 'text-muted-foreground hover:text-foreground'
               )}
             >
               {status === 'all' ? 'All' : status}
@@ -143,33 +141,32 @@ export function ProposalList({ initialProposals, workspaceId, workspaceSlug }: P
         </div>
 
         <div className="relative w-full max-w-sm">
-          <Search className="absolute left-3 top-2.5 h-4 w-4 text-zinc-400 dark:text-slate-500" />
+          <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder="Search proposals..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-9 bg-white dark:bg-zinc-900 text-xs h-9 rounded-lg"
+            className="h-9 pl-9 text-sm"
           />
         </div>
       </div>
 
-      {/* Grid Table */}
       {filteredProposals.length === 0 ? (
-        <Card className="flex flex-col items-center justify-center p-12 text-center border-dashed border-border">
-          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-muted text-muted-foreground mb-4 border border-border">
-            <FileText className="h-6 w-6" />
+        <Card className="flex flex-col items-center justify-center border-dashed border-border bg-secondary/40 p-12 text-center">
+          <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg border border-border bg-background text-muted-foreground">
+            <FileText className="h-6 w-6 text-brand" strokeWidth={1.75} />
           </div>
-          <CardTitle className="text-sm font-bold text-zinc-900 dark:text-zinc-50">
+          <CardTitle className="font-heading text-base font-bold text-foreground">
             {searchQuery || statusFilter !== 'all' ? 'No proposals found' : 'No proposals yet'}
           </CardTitle>
-          <CardDescription className="max-w-sm mt-1 text-xs text-zinc-500 dark:text-zinc-400">
+          <CardDescription className="mt-1 max-w-sm text-xs text-muted-foreground">
             {searchQuery || statusFilter !== 'all'
               ? 'Try adjusting your filters or search query.'
               : 'Create a proposal draft to estimate services and outline contracts for clients.'}
           </CardDescription>
           {!searchQuery && statusFilter === 'all' && (
             <Link href={`/${workspaceSlug}/proposals/new`} className="mt-4">
-              <Button className="cursor-pointer font-semibold text-xs h-9">
+              <Button>
                 <Plus className="mr-1.5 h-4 w-4" />
                 <span>Create Proposal</span>
               </Button>
@@ -177,81 +174,81 @@ export function ProposalList({ initialProposals, workspaceId, workspaceSlug }: P
           )}
         </Card>
       ) : (
-        <Card className="overflow-hidden border border-zinc-200/60 dark:border-zinc-800/80 rounded-xl shadow-xs">
+        <Card className="overflow-hidden border border-border">
           <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse text-xs">
-                <thead>
-                  <tr className="border-b border-border text-[11px] font-semibold text-muted-foreground uppercase tracking-wider bg-muted/40">
-                    <th className="px-5 py-3">Number</th>
-                    <th className="px-5 py-3">Client</th>
-                    <th className="px-5 py-3">Proposal Title</th>
-                    <th className="px-5 py-3">Total Amount</th>
-                    <th className="px-5 py-3">Expires</th>
-                    <th className="px-5 py-3">Status</th>
-                    <th className="px-5 py-3 text-right">Actions</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-border bg-card">
-                  {filteredProposals.map((proposal) => {
-                    const formattedTotal = new Intl.NumberFormat('en-US', {
-                      style: 'currency',
-                      currency: proposal.currency || 'USD',
-                      minimumFractionDigits: 0,
-                      maximumFractionDigits: 0,
-                    }).format(Number(proposal.totalAmount));
+            <table className="w-full border-collapse text-left text-xs">
+              <thead>
+                <tr className="h-11 border-b border-border bg-secondary/50 text-xs font-medium text-muted-foreground">
+                  <th className="px-5">Number</th>
+                  <th className="px-5">Client</th>
+                  <th className="px-5">Proposal Title</th>
+                  <th className="px-5">Total Amount</th>
+                  <th className="px-5">Expires</th>
+                  <th className="px-5">Status</th>
+                  <th className="px-5 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border bg-card">
+                {filteredProposals.map((proposal) => {
+                  const formattedTotal = new Intl.NumberFormat('en-US', {
+                    style: 'currency',
+                    currency: proposal.currency || 'USD',
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0,
+                  }).format(Number(proposal.totalAmount));
 
-                    return (
-                      <tr key={proposal.id} className="hover:bg-muted/40 transition-colors">
-                        <td className="px-5 py-3.5 font-mono text-xs font-semibold text-muted-foreground">{proposal.proposalNumber}</td>
-                        <td className="px-5 py-3.5">
-                          <div className="flex items-center gap-2">
-                            <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded bg-primary/10 text-primary font-bold border border-primary/20 text-[11px]">
-                              {proposal.client.companyName.substring(0, 2).toUpperCase()}
-                            </div>
-                          <span className="font-semibold text-zinc-900 dark:text-zinc-100">
+                  return (
+                    <tr key={proposal.id} className="h-[58px] transition-colors hover:bg-secondary/40">
+                      <td className="px-5 font-mono text-xs font-semibold text-muted-foreground">{proposal.proposalNumber}</td>
+                      <td className="px-5">
+                        <div className="flex items-center gap-2.5">
+                          <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-[5px] bg-foreground font-heading text-[11px] font-bold text-background">
+                            {proposal.client.companyName.substring(0, 2).toUpperCase()}
+                          </div>
+                          <span className="font-semibold text-foreground">
                             {proposal.client.companyName}
                           </span>
                         </div>
                       </td>
-                      <td className="px-5 py-3.5 font-semibold text-gray-700 dark:text-zinc-300 truncate max-w-[180px]">{proposal.title}</td>
-                      <td className="px-5 py-3.5 font-bold font-mono text-zinc-900 dark:text-zinc-100">{formattedTotal}</td>
-                      <td className="px-5 py-3.5 text-zinc-400 dark:text-zinc-500 font-medium">
+                      <td className="max-w-[180px] truncate px-5 font-medium text-foreground">{proposal.title}</td>
+                      <td className="px-5 font-mono font-semibold tabular-nums text-foreground">{formattedTotal}</td>
+                      <td className="px-5 text-muted-foreground">
                         {new Date(proposal.expiresAt).toLocaleDateString()}
                       </td>
-                      <td className="px-5 py-3.5">{getStatusBadge(proposal.status)}</td>
-                      <td className="px-5 py-3.5 text-right">
+                      <td className="px-5">{getStatusBadge(proposal.status)}</td>
+                      <td className="px-5 text-right">
                         <div className="flex items-center justify-end gap-1">
                           <Link href={`/${workspaceSlug}/proposals/${proposal.id}`}>
-                            <Button variant="ghost" size="icon" title="View Detail" className="h-7 w-7 text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 cursor-pointer">
+                            <Button variant="ghost" size="icon" title="View Detail" className="h-7 w-7 text-muted-foreground hover:text-foreground">
                               <Eye className="h-3.5 w-3.5" />
                             </Button>
                           </Link>
-                          
+
                           {proposal.status === 'DRAFT' && (
                             <Link href={`/${workspaceSlug}/proposals/${proposal.id}/edit`}>
-                              <Button variant="ghost" size="icon" title="Edit Draft" className="h-7 w-7 text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 cursor-pointer">
+                              <Button variant="ghost" size="icon" title="Edit Draft" className="h-7 w-7 text-muted-foreground hover:text-foreground">
                                 <Edit className="h-3.5 w-3.5" />
                               </Button>
                             </Link>
                           )}
-                          
-                          <a 
-                            href={`/api/v1/proposals/${proposal.id}/pdf?workspaceId=${workspaceId}`} 
-                            target="_blank" 
+
+                          <a
+                            href={`/api/v1/proposals/${proposal.id}/pdf?workspaceId=${workspaceId}`}
+                            target="_blank"
                             rel="noopener noreferrer"
                           >
-                            <Button variant="ghost" size="icon" title="Download PDF" className="h-7 w-7 text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 cursor-pointer">
+                            <Button variant="ghost" size="icon" title="Download PDF" className="h-7 w-7 text-muted-foreground hover:text-foreground">
                               <Download className="h-3.5 w-3.5" />
                             </Button>
                           </a>
-                          
+
                           {proposal.status === 'DRAFT' && (
-                            <Button 
-                              variant="ghost" 
-                              size="icon" 
-                              title="Delete Draft" 
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              title="Delete Draft"
                               onClick={() => handleDeleteProposal(proposal.id)}
-                              className="h-7 w-7 text-zinc-400 hover:bg-destructive/5 hover:text-destructive cursor-pointer"
+                              className="h-7 w-7 text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
                             >
                               <Trash2 className="h-3.5 w-3.5" />
                             </Button>

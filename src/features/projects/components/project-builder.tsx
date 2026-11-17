@@ -4,7 +4,7 @@ import type { Serialized } from '@/lib/serialize';
 import { getErrorMessage } from '@/lib/errors';
 import React, { useState } from 'react';
 import { Project, Client, ProjectTemplate, ProjectStatus } from '@prisma/client';
-import { useForm } from 'react-hook-form';
+import { useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
@@ -54,6 +54,11 @@ export function ProjectBuilder({
     return d.toISOString().split('T')[0];
   };
 
+  const [defaultDates] = useState(() => ({
+    startDate: new Date().toISOString().split('T')[0],
+    deadline: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+  }));
+
   const form = useForm({
     resolver: zodResolver(isEdit ? updateProjectSchema : createProjectSchema),
     defaultValues: {
@@ -62,14 +67,14 @@ export function ProjectBuilder({
       clientId: project?.clientId || '',
       budget: project ? parseFloat(project.budget.toString()) : 0,
       currency: project?.currency || 'USD',
-      startDate: project ? formatDateForInput(project.startDate) : formatDateForInput(new Date()),
-      deadline: project ? formatDateForInput(project.deadline) : formatDateForInput(new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)),
+      startDate: project ? formatDateForInput(project.startDate) : defaultDates.startDate,
+      deadline: project ? formatDateForInput(project.deadline) : defaultDates.deadline,
       status: project?.status || ProjectStatus.DRAFT,
       templateId: '',
     },
   });
 
-  const selectedStatus = form.watch('status');
+  const selectedStatus = useWatch({ control: form.control, name: 'status' });
 
   // Check if active project limit is reached
   const originalStatusWasActive = project?.status === ProjectStatus.ACTIVE;
@@ -147,15 +152,15 @@ export function ProjectBuilder({
     <div className="space-y-6 max-w-3xl mx-auto">
       <div className="flex items-center gap-4">
         <Link href={isEdit ? `/${workspaceSlug}/projects/${project.id}` : `/${workspaceSlug}/projects`}>
-          <Button variant="ghost" size="icon" className="h-9 w-9 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400">
+          <Button variant="ghost" size="icon" className="h-9 w-9 border border-border text-muted-foreground hover:text-foreground">
             <ArrowLeft className="h-4.5 w-4.5" />
           </Button>
         </Link>
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-50">
+          <h1 className="font-heading text-2xl font-bold tracking-tight text-foreground">
             {isEdit ? 'Edit Project' : 'New Project'}
           </h1>
-          <p className="text-sm text-slate-500 dark:text-slate-400">
+          <p className="text-sm text-muted-foreground">
             {isEdit ? 'Update project settings, status, and budget details.' : 'Create a project, select a client, and launch from a template.'}
           </p>
         </div>
@@ -163,12 +168,12 @@ export function ProjectBuilder({
 
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-          <Card className="border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 rounded-xl shadow-sm">
-            <CardHeader className="border-b border-slate-100 dark:border-gray-800 pb-4">
-              <CardTitle className="text-base font-bold text-slate-900 dark:text-slate-50 flex items-center gap-2">
-                <Briefcase className="h-5 w-5 text-primary" /> Project Specifications
+          <Card className="border-border bg-card rounded-lg">
+            <CardHeader className="border-b border-border pb-4">
+              <CardTitle className="font-heading text-base font-bold text-foreground flex items-center gap-2">
+                <Briefcase className="h-5 w-5 text-brand" /> Project Specifications
               </CardTitle>
-              <CardDescription className="text-xs">
+              <CardDescription className="text-xs text-muted-foreground">
                 Fill in the basic workspace parameters for this engagement.
               </CardDescription>
             </CardHeader>
@@ -178,12 +183,12 @@ export function ProjectBuilder({
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-slate-700 dark:text-slate-300 font-medium">Project Name</FormLabel>
+                    <FormLabel className="text-foreground font-medium">Project Name</FormLabel>
                     <FormControl>
                       <Input 
                         placeholder="e.g. Nusantara Portal Redesign" 
                         {...field} 
-                        className="bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800"
+                        className="bg-background border-border"
                       />
                     </FormControl>
                     <FormMessage />
@@ -196,12 +201,12 @@ export function ProjectBuilder({
                 name="description"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-slate-700 dark:text-slate-300 font-medium">Description</FormLabel>
+                    <FormLabel className="text-foreground font-medium">Description</FormLabel>
                     <FormControl>
                       <Textarea 
                         placeholder="Detail the scope of work and goals..." 
                         {...field} 
-                        className="bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800 min-h-[100px]"
+                        className="bg-background border-border min-h-[100px]"
                       />
                     </FormControl>
                     <FormMessage />
@@ -216,14 +221,14 @@ export function ProjectBuilder({
                     name="clientId"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-slate-700 dark:text-slate-300 font-medium">Client</FormLabel>
+                        <FormLabel className="text-foreground font-medium">Client</FormLabel>
                         <Select onValueChange={field.onChange} defaultValue={field.value}>
                           <FormControl>
-                            <SelectTrigger className="bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800">
+                            <SelectTrigger className="bg-background border-border">
                               <SelectValue placeholder="Select Client" />
                             </SelectTrigger>
                           </FormControl>
-                          <SelectContent className="bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800">
+                          <SelectContent className="bg-card border-border">
                             {clients.map((client) => (
                               <SelectItem key={client.id} value={client.id}>
                                 {client.companyName} ({client.primaryEmail})
@@ -242,14 +247,14 @@ export function ProjectBuilder({
                   name="status"
                   render={({ field }) => (
                     <FormItem className={isEdit ? 'sm:col-span-2' : ''}>
-                      <FormLabel className="text-slate-700 dark:text-slate-300 font-medium">Status</FormLabel>
+                      <FormLabel className="text-foreground font-medium">Status</FormLabel>
                       <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <FormControl>
-                          <SelectTrigger className="bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800">
+                          <SelectTrigger className="bg-background border-border">
                             <SelectValue placeholder="Select Status" />
                           </SelectTrigger>
                         </FormControl>
-                        <SelectContent className="bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800">
+                        <SelectContent className="bg-card border-border">
                           {Object.values(ProjectStatus).map((status) => (
                             <SelectItem key={status} value={status}>
                               {status}
@@ -257,7 +262,7 @@ export function ProjectBuilder({
                           ))}
                         </SelectContent>
                       </Select>
-                      <FormDescription className="text-[11px]">
+                      <FormDescription className="text-[11px] text-muted-foreground">
                         Active status counts towards subscription active project limits.
                       </FormDescription>
                       <FormMessage />
@@ -267,7 +272,7 @@ export function ProjectBuilder({
               </div>
 
               {showLimitWarning && (
-                <div className="flex items-start gap-3 rounded-lg border border-amber-200 bg-amber-50 dark:border-amber-900/30 dark:bg-amber-950/20 p-4 text-amber-800 dark:text-amber-300">
+                <div className="flex items-start gap-3 rounded-lg border border-amber-500/20 bg-amber-500/10 p-4 text-amber-800 dark:text-amber-300">
                   <AlertTriangle className="h-5 w-5 shrink-0 mt-0.5" />
                   <div className="space-y-1">
                     <p className="text-sm font-bold">Active Projects Limit Reached</p>
@@ -281,12 +286,12 @@ export function ProjectBuilder({
             </CardContent>
           </Card>
 
-          <Card className="border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 rounded-xl shadow-sm">
-            <CardHeader className="border-b border-slate-100 dark:border-gray-800 pb-4">
-              <CardTitle className="text-base font-bold text-slate-900 dark:text-slate-50 flex items-center gap-2">
-                <DollarSign className="h-5 w-5 text-primary" /> Budget & Timeline
+          <Card className="border-border bg-card rounded-lg">
+            <CardHeader className="border-b border-border pb-4">
+              <CardTitle className="font-heading text-base font-bold text-foreground flex items-center gap-2">
+                <DollarSign className="h-5 w-5 text-brand" /> Budget & Timeline
               </CardTitle>
-              <CardDescription className="text-xs">
+              <CardDescription className="text-xs text-muted-foreground">
                 Configure financials and dates.
               </CardDescription>
             </CardHeader>
@@ -297,7 +302,7 @@ export function ProjectBuilder({
                   name="budget"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-slate-700 dark:text-slate-300 font-medium">Budget</FormLabel>
+                      <FormLabel className="text-foreground font-medium">Budget</FormLabel>
                       <FormControl>
                         <Input 
                           type="number" 
@@ -305,7 +310,7 @@ export function ProjectBuilder({
                           placeholder="0.00" 
                           {...field} 
                           onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
-                          className="bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800"
+                          className="bg-background border-border font-mono tabular-nums"
                         />
                       </FormControl>
                       <FormMessage />
@@ -318,14 +323,14 @@ export function ProjectBuilder({
                   name="currency"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-slate-700 dark:text-slate-300 font-medium">Currency</FormLabel>
+                      <FormLabel className="text-foreground font-medium">Currency</FormLabel>
                       <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <FormControl>
-                          <SelectTrigger className="bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800">
+                          <SelectTrigger className="bg-background border-border">
                             <SelectValue placeholder="Select Currency" />
                           </SelectTrigger>
                         </FormControl>
-                        <SelectContent className="bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800">
+                        <SelectContent className="bg-card border-border">
                           <SelectItem value="USD">USD ($)</SelectItem>
                           <SelectItem value="EUR">EUR (€)</SelectItem>
                           <SelectItem value="GBP">GBP (£)</SelectItem>
@@ -344,13 +349,13 @@ export function ProjectBuilder({
                   name="startDate"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-slate-700 dark:text-slate-300 font-medium">Start Date</FormLabel>
+                      <FormLabel className="text-foreground font-medium">Start Date</FormLabel>
                       <FormControl>
                         <Input 
                           type="date" 
                           {...field} 
                           value={formatDateForInput(field.value)}
-                          className="bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800"
+                          className="bg-background border-border"
                         />
                       </FormControl>
                       <FormMessage />
@@ -363,13 +368,13 @@ export function ProjectBuilder({
                   name="deadline"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-slate-700 dark:text-slate-300 font-medium">Deadline</FormLabel>
+                      <FormLabel className="text-foreground font-medium">Deadline</FormLabel>
                       <FormControl>
                         <Input 
                           type="date" 
                           {...field} 
                           value={formatDateForInput(field.value)}
-                          className="bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800"
+                          className="bg-background border-border"
                         />
                       </FormControl>
                       <FormMessage />
@@ -381,12 +386,12 @@ export function ProjectBuilder({
           </Card>
 
           {!isEdit && (
-            <Card className="border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 rounded-xl shadow-sm">
-              <CardHeader className="border-b border-slate-100 dark:border-gray-800 pb-4">
-                <CardTitle className="text-base font-bold text-slate-900 dark:text-slate-50 flex items-center gap-2">
-                  <Calendar className="h-5 w-5 text-primary" /> Predefined Milestones & Tasks Template
+            <Card className="border-border bg-card rounded-lg">
+              <CardHeader className="border-b border-border pb-4">
+                <CardTitle className="font-heading text-base font-bold text-foreground flex items-center gap-2">
+                  <Calendar className="h-5 w-5 text-brand" /> Predefined Milestones & Tasks Template
                 </CardTitle>
-                <CardDescription className="text-xs">
+                <CardDescription className="text-xs text-muted-foreground">
                   Optional: Automatically pre-populate your milestones and task list.
                 </CardDescription>
               </CardHeader>
@@ -396,14 +401,14 @@ export function ProjectBuilder({
                   name="templateId"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-slate-700 dark:text-slate-300 font-medium">Project Template</FormLabel>
+                      <FormLabel className="text-foreground font-medium">Project Template</FormLabel>
                       <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <FormControl>
-                          <SelectTrigger className="bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800">
+                          <SelectTrigger className="bg-background border-border">
                             <SelectValue placeholder="No template (create blank project)" />
                           </SelectTrigger>
                         </FormControl>
-                        <SelectContent className="bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800">
+                        <SelectContent className="bg-card border-border">
                           <SelectItem value="">No template (create blank project)</SelectItem>
                           {templates.map((template) => (
                             <SelectItem key={template.id} value={template.id}>
@@ -412,7 +417,7 @@ export function ProjectBuilder({
                           ))}
                         </SelectContent>
                       </Select>
-                      <FormDescription className="text-[11px]">
+                      <FormDescription className="text-[11px] text-muted-foreground">
                         Selecting a template auto-generates structured milestones and tasks evenly scheduled between your Start Date and Deadline.
                       </FormDescription>
                       <FormMessage />
@@ -429,7 +434,7 @@ export function ProjectBuilder({
                 type="button" 
                 variant="outline" 
                 disabled={isLoading}
-                className="border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 font-medium"
+                className="border-border text-foreground font-medium"
               >
                 Cancel
               </Button>
@@ -437,7 +442,7 @@ export function ProjectBuilder({
             <Button
               type="submit"
               disabled={isLoading || showLimitWarning}
-              className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold"
+              className="font-semibold"
             >
               {isLoading ? 'Saving...' : isEdit ? 'Save Changes' : 'Create Project'}
             </Button>

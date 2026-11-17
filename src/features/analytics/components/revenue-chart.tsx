@@ -20,8 +20,8 @@ function CustomTooltip({ active, payload, label }: ChartTooltipProps) {
   if (active && payload && payload.length) {
     return (
       <div className="rounded-md border border-border bg-popover p-3 text-xs text-popover-foreground shadow-lg">
-        <p className="font-semibold text-zinc-900 dark:text-zinc-50">{label}</p>
-        <p className="mt-1 font-bold text-primary dark:text-primary">
+        <p className="font-semibold text-foreground">{label}</p>
+        <p className="mt-1 font-mono font-bold tabular-nums text-brand">
           {new Intl.NumberFormat('en-US', {
             style: 'currency',
             currency: 'USD',
@@ -43,14 +43,14 @@ export function RevenueChart({ data }: RevenueChartProps) {
 
   if (isEmpty) {
     return (
-      <div className="flex min-h-[260px] h-[260px] sm:min-h-[360px] sm:h-[360px] flex-col items-center justify-center rounded-lg border border-dashed border-border bg-muted/30 p-6 text-center">
-        <Receipt className="h-10 w-10 text-zinc-400 dark:text-zinc-600 mb-3 shrink-0" />
-        <h4 className="text-sm font-bold text-zinc-900 dark:text-zinc-100 mb-1">No revenue data yet</h4>
-        <p className="text-xs text-zinc-500 dark:text-zinc-400 max-w-[240px] mb-4">
+      <div className="flex h-[260px] min-h-[260px] flex-col items-center justify-center rounded-lg border border-dashed border-border bg-secondary/40 p-6 text-center sm:h-[360px] sm:min-h-[360px]">
+        <Receipt className="mb-3 h-8 w-8 shrink-0 text-muted-foreground" strokeWidth={1.75} />
+        <h4 className="mb-1 text-sm font-semibold text-foreground">No revenue data yet</h4>
+        <p className="mb-4 max-w-[240px] text-xs text-muted-foreground">
           Create your first invoice to start tracking revenue.
         </p>
         <Link href={`/${workspaceSlug}/invoices`}>
-          <Button size="sm" variant="default" className="font-medium text-xs rounded-md px-3.5 h-8 cursor-pointer">
+          <Button size="sm" variant="default">
             Create Invoice
           </Button>
         </Link>
@@ -72,11 +72,11 @@ export function RevenueChart({ data }: RevenueChartProps) {
         >
           <defs>
             <linearGradient id="revenueGradient" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor="var(--primary)" stopOpacity={0.12} />
-              <stop offset="95%" stopColor="var(--primary)" stopOpacity={0.0} />
+              <stop offset="5%" stopColor="var(--brand)" stopOpacity={0.14} />
+              <stop offset="95%" stopColor="var(--brand)" stopOpacity={0.0} />
             </linearGradient>
           </defs>
-          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border)" className="opacity-40" />
+          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border)" className="opacity-50" />
           <XAxis
             dataKey="name"
             stroke="var(--muted-foreground)"
@@ -93,15 +93,15 @@ export function RevenueChart({ data }: RevenueChartProps) {
             tickFormatter={(value) => `$${value}`}
             dx={-4}
           />
-          <Tooltip content={<CustomTooltip />} cursor={{ stroke: 'rgba(37, 99, 235, 0.16)', strokeWidth: 1 }} />
+          <Tooltip content={<CustomTooltip />} cursor={{ stroke: 'var(--border)', strokeWidth: 1 }} />
           <Area
             type="monotone"
             dataKey="revenue"
-            stroke="var(--primary)"
+            stroke="var(--brand)"
             strokeWidth={2}
             fillOpacity={1}
             fill="url(#revenueGradient)"
-            activeDot={{ r: 5, stroke: 'var(--primary)', strokeWidth: 2, fill: 'var(--card)' }}
+            activeDot={{ r: 5, stroke: 'var(--brand)', strokeWidth: 2, fill: 'var(--card)' }}
           />
         </AreaChart>
       </ResponsiveContainer>

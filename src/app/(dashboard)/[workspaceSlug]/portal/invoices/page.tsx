@@ -40,10 +40,10 @@ export default async function ClientInvoicesPage({ params }: PageProps) {
 
   if (!clientUser || clientUser.client.workspaceId !== workspace.id) {
     return (
-      <div className="flex flex-col items-center justify-center py-16 text-center space-y-4">
-        <AlertCircle className="h-12 w-12 text-red-500" />
-        <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-50">Access Denied</h2>
-        <p className="text-sm text-gray-500 dark:text-zinc-400">
+      <div className="flex flex-col items-center justify-center space-y-4 py-16 text-center">
+        <AlertCircle className="h-10 w-10 text-destructive" strokeWidth={1.75} />
+        <h2 className="font-heading text-xl font-bold text-foreground">Access Denied</h2>
+        <p className="text-sm text-muted-foreground">
           You do not have a client profile linked in this workspace.
         </p>
       </div>
@@ -88,85 +88,81 @@ export default async function ClientInvoicesPage({ params }: PageProps) {
   };
 
   const STATUS_COLORS: Record<string, string> = {
-    DRAFT: 'bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-200 border-zinc-200 dark:border-zinc-700',
-    SENT: 'bg-blue-50 text-blue-700 dark:bg-blue-950/40 dark:text-blue-300 border-blue-200 dark:border-blue-800',
-    PAID: 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800',
-    OVERDUE: 'bg-red-50 text-red-700 dark:bg-red-950/40 dark:text-red-300 border-red-200 dark:border-red-800',
-    CANCELLED: 'bg-amber-50 text-amber-800 dark:bg-amber-950/40 dark:text-amber-300 border-amber-200 dark:border-amber-800',
+    DRAFT: 'border-border bg-secondary text-foreground',
+    SENT: 'border-border bg-secondary text-foreground',
+    PAID: 'border-emerald-500/20 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400',
+    OVERDUE: 'border-red-500/20 bg-red-500/10 text-red-700 dark:text-red-400',
+    CANCELLED: 'border-amber-500/20 bg-amber-500/10 text-amber-700 dark:text-amber-400',
   };
 
   return (
     <div className="space-y-6">
-      {/* Header Panel */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-4 border-b border-border pb-5 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <h1 className="font-heading text-2xl font-bold tracking-tight text-foreground">Invoices & Billing</h1>
-          <p className="text-sm text-muted-foreground mt-0.5">
+          <p className="mt-1 text-sm text-muted-foreground">
             Review your billing statements, invoices, and payment history.
           </p>
         </div>
-        <div className="bg-card border border-border rounded-lg p-3 px-4 flex items-center gap-3">
-          <div>
-            <span className="text-[11px] text-muted-foreground uppercase font-semibold">Total Outstanding</span>
-            <div className="font-mono text-lg font-semibold tabular-nums text-foreground">
-              {formatCurrency(outstandingBalance)}
-            </div>
+        <div className="rounded-lg border border-border bg-card px-4 py-2.5">
+          <span className="text-[11px] font-medium text-muted-foreground">Total Outstanding</span>
+          <div className="font-heading text-lg font-bold tabular-nums text-foreground">
+            {formatCurrency(outstandingBalance)}
           </div>
         </div>
       </div>
 
-      {/* Invoices List Table */}
-      <Card className="border-border bg-card rounded-xl shadow-xs overflow-hidden">
+      <Card className="overflow-hidden border-border bg-card">
         <CardHeader className="border-b border-border pb-4">
-          <CardTitle className="text-base font-bold text-foreground flex items-center gap-2">
-            <FileText className="h-5 w-5 text-primary" /> Billing History
+          <CardTitle className="flex items-center gap-2 font-heading text-base font-bold text-foreground">
+            <FileText className="h-4 w-4 text-brand" strokeWidth={1.75} /> Billing History
           </CardTitle>
-          <CardDescription className="text-xs">
+          <CardDescription className="text-xs text-muted-foreground">
             A comprehensive list of all invoices issued to {clientUser.client.companyName}.
           </CardDescription>
         </CardHeader>
         <CardContent className="p-0">
           {invoices.length === 0 ? (
-            <div className="text-center py-12 text-muted-foreground space-y-2">
-              <FileText className="h-10 w-10 mx-auto text-muted-foreground/50" />
+            <div className="space-y-2 py-12 text-center text-muted-foreground">
+              <FileText className="mx-auto h-9 w-9 text-muted-foreground/50" />
               <p className="text-sm font-semibold text-foreground">No invoices found</p>
               <p className="text-xs text-muted-foreground">You have no invoices generated for your account.</p>
             </div>
           ) : (
             <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse">
+              <table className="w-full border-collapse text-left">
                 <thead>
-                  <tr className="border-b border-border bg-muted/40 text-xs font-bold text-muted-foreground">
-                    <th className="py-3 px-4 font-bold">Invoice Number</th>
-                    <th className="py-3 px-4 font-bold">Project</th>
-                    <th className="py-3 px-4 font-bold">Due Date</th>
-                    <th className="py-3 px-4 font-bold">Status</th>
-                    <th className="py-3 px-4 font-bold text-right">Total Amount</th>
-                    <th className="py-3 px-4 font-bold text-right">Actions</th>
+                  <tr className="border-b border-border bg-secondary/50 text-xs font-medium text-muted-foreground">
+                    <th className="px-4 py-3">Invoice Number</th>
+                    <th className="px-4 py-3">Project</th>
+                    <th className="px-4 py-3">Due Date</th>
+                    <th className="px-4 py-3">Status</th>
+                    <th className="px-4 py-3 text-right">Total Amount</th>
+                    <th className="px-4 py-3 text-right">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border text-xs">
                   {invoices.map((invoice) => (
-                    <tr key={invoice.id} className="hover:bg-muted/40 transition-colors">
-                      <td className="py-3.5 px-4 font-mono font-bold text-foreground">
+                    <tr key={invoice.id} className="transition-colors hover:bg-secondary/40">
+                      <td className="px-4 py-3.5 font-mono font-semibold text-foreground">
                         {invoice.invoiceNumber}
                       </td>
-                      <td className="py-3.5 px-4 text-muted-foreground font-medium">
+                      <td className="px-4 py-3.5 font-medium text-muted-foreground">
                         {invoice.project?.name || 'General Billing'}
                       </td>
-                      <td className="py-3.5 px-4 text-muted-foreground font-medium">
+                      <td className="px-4 py-3.5 font-medium text-muted-foreground">
                         {formatDate(invoice.dueDate)}
                       </td>
-                      <td className="py-3.5 px-4">
-                        <Badge variant="outline" className={`text-[11px] font-semibold uppercase tracking-wider px-2 border ${STATUS_COLORS[invoice.status]}`}>
+                      <td className="px-4 py-3.5">
+                        <Badge variant="outline" className={`px-2 text-[11px] font-medium ${STATUS_COLORS[invoice.status] || 'border-border bg-secondary text-foreground'}`}>
                           {invoice.status}
                         </Badge>
                       </td>
-                      <td className="py-3.5 px-4 text-right font-mono font-semibold tabular-nums text-foreground">
+                      <td className="px-4 py-3.5 text-right font-mono font-semibold tabular-nums text-foreground">
                         {formatCurrency(Number(invoice.totalAmount), invoice.currency)}
                       </td>
-                      <td className="py-3.5 px-4 text-right">
-                        <a 
+                      <td className="px-4 py-3.5 text-right">
+                        <a
                           href={`/api/v1/invoices/${invoice.id}/pdf?workspaceId=${workspace.id}`}
                           target="_blank"
                           rel="noreferrer"
@@ -174,7 +170,7 @@ export default async function ClientInvoicesPage({ params }: PageProps) {
                           <Button
                             variant="ghost"
                             size="icon"
-                            className="h-7 w-7 text-zinc-400 hover:text-slate-600 dark:hover:text-zinc-200"
+                            className="h-7 w-7 text-muted-foreground hover:text-foreground"
                             title="Download PDF"
                           >
                             <Download className="h-3.5 w-3.5" />

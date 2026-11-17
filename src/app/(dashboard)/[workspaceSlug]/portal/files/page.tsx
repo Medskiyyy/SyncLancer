@@ -38,10 +38,10 @@ export default async function ClientFilesPage({ params }: PageProps) {
 
   if (!clientUser || clientUser.client.workspaceId !== workspace.id) {
     return (
-      <div className="flex flex-col items-center justify-center py-16 text-center space-y-4">
-        <AlertCircle className="h-12 w-12 text-red-500" />
-        <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-50">Access Denied</h2>
-        <p className="text-sm text-gray-500 dark:text-zinc-400">
+      <div className="flex flex-col items-center justify-center space-y-4 py-16 text-center">
+        <AlertCircle className="h-10 w-10 text-destructive" strokeWidth={1.75} />
+        <h2 className="font-heading text-xl font-bold text-foreground">Access Denied</h2>
+        <p className="text-sm text-muted-foreground">
           You do not have a client profile linked in this workspace.
         </p>
       </div>
@@ -91,9 +91,9 @@ export default async function ClientFilesPage({ params }: PageProps) {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">Shared Documents</h1>
-        <p className="text-sm text-gray-500 dark:text-zinc-400 mt-0.5">
+      <div className="border-b border-border pb-5">
+        <h1 className="font-heading text-2xl font-bold tracking-tight text-foreground">Shared Documents</h1>
+        <p className="mt-1 text-sm text-muted-foreground">
           Access shared project deliverables, guidelines, assets, or upload references for the project owner.
         </p>
       </div>

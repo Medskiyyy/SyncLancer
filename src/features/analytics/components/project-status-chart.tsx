@@ -11,12 +11,12 @@ interface ProjectStatusChartProps {
 }
 
 const STATUS_COLORS: Record<string, string> = {
-  'Draft': '#64748b',
-  'Active': '#2563eb',
+  Draft: '#a3a39e',
+  Active: 'var(--brand)',
   'On Hold': '#d97706',
-  'Review': '#8b5cf6',
-  'Completed': '#059669',
-  'Cancelled': '#dc2626',
+  Review: '#52524e',
+  Completed: 'var(--foreground)',
+  Cancelled: '#dc2626',
 };
 
 interface ChartTooltipProps {
@@ -29,8 +29,8 @@ function CustomTooltip({ active, payload, label }: ChartTooltipProps) {
   if (active && payload && payload.length) {
     return (
       <div className="rounded-md border border-border bg-popover p-3 text-xs text-popover-foreground shadow-lg">
-        <p className="font-semibold text-zinc-900 dark:text-zinc-50">{label}</p>
-        <p className="mt-1 font-bold text-primary dark:text-primary">
+        <p className="font-semibold text-foreground">{label}</p>
+        <p className="mt-1 font-mono font-bold tabular-nums text-brand">
           {payload[0].value} {payload[0].value === 1 ? 'Project' : 'Projects'}
         </p>
       </div>
@@ -47,14 +47,14 @@ export function ProjectStatusChart({ data }: ProjectStatusChartProps) {
 
   if (!hasData) {
     return (
-      <div className="flex min-h-[260px] h-[260px] sm:min-h-[360px] sm:h-[360px] flex-col items-center justify-center rounded-lg border border-dashed border-border bg-muted/30 p-6 text-center">
-        <FolderKanban className="h-10 w-10 text-zinc-400 dark:text-zinc-600 mb-3 shrink-0" />
-        <h4 className="text-sm font-bold text-zinc-900 dark:text-zinc-100 mb-1">No projects data yet</h4>
-        <p className="text-xs text-zinc-500 dark:text-zinc-400 max-w-[240px] mb-4">
+      <div className="flex h-[260px] min-h-[260px] flex-col items-center justify-center rounded-lg border border-dashed border-border bg-secondary/40 p-6 text-center sm:h-[360px] sm:min-h-[360px]">
+        <FolderKanban className="mb-3 h-8 w-8 shrink-0 text-muted-foreground" strokeWidth={1.75} />
+        <h4 className="mb-1 text-sm font-semibold text-foreground">No projects data yet</h4>
+        <p className="mb-4 max-w-[240px] text-xs text-muted-foreground">
           Create your first project to start managing tasks, milestones, and time entries.
         </p>
         <Link href={`/${workspaceSlug}/projects/new`}>
-          <Button size="sm" variant="default" className="font-medium text-xs rounded-md px-3.5 h-8 cursor-pointer">
+          <Button size="sm" variant="default">
             Create Project
           </Button>
         </Link>
@@ -75,7 +75,7 @@ export function ProjectStatusChart({ data }: ProjectStatusChartProps) {
           }}
           barSize={24}
         >
-          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border)" className="opacity-40" />
+          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border)" className="opacity-50" />
           <XAxis
             dataKey="status"
             stroke="var(--muted-foreground)"
@@ -92,10 +92,10 @@ export function ProjectStatusChart({ data }: ProjectStatusChartProps) {
             allowDecimals={false}
             dx={-4}
           />
-          <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(37, 99, 235, 0.06)' }} />
+          <Tooltip content={<CustomTooltip />} cursor={{ fill: 'var(--secondary)' }} />
           <Bar dataKey="count" radius={[4, 4, 0, 0]}>
             {data.map((entry, index) => (
-              <Cell key={`cell-${index}`} fill={STATUS_COLORS[entry.status] || 'var(--primary)'} />
+              <Cell key={`cell-${index}`} fill={STATUS_COLORS[entry.status] || 'var(--foreground)'} />
             ))}
           </Bar>
         </BarChart>

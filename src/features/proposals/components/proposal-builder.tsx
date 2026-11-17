@@ -166,22 +166,22 @@ export function ProposalBuilder({
   };
 
   return (
-    <div className="space-y-6 max-w-5xl mx-auto animate-in fade-in-50 duration-300">
+    <div className="space-y-6 max-w-5xl mx-auto">
       {/* Back Link */}
       <div className="flex items-center gap-2">
         <Link href={`/${workspaceSlug}/proposals`}>
-          <Button variant="ghost" size="sm" className="flex items-center gap-1.5 cursor-pointer text-xs font-semibold hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-500 hover:text-zinc-900">
+          <Button variant="ghost" size="sm" className="flex items-center gap-1.5 cursor-pointer text-xs font-semibold text-muted-foreground hover:text-foreground">
             <ArrowLeft className="h-4 w-4" />
             <span>Back to Proposals</span>
           </Button>
         </Link>
       </div>
 
-      <div className="border-b border-zinc-200/60 dark:border-zinc-800/80 pb-5">
-        <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight text-zinc-900 dark:text-zinc-50">
-          {isEditMode ? `Edit Proposal — ${initialProposal.proposalNumber}` : 'New Proposal Draft'}
+      <div className="border-b border-border pb-5">
+        <h1 className="font-heading text-2xl md:text-3xl font-bold tracking-tight text-foreground">
+          {isEditMode ? `Edit Proposal - ${initialProposal.proposalNumber}` : 'New Proposal Draft'}
         </h1>
-        <p className="text-sm text-zinc-500 dark:text-zinc-400">
+        <p className="text-sm text-muted-foreground mt-1">
           {isEditMode 
             ? 'Modify line items, adjust tax rates, and update scope descriptions.' 
             : 'Structure your service quotation, details, and project outline for review.'}
@@ -189,12 +189,12 @@ export function ProposalBuilder({
       </div>
 
       {clients.length === 0 ? (
-        <Card className="p-8 text-center border-dashed border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 rounded-xl shadow-xs">
-          <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 text-primary border border-primary/20 mx-auto mb-4">
+        <Card className="p-8 text-center border-dashed border-border bg-card rounded-lg">
+          <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-brand/10 text-brand border border-brand/20 mx-auto mb-4">
             <AlertCircle className="h-6 w-6" />
           </div>
-          <CardTitle className="text-sm font-bold text-zinc-900 dark:text-zinc-50">No clients available</CardTitle>
-          <CardDescription className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
+          <CardTitle className="font-heading text-sm font-bold text-foreground">No clients available</CardTitle>
+          <CardDescription className="mt-1 text-xs text-muted-foreground">
             You must create at least one active client before you can draft a proposal.
           </CardDescription>
           <Link href={`/${workspaceSlug}/clients`} className="mt-4 inline-block">
@@ -207,10 +207,10 @@ export function ProposalBuilder({
             {/* Left side: Form Details */}
             <div className="md:col-span-2 space-y-6">
               {/* Basic Information */}
-              <Card className="shadow-xs border border-zinc-200/60 dark:border-zinc-800/80 rounded-xl overflow-hidden bg-white dark:bg-zinc-900">
-                <CardHeader className="pb-4 border-b border-gray-100 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/30">
-                  <CardTitle className="text-xs font-bold uppercase tracking-wider text-zinc-900 dark:text-zinc-50 flex items-center gap-2">
-                    <FileText className="h-4 w-4 text-primary" />
+              <Card className="border border-border rounded-lg overflow-hidden bg-card">
+                <CardHeader className="pb-4 border-b border-border bg-muted/30">
+                  <CardTitle className="font-heading text-sm font-bold text-foreground flex items-center gap-2">
+                    <FileText className="h-4 w-4 text-brand" />
                     <span>Proposal Information</span>
                   </CardTitle>
                 </CardHeader>
@@ -221,21 +221,21 @@ export function ProposalBuilder({
                       name="clientId"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-xs font-semibold text-zinc-700 dark:text-zinc-300">Recipient Client</FormLabel>
+                          <FormLabel className="text-xs font-semibold text-foreground">Recipient Client</FormLabel>
                           {isEditMode ? (
-                            <div className="h-9 px-3 py-2 border border-zinc-200 bg-zinc-50 rounded-lg text-xs text-zinc-500 font-semibold select-none dark:bg-zinc-950 dark:border-zinc-800/80">
+                            <div className="h-9 px-3 py-2 border border-border bg-muted/40 rounded-lg text-xs text-muted-foreground font-semibold select-none">
                               {initialProposal.client ? initialProposal.client.companyName : 'Selected Client'}
                             </div>
                           ) : (
                             <Select onValueChange={field.onChange} defaultValue={field.value}>
                               <FormControl>
-                                <SelectTrigger className="text-xs h-9 rounded-lg bg-white dark:bg-zinc-900">
+                                <SelectTrigger className="text-xs h-9 rounded-lg bg-background border-border">
                                   <SelectValue placeholder="Select a client...">
                                     {field.value ? (clients.find(c => c.id === field.value)?.companyName || field.value) : undefined}
                                   </SelectValue>
                                 </SelectTrigger>
                               </FormControl>
-                              <SelectContent className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-xs">
+                              <SelectContent className="bg-card border border-border text-xs">
                                 {clients.map((client) => (
                                   <SelectItem key={client.id} value={client.id}>
                                     {client.companyName}
@@ -244,7 +244,7 @@ export function ProposalBuilder({
                               </SelectContent>
                             </Select>
                           )}
-                          <FormMessage className="text-[10px]" />
+                          <FormMessage className="text-[11px]" />
                         </FormItem>
                       )}
                     />
@@ -254,11 +254,11 @@ export function ProposalBuilder({
                       name="expiresAt"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-xs font-semibold text-zinc-700 dark:text-zinc-300">Expiry Date</FormLabel>
+                          <FormLabel className="text-xs font-semibold text-foreground">Expiry Date</FormLabel>
                           <FormControl>
                             <Input
                               type="date"
-                              className="text-xs h-9 rounded-lg bg-white dark:bg-zinc-900"
+                              className="text-xs h-9 rounded-lg bg-background border-border"
                               name={field.name}
                               ref={field.ref}
                               onBlur={field.onBlur}
@@ -266,7 +266,7 @@ export function ProposalBuilder({
                               value={field.value instanceof Date ? field.value.toISOString().split('T')[0] : field.value}
                             />
                           </FormControl>
-                          <FormMessage className="text-[10px]" />
+                          <FormMessage className="text-[11px]" />
                         </FormItem>
                       )}
                     />
@@ -277,11 +277,11 @@ export function ProposalBuilder({
                     name="title"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-xs font-semibold text-zinc-700 dark:text-zinc-300">Proposal Subject Title</FormLabel>
+                        <FormLabel className="text-xs font-semibold text-foreground">Proposal Subject Title</FormLabel>
                         <FormControl>
-                          <Input placeholder="E.g., Web Design & Development Scopes" className="text-xs h-9 rounded-lg bg-white dark:bg-zinc-900" {...field} />
+                          <Input placeholder="E.g., Web Design & Development Scopes" className="text-xs h-9 rounded-lg bg-background border-border" {...field} />
                         </FormControl>
-                        <FormMessage className="text-[10px]" />
+                        <FormMessage className="text-[11px]" />
                       </FormItem>
                     )}
                   />
@@ -291,15 +291,15 @@ export function ProposalBuilder({
                     name="description"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-xs font-semibold text-zinc-700 dark:text-zinc-300">Scope Description / Conditions</FormLabel>
+                        <FormLabel className="text-xs font-semibold text-foreground">Scope Description / Conditions</FormLabel>
                         <FormControl>
                           <Textarea 
                             placeholder="Introduce the objective, details of services, milestones, and payment conditions..." 
-                            className="text-xs min-h-[100px] resize-none rounded-lg bg-white dark:bg-zinc-900"
+                            className="text-xs min-h-[100px] resize-none rounded-lg bg-background border-border"
                             {...field} 
                           />
                         </FormControl>
-                        <FormMessage className="text-[10px]" />
+                        <FormMessage className="text-[11px]" />
                       </FormItem>
                     )}
                   />
@@ -307,18 +307,18 @@ export function ProposalBuilder({
               </Card>
 
               {/* Service Line Items */}
-              <Card className="shadow-xs border border-zinc-200/60 dark:border-zinc-800/80 rounded-xl overflow-hidden bg-white dark:bg-zinc-900">
-                <CardHeader className="flex flex-row items-center justify-between pb-4 border-b border-gray-100 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/30">
+              <Card className="border border-border rounded-lg overflow-hidden bg-card">
+                <CardHeader className="flex flex-row items-center justify-between pb-4 border-b border-border bg-muted/30">
                   <div>
-                    <CardTitle className="text-xs font-bold uppercase tracking-wider text-zinc-900 dark:text-zinc-50">Scope & Pricing Items</CardTitle>
-                    <CardDescription className="text-[10px] text-zinc-500 dark:text-zinc-400">Add service line items with cost calculations</CardDescription>
+                    <CardTitle className="font-heading text-sm font-bold text-foreground">Scope & Pricing Items</CardTitle>
+                    <CardDescription className="text-xs text-muted-foreground">Add service line items with cost calculations</CardDescription>
                   </div>
                   <Button 
                     type="button" 
                     variant="outline" 
                     size="sm"
                     onClick={() => append({ name: '', description: '', quantity: 1, unitPrice: 0 })}
-                    className="cursor-pointer text-[10px] font-bold h-8 rounded-lg flex items-center gap-1 bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50"
+                    className="cursor-pointer text-xs font-semibold h-8 rounded-lg flex items-center gap-1 bg-background border-border text-foreground"
                   >
                     <PlusCircle className="h-3.5 w-3.5" />
                     <span>Add Item</span>
@@ -328,7 +328,7 @@ export function ProposalBuilder({
                   {fields.map((field, index) => (
                     <div 
                       key={field.id} 
-                      className="p-4 rounded-xl bg-zinc-50/50 border border-zinc-200/60 dark:bg-zinc-950/20 dark:border-zinc-800/80 space-y-3"
+                      className="p-4 rounded-lg bg-muted/30 border border-border space-y-3"
                     >
                       <div className="flex justify-between items-start gap-4">
                         <FormField
@@ -337,9 +337,9 @@ export function ProposalBuilder({
                           render={({ field }) => (
                             <FormItem className="flex-1">
                               <FormControl>
-                                <Input placeholder="Service title (e.g. Design Wireframes)" className="text-xs h-9 rounded-lg bg-white dark:bg-zinc-900" {...field} />
+                                <Input placeholder="Service title (e.g. Design Wireframes)" className="text-xs h-9 rounded-lg bg-background border-border" {...field} />
                               </FormControl>
-                              <FormMessage className="text-[10px]" />
+                              <FormMessage className="text-[11px]" />
                             </FormItem>
                           )}
                         />
@@ -349,7 +349,7 @@ export function ProposalBuilder({
                             variant="ghost" 
                             size="icon" 
                             onClick={() => remove(index)}
-                            className="h-9 w-9 text-zinc-400 hover:text-destructive hover:bg-destructive/5 rounded-lg shrink-0 cursor-pointer"
+                            className="h-9 w-9 text-muted-foreground hover:text-destructive hover:bg-destructive/5 rounded-lg shrink-0 cursor-pointer"
                           >
                             <Trash2 className="h-4 w-4" />
                           </Button>
@@ -364,11 +364,11 @@ export function ProposalBuilder({
                             <FormControl>
                               <Textarea 
                                 placeholder="Describe details, deliverables or timeline details (optional)..." 
-                                className="text-xs h-14 resize-none rounded-lg bg-white dark:bg-zinc-900"
+                                className="text-xs h-14 resize-none rounded-lg bg-background border-border"
                                 {...field} 
                               />
                             </FormControl>
-                            <FormMessage className="text-[10px]" />
+                            <FormMessage className="text-[11px]" />
                           </FormItem>
                         )}
                       />
@@ -379,17 +379,17 @@ export function ProposalBuilder({
                           name={`items.${index}.quantity`}
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel className="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider">Qty</FormLabel>
+                              <FormLabel className="text-xs font-medium text-muted-foreground">Qty</FormLabel>
                               <FormControl>
                                 <Input 
                                   type="number" 
                                   min="1"
-                                  className="text-xs h-9 rounded-lg bg-white dark:bg-zinc-900"
+                                  className="text-xs h-9 rounded-lg bg-background border-border font-mono tabular-nums"
                                   onChange={e => field.onChange(parseInt(e.target.value) || 0)}
                                   value={field.value} 
                                 />
                               </FormControl>
-                              <FormMessage className="text-[10px]" />
+                              <FormMessage className="text-[11px]" />
                             </FormItem>
                           )}
                         />
@@ -399,28 +399,28 @@ export function ProposalBuilder({
                           name={`items.${index}.unitPrice`}
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel className="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider">Unit Price</FormLabel>
+                              <FormLabel className="text-xs font-medium text-muted-foreground">Unit Price</FormLabel>
                               <FormControl>
                                 <div className="relative">
-                                  <span className="absolute left-2.5 top-2.5 text-zinc-400 text-xs font-semibold">{currentSymbol}</span>
+                                  <span className="absolute left-2.5 top-2.5 text-muted-foreground text-xs font-semibold">{currentSymbol}</span>
                                   <Input 
                                     type="number" 
                                     min="0"
                                     step="0.01"
-                                    className="pl-7 text-xs h-9 rounded-lg bg-white dark:bg-zinc-900"
+                                    className="pl-7 text-xs h-9 rounded-lg bg-background border-border font-mono tabular-nums"
                                     onChange={e => field.onChange(parseFloat(e.target.value) || 0)}
                                     value={field.value === 0 ? '' : field.value} 
                                   />
                                 </div>
                               </FormControl>
-                              <FormMessage className="text-[10px]" />
+                              <FormMessage className="text-[11px]" />
                             </FormItem>
                           )}
                         />
 
                         <div className="flex flex-col justify-end text-right pb-1">
-                          <span className="text-[11px] text-zinc-500 dark:text-zinc-400 uppercase font-semibold tracking-wider">Subtotal</span>
-                          <span className="text-sm font-bold text-zinc-900 dark:text-zinc-100 font-mono mt-0.5">
+                          <span className="text-xs text-muted-foreground font-medium">Subtotal</span>
+                          <span className="text-sm font-bold text-foreground font-mono tabular-nums mt-0.5">
                             {new Intl.NumberFormat('en-US', {
                               style: 'currency',
                               currency: watchCurrency,
@@ -443,32 +443,32 @@ export function ProposalBuilder({
             {/* Right side: Summary & Settings */}
             <div className="md:col-span-1 space-y-6">
               {/* Invoice Calculations */}
-              <Card className="shadow-xs border border-border rounded-xl overflow-hidden bg-white dark:bg-zinc-900">
-                <CardHeader className="bg-zinc-50 dark:bg-zinc-900/50 pb-4 border-b border-gray-100 dark:border-zinc-800">
-                  <CardTitle className="text-xs font-bold text-zinc-400 uppercase tracking-wider">Cost Summary</CardTitle>
+              <Card className="border border-border rounded-lg overflow-hidden bg-card">
+                <CardHeader className="bg-muted/30 pb-4 border-b border-border">
+                  <CardTitle className="font-heading text-xs font-bold text-muted-foreground">Cost Summary</CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-4 pt-5 text-xs font-semibold">
+                <CardContent className="space-y-4 pt-5 text-xs font-medium">
                   {/* Currency settings */}
                   <FormField
                     control={control}
                     name="currency"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-xs text-zinc-700 dark:text-zinc-300">Pricing Currency</FormLabel>
+                        <FormLabel className="text-xs text-foreground">Pricing Currency</FormLabel>
                         <Select onValueChange={field.onChange} defaultValue={field.value}>
                           <FormControl>
-                            <SelectTrigger className="text-xs h-9 rounded-lg bg-white dark:bg-zinc-950">
+                            <SelectTrigger className="text-xs h-9 rounded-lg bg-background border-border">
                               <SelectValue placeholder="Select currency..." />
                             </SelectTrigger>
                           </FormControl>
-                          <SelectContent className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-xs">
+                          <SelectContent className="bg-card border border-border text-xs">
                             <SelectItem value="USD">USD ($)</SelectItem>
                             <SelectItem value="EUR">EUR (€)</SelectItem>
                             <SelectItem value="GBP">GBP (£)</SelectItem>
                             <SelectItem value="IDR">IDR (Rp)</SelectItem>
                           </SelectContent>
                         </Select>
-                        <FormMessage className="text-[10px]" />
+                        <FormMessage className="text-[11px]" />
                       </FormItem>
                     )}
                   />
@@ -479,51 +479,51 @@ export function ProposalBuilder({
                     name="taxRate"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-xs text-zinc-700 dark:text-zinc-300">Tax Rate (%)</FormLabel>
+                        <FormLabel className="text-xs text-foreground">Tax Rate (%)</FormLabel>
                         <FormControl>
                           <Input 
                             type="number" 
                             min="0"
                             max="100"
                             step="0.1"
-                            className="text-xs h-9 rounded-lg bg-white dark:bg-zinc-950"
+                            className="text-xs h-9 rounded-lg bg-background border-border font-mono tabular-nums"
                             onChange={e => field.onChange(parseFloat(e.target.value) || 0)}
                             value={field.value} 
                           />
                         </FormControl>
-                        <FormMessage className="text-[10px]" />
+                        <FormMessage className="text-[11px]" />
                       </FormItem>
                     )}
                   />
 
-                  <div className="border-t border-gray-100 dark:border-zinc-800 pt-4 space-y-2 font-medium">
-                    <div className="flex justify-between text-zinc-500 dark:text-zinc-400">
+                  <div className="border-t border-border pt-4 space-y-2">
+                    <div className="flex justify-between text-muted-foreground">
                       <span>Subtotal</span>
-                      <span className="font-bold text-zinc-900 dark:text-zinc-100 font-mono">
+                      <span className="font-semibold text-foreground font-mono tabular-nums">
                         {new Intl.NumberFormat('en-US', { style: 'currency', currency: watchCurrency, minimumFractionDigits: 0 }).format(subtotal)}
                       </span>
                     </div>
-                    <div className="flex justify-between text-zinc-500 dark:text-zinc-400">
+                    <div className="flex justify-between text-muted-foreground">
                       <span>Tax ({watchTaxRate}%)</span>
-                      <span className="font-bold text-zinc-900 dark:text-zinc-100 font-mono">
+                      <span className="font-semibold text-foreground font-mono tabular-nums">
                         {new Intl.NumberFormat('en-US', { style: 'currency', currency: watchCurrency, minimumFractionDigits: 0 }).format(taxAmount)}
                       </span>
                     </div>
-                    <div className="flex justify-between border-t border-dashed border-zinc-200 dark:border-zinc-700/80 pt-3.5 font-bold text-zinc-900 dark:text-zinc-50 text-sm">
+                    <div className="flex justify-between border-t border-dashed border-border pt-3.5 font-bold text-foreground text-sm">
                       <span>Total Amount</span>
-                      <span className="text-primary font-mono font-black">
+                      <span className="text-foreground font-mono tabular-nums font-bold">
                         {new Intl.NumberFormat('en-US', { style: 'currency', currency: watchCurrency, minimumFractionDigits: 0 }).format(totalAmount)}
                       </span>
                     </div>
                   </div>
                 </CardContent>
-                <CardFooter className="bg-zinc-50/50 dark:bg-zinc-900/50 p-4 border-t border-gray-100 dark:border-zinc-800 flex flex-col gap-2">
+                <CardFooter className="bg-muted/30 p-4 border-t border-border flex flex-col gap-2">
                   <Button type="submit" disabled={isLoading} className="w-full flex items-center justify-center gap-1.5 cursor-pointer text-xs h-9 font-semibold">
                     <Save className="h-4 w-4" />
                     <span>{isLoading ? 'Saving...' : isEditMode ? 'Save Changes' : 'Save Draft'}</span>
                   </Button>
                   <Link href={`/${workspaceSlug}/proposals`} className="w-full">
-                    <Button type="button" variant="outline" className="w-full cursor-pointer text-xs h-9 font-semibold bg-white dark:bg-zinc-950">
+                    <Button type="button" variant="outline" className="w-full cursor-pointer text-xs h-9 font-semibold bg-background border-border">
                       Cancel
                     </Button>
                   </Link>
