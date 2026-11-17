@@ -342,7 +342,7 @@ export function InvoiceManager({ projectId, workspaceId, clientId, initialInvoic
             <div className="text-xl font-black text-slate-950 dark:text-zinc-50">
               {formatCurrency(invoiceStats.totalInvoiced, currency)}
             </div>
-            <p className="text-[9px] text-slate-400 dark:text-zinc-500 mt-1">Excludes cancelled invoices</p>
+            <p className="text-xs text-muted-foreground mt-1">Excludes cancelled invoices</p>
           </CardContent>
         </Card>
 
@@ -352,10 +352,10 @@ export function InvoiceManager({ projectId, workspaceId, clientId, initialInvoic
             <CheckCircle className="h-4 w-4 text-emerald-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-xl font-black text-slate-950 dark:text-zinc-50 text-emerald-700 dark:text-emerald-500">
+            <div className="text-xl font-black text-emerald-700 dark:text-emerald-400">
               {formatCurrency(invoiceStats.collected, currency)}
             </div>
-            <p className="text-[9px] text-slate-400 dark:text-zinc-500 mt-1">Paid in full</p>
+            <p className="text-xs text-muted-foreground mt-1">Paid in full</p>
           </CardContent>
         </Card>
 
@@ -365,10 +365,10 @@ export function InvoiceManager({ projectId, workspaceId, clientId, initialInvoic
             <CreditCard className="h-4 w-4 text-blue-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-xl font-black text-slate-950 dark:text-zinc-50 text-blue-700 dark:text-blue-500">
+            <div className="text-xl font-black text-blue-700 dark:text-blue-400">
               {formatCurrency(invoiceStats.pending, currency)}
             </div>
-            <p className="text-[9px] text-slate-400 dark:text-zinc-500 mt-1">Sent to client, awaiting payment</p>
+            <p className="text-xs text-muted-foreground mt-1">Sent to client, awaiting payment</p>
           </CardContent>
         </Card>
 
@@ -378,10 +378,10 @@ export function InvoiceManager({ projectId, workspaceId, clientId, initialInvoic
             <FileText className="h-4 w-4 text-zinc-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-xl font-black text-slate-950 dark:text-zinc-50 text-slate-600 dark:text-zinc-400">
+            <div className="text-xl font-black text-slate-700 dark:text-zinc-300">
               {formatCurrency(invoiceStats.drafts, currency)}
             </div>
-            <p className="text-[9px] text-slate-400 dark:text-zinc-500 mt-1">Unsent invoices</p>
+            <p className="text-xs text-muted-foreground mt-1">Unsent invoices</p>
           </CardContent>
         </Card>
       </div>
@@ -522,7 +522,7 @@ export function InvoiceManager({ projectId, workspaceId, clientId, initialInvoic
                         {formatDate(invoice.dueDate)}
                       </td>
                       <td className="py-3.5 px-4">
-                        <Badge variant="outline" className={`cursor-pointer text-[9px] font-bold uppercase tracking-wider px-2 border ${STATUS_COLORS[invoice.status]}`}>
+                        <Badge variant="outline" className={`cursor-pointer text-[11px] font-semibold uppercase tracking-wider px-2 border ${STATUS_COLORS[invoice.status]}`}>
                           {invoice.status}
                         </Badge>
                       </td>
@@ -739,7 +739,7 @@ export function InvoiceManager({ projectId, workspaceId, clientId, initialInvoic
                 </div>
                 <div className="flex justify-between border-t border-slate-200 dark:border-zinc-800/80 pt-2 text-sm font-bold">
                   <span className="text-zinc-950 dark:text-zinc-50">Grand Total:</span>
-                  <span className="text-primary dark:text-indigo-400">{formatCurrency(totalAmount, currency)}</span>
+                  <span className="text-primary">{formatCurrency(totalAmount, currency)}</span>
                 </div>
               </div>
             </div>

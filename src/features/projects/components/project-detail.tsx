@@ -480,7 +480,7 @@ export function ProjectDetail({ project, workspaceSlug }: ProjectDetailProps) {
                         </div>
                       </div>
                       <div className="flex items-center gap-2">
-                        <Badge className={`w-fit uppercase tracking-wider text-[9px] font-semibold ${MILESTONE_STATUS_COLORS[milestone.status]}`}>
+                        <Badge className={`w-fit uppercase tracking-wider text-[11px] font-semibold ${MILESTONE_STATUS_COLORS[milestone.status]}`}>
                           {milestone.status.replace('_', ' ')}
                         </Badge>
                         <Button
@@ -517,7 +517,7 @@ export function ProjectDetail({ project, workspaceSlug }: ProjectDetailProps) {
                               <CheckSquare className="h-3.5 w-3.5 text-primary" />
                               {task.title}
                             </span>
-                            <Badge variant="outline" className={`cursor-pointer text-[9px] px-1.5 border tracking-wide uppercase font-semibold ${TASK_PRIORITY_COLORS[task.priority]}`}>
+                            <Badge variant="outline" className={`cursor-pointer text-[11px] px-1.5 border tracking-wide uppercase font-semibold ${TASK_PRIORITY_COLORS[task.priority]}`}>
                               {task.priority}
                             </Badge>
                           </div>

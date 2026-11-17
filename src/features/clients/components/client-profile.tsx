@@ -152,16 +152,16 @@ export function ClientProfile({ client, files, workspaceId, workspaceSlug }: Cli
                         <div className="flex items-center gap-3">
                           <div className="flex items-center gap-1.5">
                             <div className="h-1.5 w-16 bg-zinc-100 dark:bg-zinc-800 rounded-full overflow-hidden">
-                              <div className="h-full bg-gradient-to-r from-amber-500 to-amber-600" style={{ width: `${project.progress}%` }} />
+                              <div className="h-full bg-primary" style={{ width: `${project.progress}%` }} />
                             </div>
-                            <span className="text-[10px] font-mono font-bold text-slate-600 dark:text-zinc-400">{project.progress}%</span>
+                            <span className="text-[11px] font-mono font-bold text-slate-600 dark:text-zinc-400">{project.progress}%</span>
                           </div>
                           <Badge 
                             className={cn(
-                              "text-[9px] font-bold px-1.5 py-0.5",
+                              "text-[11px] font-semibold px-1.5 py-0.5",
                               project.status === 'ACTIVE' 
-                                ? "bg-green-500/10 text-green-600 dark:text-green-400 border border-green-600/15"
-                                : "bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 border border-zinc-200/30"
+                                ? "bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-600/20"
+                                : "bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 border border-zinc-200/40"
                             )}
                             variant="secondary"
                           >
@@ -207,7 +207,7 @@ export function ClientProfile({ client, files, workspaceId, workspaceSlug }: Cli
                 <div className="overflow-x-auto">
                   <table className="w-full text-left border-collapse text-xs">
                     <thead>
-                      <tr className="border-b border-gray-100 dark:border-zinc-800 text-[9px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider bg-zinc-50/50 dark:bg-zinc-900/30">
+                      <tr className="border-b border-gray-100 dark:border-zinc-800 text-[11px] font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider bg-zinc-50/50 dark:bg-zinc-900/30">
                         <th className="px-5 py-3">Number</th>
                         <th className="px-5 py-3">Proposal Title</th>
                         <th className="px-5 py-3">Total Cost</th>
@@ -218,26 +218,26 @@ export function ClientProfile({ client, files, workspaceId, workspaceSlug }: Cli
                     <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800/60 bg-white dark:bg-zinc-900">
                       {client.proposals.map((proposal) => (
                         <tr key={proposal.id} className="hover:bg-zinc-50/40 dark:hover:bg-zinc-900/40 transition-colors">
-                          <td className="px-5 py-3 font-mono font-bold text-zinc-600 dark:text-zinc-400 text-[10px]">
+                          <td className="px-5 py-3 font-mono font-bold text-zinc-600 dark:text-zinc-400 text-xs">
                             {proposal.proposalNumber}
                           </td>
                           <td className="px-5 py-3 font-semibold text-zinc-800 dark:text-zinc-200">
                             {proposal.title}
                           </td>
-                          <td className="px-5 py-3 font-bold font-mono text-zinc-900 dark:text-zinc-100">
+                          <td className="px-5 py-3 font-bold font-mono tabular-nums text-zinc-900 dark:text-zinc-100">
                             {new Intl.NumberFormat('en-US', { style: 'currency', currency: proposal.currency }).format(Number(proposal.totalAmount))}
                           </td>
                           <td className="px-5 py-3">
                             <Badge 
                               className={cn(
-                                "text-[9px] font-bold px-1.5 py-0.5",
+                                "text-[11px] font-semibold px-1.5 py-0.5",
                                 proposal.status === 'APPROVED' 
-                                  ? "bg-green-500/10 text-green-600 dark:text-green-400 border border-green-600/15"
+                                  ? "bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-600/20"
                                   : proposal.status === 'SENT'
-                                    ? "bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-600/15"
+                                    ? "bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-600/20"
                                     : proposal.status === 'REJECTED'
-                                      ? "bg-red-500/10 text-red-700 dark:text-red-400 border border-red-600/15"
-                                      : "bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 border border-zinc-200/30"
+                                      ? "bg-red-500/10 text-red-700 dark:text-red-400 border border-red-600/20"
+                                      : "bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 border border-zinc-200/40"
                               )}
                               variant="secondary"
                             >
@@ -276,7 +276,7 @@ export function ClientProfile({ client, files, workspaceId, workspaceSlug }: Cli
                 <div className="overflow-x-auto">
                   <table className="w-full text-left border-collapse text-xs">
                     <thead>
-                      <tr className="border-b border-gray-100 dark:border-zinc-800 text-[9px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider bg-zinc-50/50 dark:bg-zinc-900/30">
+                      <tr className="border-b border-gray-100 dark:border-zinc-800 text-[11px] font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider bg-zinc-50/50 dark:bg-zinc-900/30">
                         <th className="px-5 py-3">Invoice Number</th>
                         <th className="px-5 py-3">Total Amount</th>
                         <th className="px-5 py-3">Payment Status</th>
@@ -286,23 +286,23 @@ export function ClientProfile({ client, files, workspaceId, workspaceSlug }: Cli
                     <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800/60 bg-white dark:bg-zinc-900">
                       {client.invoices.map((invoice) => (
                         <tr key={invoice.id} className="hover:bg-zinc-50/40 dark:hover:bg-zinc-900/40 transition-colors">
-                          <td className="px-5 py-3 font-mono font-bold text-slate-600 dark:text-zinc-400 text-[10px]">
+                          <td className="px-5 py-3 font-mono font-bold text-slate-600 dark:text-zinc-400 text-xs">
                             {invoice.invoiceNumber}
                           </td>
-                          <td className="px-5 py-3 font-bold font-mono text-zinc-900 dark:text-zinc-100">
+                          <td className="px-5 py-3 font-bold font-mono tabular-nums text-zinc-900 dark:text-zinc-100">
                             {new Intl.NumberFormat('en-US', { style: 'currency', currency: invoice.currency }).format(Number(invoice.totalAmount))}
                           </td>
                           <td className="px-5 py-3">
                             <Badge 
                               className={cn(
-                                "text-[9px] font-bold px-1.5 py-0.5",
+                                "text-[11px] font-semibold px-1.5 py-0.5",
                                 invoice.status === 'PAID' 
-                                  ? "bg-green-500/10 text-green-600 dark:text-green-400 border border-green-600/15"
+                                  ? "bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-600/20"
                                   : invoice.status === 'OVERDUE'
-                                    ? "bg-red-500/10 text-red-700 dark:text-red-400 border border-red-600/15"
+                                    ? "bg-red-500/10 text-red-700 dark:text-red-400 border border-red-600/20"
                                     : invoice.status === 'SENT'
-                                      ? "bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-600/15"
-                                      : "bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 border border-zinc-200/30"
+                                      ? "bg-blue-500/10 text-blue-700 dark:text-blue-400 border border-blue-600/20"
+                                      : "bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 border border-zinc-200/40"
                               )}
                               variant="secondary"
                             >
@@ -403,10 +403,10 @@ export function ClientProfile({ client, files, workspaceId, workspaceSlug }: Cli
               <div className="pt-1">
                 <Badge 
                   className={cn(
-                    "text-[9px] font-bold px-1.5 py-0.5",
+                    "text-[11px] font-semibold px-1.5 py-0.5",
                     client.archived 
-                      ? "bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 border border-zinc-200/30"
-                      : "bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-600/15"
+                      ? "bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 border border-zinc-200/40"
+                      : "bg-blue-500/10 text-blue-700 dark:text-blue-400 border border-blue-600/20"
                   )}
                   variant="secondary"
                 >
@@ -455,17 +455,17 @@ export function ClientProfile({ client, files, workspaceId, workspaceSlug }: Cli
                       <div key={portalUser.id} className="flex items-center justify-between text-xs p-2.5 rounded-lg bg-zinc-50/50 dark:bg-zinc-950/20 border border-zinc-200/60 dark:border-zinc-800">
                         <div className="min-w-0 pr-2">
                           <div className="font-semibold text-gray-800 dark:text-zinc-200 truncate">{portalUser.user.email}</div>
-                          <div className="text-[9px] text-zinc-400 dark:text-zinc-500 mt-0.5 font-medium">{portalUser.title}</div>
+                          <div className="text-[11px] text-zinc-500 dark:text-zinc-400 mt-0.5 font-medium">{portalUser.title}</div>
                         </div>
                         <div className="flex items-center gap-1 shrink-0">
                           {isActive ? (
-                            <Badge variant="default" className="text-[8px] font-extrabold px-1.5 py-0.5 bg-green-600/10 text-green-600 dark:text-green-400 border border-green-600/15 flex items-center gap-0.5">
-                              <ShieldCheck className="h-2.5 w-2.5" />
+                            <Badge variant="default" className="text-[11px] font-semibold px-1.5 py-0.5 bg-emerald-600/10 text-emerald-700 dark:text-emerald-400 border border-emerald-600/20 flex items-center gap-1">
+                              <ShieldCheck className="h-3 w-3" />
                               <span>Active</span>
                             </Badge>
                           ) : (
-                            <Badge variant="secondary" className="text-[8px] font-extrabold px-1.5 py-0.5 bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 border border-zinc-200/30 flex items-center gap-0.5">
-                              <Clock className="h-2.5 w-2.5 animate-pulse" />
+                            <Badge variant="secondary" className="text-[11px] font-semibold px-1.5 py-0.5 bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 border border-zinc-200/40 flex items-center gap-1">
+                              <Clock className="h-3 w-3" />
                               <span>Invited</span>
                             </Badge>
                           )}
@@ -560,7 +560,7 @@ export function ClientProfile({ client, files, workspaceId, workspaceSlug }: Cli
                   <FormItem>
                     <FormLabel className="text-xs font-semibold text-zinc-700 dark:text-zinc-300">Representative Email</FormLabel>
                     <FormControl>
-                      <Input type="email" placeholder="representative@acme.com" className="text-xs h-9 rounded-lg" {...field} />
+                      <Input type="email" placeholder="representative@nusantara.id" className="text-xs h-9 rounded-lg" {...field} />
                     </FormControl>
                     <FormMessage className="text-[10px]" />
                   </FormItem>

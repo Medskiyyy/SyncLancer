@@ -146,9 +146,9 @@ export function ClientFilesPortal({ projects, files, workspaceId }: ClientFilesP
     <div className="space-y-6">
       {/* File Upload card */}
       <Card className="border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 rounded-xl shadow-sm overflow-hidden">
-        <CardHeader className="border-b border-zinc-100 dark:border-gray-800 pb-4">
-          <CardTitle className="text-sm font-bold text-zinc-900 dark:text-zinc-50 flex items-center gap-2">
-            <UploadCloud className="h-4.5 w-4.5 text-indigo-500" /> Share a File
+        <CardHeader className="border-b border-border pb-4">
+          <CardTitle className="text-sm font-bold text-foreground flex items-center gap-2">
+            <UploadCloud className="h-4.5 w-4.5 text-primary" /> Share a File
           </CardTitle>
           <CardDescription className="text-xs">
             Link a file to one of your active projects and upload it.
@@ -194,8 +194,8 @@ export function ClientFilesPortal({ projects, files, workspaceId }: ClientFilesP
                   onDrop={handleDrop}
                   className={`border-2 border-dashed rounded-xl p-8 text-center transition-all cursor-pointer flex flex-col items-center justify-center space-y-3 ${
                     isDragOver 
-                      ? 'border-indigo-500 bg-indigo-50/20 dark:bg-indigo-950/10' 
-                      : 'border-zinc-200 hover:border-indigo-400 bg-white dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-indigo-500'
+                      ? 'border-primary bg-primary/5' 
+                      : 'border-border hover:border-primary/50 bg-card'
                   }`}
                   onClick={() => fileInputRef.current?.click()}
                 >
@@ -209,17 +209,17 @@ export function ClientFilesPortal({ projects, files, workspaceId }: ClientFilesP
                   
                   {isUploading ? (
                     <>
-                      <Loader2 className="h-10 w-10 text-indigo-500 animate-spin" />
-                      <p className="text-sm font-bold text-zinc-800 dark:text-zinc-200">Uploading file...</p>
-                      <p className="text-xs text-zinc-400">Storing your file securely.</p>
+                      <Loader2 className="h-10 w-10 text-primary animate-spin" />
+                      <p className="text-sm font-bold text-foreground">Uploading file...</p>
+                      <p className="text-xs text-muted-foreground">Storing your file securely.</p>
                     </>
                   ) : (
                     <>
-                      <UploadCloud className="h-10 w-10 text-zinc-400 dark:text-gray-500" />
-                      <p className="text-sm font-bold text-gray-800 dark:text-zinc-200">
-                        Drag & drop a file here, or <span className="text-indigo-600 dark:text-indigo-400 hover:underline">browse files</span>
+                      <UploadCloud className="h-10 w-10 text-muted-foreground" />
+                      <p className="text-sm font-bold text-foreground">
+                        Drag & drop a file here, or <span className="text-primary hover:underline">browse files</span>
                       </p>
-                      <p className="text-xs text-zinc-400 max-w-sm">
+                      <p className="text-xs text-muted-foreground max-w-sm">
                         Supports images, PDF, documents up to 10MB.
                       </p>
                     </>
@@ -232,10 +232,10 @@ export function ClientFilesPortal({ projects, files, workspaceId }: ClientFilesP
       </Card>
 
       {/* Files List Card */}
-      <Card className="border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 rounded-xl shadow-sm overflow-hidden">
-        <CardHeader className="border-b border-zinc-100 dark:border-gray-800 pb-4">
-          <CardTitle className="text-base font-bold text-zinc-900 dark:text-zinc-50 flex items-center gap-2">
-            <FolderOpen className="h-5 w-5 text-indigo-500" /> Shared Files & Assets
+      <Card className="border-border bg-card rounded-xl shadow-xs overflow-hidden">
+        <CardHeader className="border-b border-border pb-4">
+          <CardTitle className="text-base font-bold text-foreground flex items-center gap-2">
+            <FolderOpen className="h-5 w-5 text-primary" /> Shared Files & Assets
           </CardTitle>
           <CardDescription className="text-xs">
             A listing of all project documents, mockups, and assets shared with you.
@@ -243,16 +243,16 @@ export function ClientFilesPortal({ projects, files, workspaceId }: ClientFilesP
         </CardHeader>
         <CardContent className="p-0">
           {files.length === 0 ? (
-            <div className="text-center py-12 text-gray-500 dark:text-zinc-400 space-y-2">
-              <FileText className="h-10 w-10 mx-auto text-zinc-300 dark:text-zinc-700" />
-              <p className="text-sm font-semibold">No files shared yet</p>
-              <p className="text-xs text-zinc-400 font-medium">Select a project and upload a file above to begin.</p>
+            <div className="text-center py-12 text-muted-foreground space-y-2">
+              <FileText className="h-10 w-10 mx-auto text-muted-foreground/50" />
+              <p className="text-sm font-semibold text-foreground">No files shared yet</p>
+              <p className="text-xs text-muted-foreground font-medium">Select a project and upload a file above to begin.</p>
             </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse">
                 <thead>
-                  <tr className="border-b border-gray-100 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-950/20 text-xs font-bold text-zinc-500 dark:text-zinc-400">
+                  <tr className="border-b border-border bg-muted/40 text-xs font-bold text-muted-foreground">
                     <th className="py-3 px-4 font-bold">File Name</th>
                     <th className="py-3 px-4 font-bold">Linked Project</th>
                     <th className="py-3 px-4 font-bold">Size</th>
@@ -261,12 +261,12 @@ export function ClientFilesPortal({ projects, files, workspaceId }: ClientFilesP
                     <th className="py-3 px-4 font-bold text-right">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-100 dark:divide-gray-800 text-xs">
+                <tbody className="divide-y divide-border text-xs">
                   {files.map((file) => (
-                    <tr key={file.id} className="hover:bg-zinc-50/40 dark:hover:bg-zinc-950/10 transition-colors">
-                      <td className="py-3.5 px-4 font-medium text-zinc-800 dark:text-zinc-200">
+                    <tr key={file.id} className="hover:bg-muted/40 transition-colors">
+                      <td className="py-3.5 px-4 font-medium text-foreground">
                         <div className="flex items-center gap-2 max-w-[250px] sm:max-w-md truncate">
-                          <FileText className="h-4 w-4 text-indigo-500 shrink-0" />
+                          <FileText className="h-4 w-4 text-primary shrink-0" />
                           <span className="truncate" title={file.fileName}>{file.fileName}</span>
                         </div>
                       </td>

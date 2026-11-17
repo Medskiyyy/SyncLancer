@@ -10,40 +10,35 @@ export default function OfflinePage() {
   };
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-zinc-50 dark:bg-zinc-950 px-4">
-      <div className="w-full max-w-md text-center space-y-6 p-8 border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 rounded-2xl shadow-xl">
-        {/* Animated Icon Container */}
-        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-red-50 dark:bg-red-950/30 text-red-500 dark:text-red-500 animate-pulse">
-          <WifiOff className="h-8 w-8" />
+    <div className="flex min-h-screen flex-col items-center justify-center bg-background px-4">
+      <div className="w-full max-w-md space-y-6 rounded-xl border border-border bg-card p-8 text-center shadow-sm">
+        <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full border border-destructive/20 bg-destructive/10 text-destructive">
+          <WifiOff className="h-7 w-7" />
         </div>
 
-        {/* Header Description */}
         <div className="space-y-2">
-          <h1 className="text-2xl font-black tracking-tight text-zinc-900 dark:text-zinc-50">
+          <h1 className="font-heading text-2xl font-bold tracking-tight text-foreground">
             You are Offline
           </h1>
-          <p className="text-sm text-zinc-500 dark:text-zinc-400">
+          <p className="text-sm text-muted-foreground">
             It looks like you&rsquo;ve lost your network connection.
           </p>
         </div>
 
-        {/* Explanation Card */}
-        <div className="rounded-xl bg-zinc-50 dark:bg-zinc-950 p-4 border border-gray-100 dark:border-gray-800 text-left">
-          <p className="text-xs text-slate-600 dark:text-zinc-400 leading-relaxed font-medium">
+        <div className="rounded-lg border border-border bg-muted/40 p-4 text-left">
+          <p className="text-xs leading-relaxed text-muted-foreground">
             SyncLancer caches core pages so you can continue viewing details. However, to synchronize active records, edit pipelines, or process invoicing, a network connection is required.
           </p>
         </div>
 
-        {/* Retry Button */}
-        <div>
-          <Button 
-            onClick={handleReload}
-            className="w-full bg-indigo-600 hover:bg-indigo-900 text-white font-extrabold h-11 flex items-center justify-center gap-2"
-          >
-            <RotateCw className="h-4 w-4" />
-            <span>Check Connection</span>
-          </Button>
-        </div>
+        <Button
+          onClick={handleReload}
+          variant="default"
+          className="flex h-10 w-full items-center justify-center gap-2 font-semibold"
+        >
+          <RotateCw className="h-4 w-4" />
+          <span>Check Connection</span>
+        </Button>
       </div>
     </div>
   );

@@ -62,10 +62,10 @@ export default async function WorkspaceDashboardPage({ params }: PageProps) {
   ];
 
   const quickActions = [
-    { title: 'New Client', href: `/${workspaceSlug}/clients?add=true`, desc: 'Add client contact card', icon: 'clients', color: 'text-blue-600 bg-blue-500/10 border-blue-500/20 dark:bg-blue-500/15 dark:text-blue-400 dark:border-blue-500/20' },
-    { title: 'New Proposal', href: `/${workspaceSlug}/proposals/new`, desc: 'Draft freelancer pitch', icon: 'proposals', color: 'text-violet-600 bg-violet-500/10 border-violet-500/20 dark:bg-violet-500/15 dark:text-violet-400 dark:border-violet-500/20' },
-    { title: 'New Project', href: `/${workspaceSlug}/projects/new`, desc: 'Launch project dashboard', icon: 'projects', color: 'text-emerald-600 bg-emerald-500/10 border-emerald-500/20 dark:bg-emerald-500/15 dark:text-emerald-400 dark:border-emerald-500/20' },
-    { title: 'New Invoice', href: `/${workspaceSlug}/invoices?create=true`, desc: 'Generate billing statement', icon: 'invoices', color: 'text-amber-700 bg-amber-500/10 border-amber-500/20 dark:bg-amber-500/15 dark:text-amber-300 dark:border-amber-500/20' },
+    { title: 'New Client', href: `/${workspaceSlug}/clients?add=true`, desc: 'Add client contact card', icon: 'clients' },
+    { title: 'New Proposal', href: `/${workspaceSlug}/proposals/new`, desc: 'Draft freelancer pitch', icon: 'proposals' },
+    { title: 'New Project', href: `/${workspaceSlug}/projects/new`, desc: 'Launch project dashboard', icon: 'projects' },
+    { title: 'New Invoice', href: `/${workspaceSlug}/invoices?create=true`, desc: 'Generate billing statement', icon: 'invoices' },
   ];
 
   const targetHours = 40;

@@ -93,13 +93,6 @@ interface AnimatedKPIGridProps {
 }
 
 export function AnimatedKPIGrid({ kpis }: AnimatedKPIGridProps) {
-  const borderColors = [
-    'border-l-emerald-500',
-    'border-l-blue-500',
-    'border-l-violet-500',
-    'border-l-amber-500',
-  ];
-
   return (
     <StaggerContainer className="grid gap-4 md:grid-cols-2 xl:grid-cols-4" staggerChildren={0.05} delayChildren={0.08}>
       {kpis.map((kpi, idx) => {
@@ -108,23 +101,18 @@ export function AnimatedKPIGrid({ kpis }: AnimatedKPIGridProps) {
 
         return (
           <StaggerItem key={kpi.title}>
-            <Card
-              className={cn(
-                'min-h-[148px] justify-between gap-4 border-l-2 p-5',
-                borderColors[idx] || 'border-l-primary',
-              )}
-            >
+            <Card className="min-h-[148px] justify-between gap-4 border border-border bg-card p-5 shadow-xs">
               <div className="flex items-center justify-between gap-3">
                 <span className="min-w-0 truncate text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                   {kpi.title}
                 </span>
-                <div className="flex h-8 w-8 items-center justify-center rounded-md border border-border bg-muted text-muted-foreground">
+                <div className="flex h-8 w-8 items-center justify-center rounded-md border border-border bg-muted/60 text-muted-foreground">
                   <Icon className="h-4 w-4" />
                 </div>
               </div>
               <div className="flex min-w-0 items-end justify-between gap-3">
                 <div className="min-w-0">
-                  <div className="font-mono text-2xl font-semibold leading-none tracking-tight text-foreground">
+                  <div className="font-mono text-2xl font-semibold tabular-nums leading-none tracking-tight text-foreground">
                     <AnimatedNumber value={kpi.value} prefix={kpi.prefix} delay={0.16 + idx * 0.04} />
                   </div>
                   <p className="mt-3 line-clamp-2 text-xs leading-5 text-muted-foreground">{kpi.description}</p>
@@ -152,7 +140,7 @@ interface AnimatedQuickActionsProps {
     href: string;
     desc: string;
     icon: string;
-    color: string;
+    color?: string;
   }>;
 }
 
@@ -166,9 +154,9 @@ export function AnimatedQuickActions({ quickActions }: AnimatedQuickActionsProps
           <StaggerItem key={action.title}>
             <Link
               href={action.href}
-              className="flex h-20 items-center gap-3 rounded-lg border border-border bg-card p-3 text-left shadow-sm transition-colors hover:bg-muted/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              className="group flex h-20 items-center gap-3 rounded-lg border border-border bg-card p-3 text-left shadow-xs transition-colors hover:bg-muted/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
-              <div className={cn('flex h-9 w-9 shrink-0 items-center justify-center rounded-md border', action.color)}>
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-border bg-muted text-foreground transition-colors group-hover:border-primary group-hover:bg-primary group-hover:text-primary-foreground">
                 <Icon className="h-4 w-4" />
               </div>
               <div className="min-w-0">
@@ -221,7 +209,7 @@ export function AnimatedWorkloadActivity({
 
           <div className="mt-5 space-y-5">
             <div className="flex items-start gap-3">
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-blue-200 bg-blue-50 text-blue-700 dark:border-blue-900 dark:bg-blue-950/40 dark:text-blue-300">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-border bg-muted/60 text-primary">
                 <Clock className="h-4 w-4" />
               </div>
               <div className="min-w-0 flex-1">
@@ -236,7 +224,7 @@ export function AnimatedWorkloadActivity({
             </div>
 
             <div className="flex items-start gap-3">
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-900 dark:bg-emerald-950/40 dark:text-emerald-300">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-border bg-muted/60 text-muted-foreground">
                 <CheckSquare className="h-4 w-4" />
               </div>
               <div className="min-w-0">
@@ -247,7 +235,7 @@ export function AnimatedWorkloadActivity({
             </div>
 
             <div className="flex items-start gap-3">
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-slate-200 bg-slate-50 text-slate-700 dark:border-slate-800 dark:bg-slate-950/40 dark:text-slate-300">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-border bg-muted/60 text-muted-foreground">
                 <Calendar className="h-4 w-4" />
               </div>
               <div className="min-w-0">

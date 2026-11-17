@@ -81,26 +81,19 @@ interface TaskFormValues {
 }
 
 // Column definitions
-const COLUMNS: { label: string; status: TaskStatus; color: string; dotColor: string }[] = [
-  { label: 'Backlog', status: TaskStatus.BACKLOG, color: 'bg-slate-50/80 dark:bg-slate-900/40 border-slate-200 dark:border-slate-800', dotColor: 'bg-slate-400' },
-  { label: 'To Do', status: TaskStatus.TODO, color: 'bg-blue-50/50 dark:bg-blue-950/10 border-blue-200 dark:border-blue-900/50', dotColor: 'bg-blue-500' },
-  { label: 'In Progress', status: TaskStatus.IN_PROGRESS, color: 'bg-amber-50/50 dark:bg-amber-950/10 border-amber-200 dark:border-amber-900/50', dotColor: 'bg-amber-500' },
-  { label: 'Review', status: TaskStatus.REVIEW, color: 'bg-purple-50/50 dark:bg-purple-950/10 border-purple-200 dark:border-purple-900/50', dotColor: 'bg-purple-500' },
-  { label: 'Done', status: TaskStatus.DONE, color: 'bg-emerald-50/50 dark:bg-emerald-950/10 border-emerald-200 dark:border-emerald-900/50', dotColor: 'bg-emerald-500' },
+const COLUMNS: { label: string; status: TaskStatus; color: string }[] = [
+  { label: 'Backlog', status: TaskStatus.BACKLOG, color: 'bg-muted/50 dark:bg-muted/20 border-border border-t-2 border-t-slate-400' },
+  { label: 'To Do', status: TaskStatus.TODO, color: 'bg-muted/50 dark:bg-muted/20 border-border border-t-2 border-t-blue-500' },
+  { label: 'In Progress', status: TaskStatus.IN_PROGRESS, color: 'bg-muted/50 dark:bg-muted/20 border-border border-t-2 border-t-amber-500' },
+  { label: 'Review', status: TaskStatus.REVIEW, color: 'bg-muted/50 dark:bg-muted/20 border-border border-t-2 border-t-slate-600 dark:border-t-slate-300' },
+  { label: 'Done', status: TaskStatus.DONE, color: 'bg-muted/50 dark:bg-muted/20 border-border border-t-2 border-t-emerald-500' },
 ];
 
 const PRIORITY_COLORS: Record<string, string> = {
-  LOW: 'text-slate-500 bg-slate-50 border-slate-200 dark:bg-slate-900 dark:border-slate-800 dark:text-slate-400',
-  MEDIUM: 'text-blue-600 bg-blue-50 border-blue-200 dark:bg-blue-950/30 dark:border-blue-900/40 dark:text-blue-400',
-  HIGH: 'text-orange-600 bg-orange-50 border-orange-200 dark:bg-orange-950/30 dark:border-orange-900/40 dark:text-orange-400',
-  URGENT: 'text-red-600 bg-red-50 border-red-200 dark:bg-red-950/30 dark:border-red-900/40 dark:text-red-400',
-};
-
-const PRIORITY_DOT_COLORS: Record<string, string> = {
-  LOW: 'bg-slate-400',
-  MEDIUM: 'bg-blue-500',
-  HIGH: 'bg-orange-500',
-  URGENT: 'bg-red-500',
+  LOW: 'text-slate-600 bg-slate-50 border-slate-200 dark:bg-slate-900 dark:border-slate-800 dark:text-slate-400',
+  MEDIUM: 'text-blue-700 bg-blue-50 border-blue-200 dark:bg-blue-950/30 dark:border-blue-900/40 dark:text-blue-400',
+  HIGH: 'text-amber-700 bg-amber-50 border-amber-200 dark:bg-amber-950/30 dark:border-amber-900/40 dark:text-amber-400',
+  URGENT: 'text-red-700 bg-red-50 border-red-200 dark:bg-red-950/30 dark:border-red-900/40 dark:text-red-400',
 };
 
 // Droppable Column Component
@@ -109,7 +102,7 @@ function DroppableColumn({ id, children, className }: { id: string; children: Re
   return (
     <div
       ref={setNodeRef}
-      className={`${className} transition-all duration-200 ${isOver ? 'ring-2 ring-indigo-400/50 bg-indigo-50/30 dark:bg-indigo-950/10' : ''}`}
+      className={`${className} transition-all duration-200 ${isOver ? 'ring-2 ring-primary/30 bg-primary/5' : ''}`}
     >
       {children}
     </div>
@@ -184,18 +177,17 @@ function DraggableTaskCard({
 
         <div className="flex items-center justify-between pl-6">
           <div className="flex items-center gap-2">
-            <Badge variant="outline" className={`text-[9px] px-1.5 border tracking-wide uppercase font-semibold ${PRIORITY_COLORS[task.priority]}`}>
-              <span className={`inline-block h-1.5 w-1.5 rounded-full mr-1 ${PRIORITY_DOT_COLORS[task.priority]}`}></span>
+            <Badge variant="outline" className={`text-[11px] px-1.5 border tracking-wide uppercase font-semibold ${PRIORITY_COLORS[task.priority]}`}>
               {task.priority}
             </Badge>
             {task.milestone && (
-              <span className="text-[10px] text-slate-400 dark:text-slate-500 flex items-center gap-1">
+              <span className="text-[11px] text-slate-500 dark:text-slate-400 flex items-center gap-1">
                 <Layers className="h-3 w-3" />
                 {task.milestone.title}
               </span>
             )}
           </div>
-          <span className="text-[10px] text-slate-400 dark:text-slate-500 flex items-center gap-1">
+          <span className="font-mono text-[11px] tabular-nums text-slate-500 dark:text-slate-400 flex items-center gap-1">
             <Calendar className="h-3 w-3" />
             {formatDate(task.dueDate)}
           </span>
@@ -541,11 +533,8 @@ export function TaskKanbanBoard({ initialTasks, milestones, projectId, workspace
                 className={`flex flex-col rounded-xl border p-3.5 min-h-[480px] w-[280px] shrink-0 ${col.color}`}
               >
                 <div className="flex items-center justify-between mb-3 px-1">
-                  <div className="flex items-center gap-2">
-                    <span className={`h-2 w-2 rounded-full ${col.dotColor}`}></span>
-                    <span className="font-semibold text-xs text-slate-700 dark:text-slate-200 uppercase tracking-wider">{col.label}</span>
-                  </div>
-                  <Badge variant="secondary" className="rounded-full text-[10px] font-bold h-5 min-w-[20px] flex items-center justify-center">
+                  <span className="font-semibold text-xs text-foreground uppercase tracking-wider">{col.label}</span>
+                  <Badge variant="secondary" className="rounded-full font-mono text-[11px] font-semibold h-5 min-w-[20px] flex items-center justify-center">
                     {columnTasks.length}
                   </Badge>
                 </div>
@@ -577,11 +566,11 @@ export function TaskKanbanBoard({ initialTasks, milestones, projectId, workspace
         {/* Drag Overlay */}
         <DragOverlay>
           {activeTask ? (
-            <div className="rounded-lg border border-indigo-300 bg-white p-3 shadow-xl dark:border-indigo-700 dark:bg-slate-900 opacity-90 rotate-2 w-[240px]">
+            <div className="rounded-lg border border-primary/40 bg-card p-3 shadow-xl opacity-95 w-[240px]">
               <div className="space-y-2">
-                <h4 className="font-semibold text-sm text-slate-900 dark:text-slate-50">{activeTask.title}</h4>
+                <h4 className="font-semibold text-sm text-foreground">{activeTask.title}</h4>
                 <div className="flex items-center gap-2">
-                  <Badge variant="outline" className={`text-[9px] px-1.5 border tracking-wide uppercase font-semibold ${PRIORITY_COLORS[activeTask.priority]}`}>
+                  <Badge variant="outline" className={`text-[11px] px-1.5 border tracking-wide uppercase font-semibold ${PRIORITY_COLORS[activeTask.priority]}`}>
                     {activeTask.priority}
                   </Badge>
                 </div>
@@ -607,7 +596,7 @@ export function TaskKanbanBoard({ initialTasks, milestones, projectId, workspace
                 <Button type="button" variant="outline" onClick={() => setIsAddOpen(false)} className="border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 font-medium">
                   Cancel
                 </Button>
-                <Button type="submit" disabled={isLoading} className="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold">
+                <Button type="submit" disabled={isLoading} className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold">
                   {isLoading ? 'Creating...' : 'Create Task'}
                 </Button>
               </DialogFooter>
@@ -632,7 +621,7 @@ export function TaskKanbanBoard({ initialTasks, milestones, projectId, workspace
                 <Button type="button" variant="outline" onClick={() => setIsEditOpen(false)} className="border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 font-medium">
                   Cancel
                 </Button>
-                <Button type="submit" disabled={isLoading} className="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold">
+                <Button type="submit" disabled={isLoading} className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold">
                   {isLoading ? 'Saving...' : 'Save Changes'}
                 </Button>
               </DialogFooter>

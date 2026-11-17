@@ -126,7 +126,7 @@ export function NotificationCenter() {
       >
         <Bell className="h-4 w-4 text-slate-600 dark:text-zinc-400" />
         {unreadCount > 0 && (
-          <span className="absolute top-1.5 right-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-indigo-600 text-[10px] font-bold text-white shadow-sm ring-2 ring-white dark:ring-zinc-900">
+          <span className="absolute top-1.5 right-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground shadow-sm ring-2 ring-background">
             {unreadCount > 9 ? '9+' : unreadCount}
           </span>
         )}
@@ -134,14 +134,14 @@ export function NotificationCenter() {
 
       {/* Dropdown Panel */}
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-80 sm:w-96 border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 rounded-xl shadow-xl z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
+        <div className="absolute right-0 mt-2 w-80 sm:w-96 border border-border bg-popover text-popover-foreground rounded-xl shadow-xl z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
           {/* Header */}
-          <div className="flex items-center justify-between px-4 py-3 border-b border-zinc-100 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-950/20">
-            <span className="text-sm font-bold text-zinc-900 dark:text-zinc-50">Notifications</span>
+          <div className="flex items-center justify-between px-4 py-3 border-b border-border bg-muted/40">
+            <span className="text-sm font-bold text-foreground">Notifications</span>
             {unreadCount > 0 && (
               <button 
                 onClick={handleMarkAllAsRead}
-                className="text-xs font-semibold text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300 transition-colors"
+                className="text-xs font-semibold text-primary hover:underline cursor-pointer"
               >
                 Mark all as read
               </button>
@@ -149,17 +149,17 @@ export function NotificationCenter() {
           </div>
 
           {/* List Area */}
-          <div className="max-h-80 overflow-y-auto divide-y divide-zinc-100 dark:divide-zinc-800">
+          <div className="max-h-80 overflow-y-auto divide-y divide-border">
             {loading ? (
-              <div className="flex flex-col items-center justify-center py-10 text-zinc-400">
-                <Loader2 className="h-6 w-6 animate-spin text-indigo-500" />
+              <div className="flex flex-col items-center justify-center py-10 text-muted-foreground">
+                <Loader2 className="h-6 w-6 animate-spin text-primary" />
                 <span className="text-xs mt-2">Loading notifications...</span>
               </div>
             ) : notifications.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-12 text-zinc-400 dark:text-zinc-600 px-4 text-center space-y-2">
-                <BellOff className="h-8 w-8 text-zinc-300 dark:text-zinc-800" />
-                <p className="text-sm font-semibold">All caught up!</p>
-                <p className="text-xs text-zinc-500 dark:text-zinc-400 max-w-xs">No notifications yet. We&rsquo;ll alert you when something happens.</p>
+              <div className="flex flex-col items-center justify-center py-12 text-muted-foreground px-4 text-center space-y-2">
+                <BellOff className="h-8 w-8 text-muted-foreground/50" />
+                <p className="text-sm font-semibold text-foreground">All caught up!</p>
+                <p className="text-xs text-muted-foreground max-w-xs">No notifications yet. We&rsquo;ll alert you when something happens.</p>
               </div>
             ) : (
               notifications.map((notif) => (
@@ -167,26 +167,26 @@ export function NotificationCenter() {
                   key={notif.id} 
                   className={`flex items-start gap-3 p-4 transition-colors ${
                     notif.isRead 
-                      ? 'bg-white dark:bg-zinc-900 hover:bg-zinc-50/50 dark:hover:bg-zinc-950/10' 
-                      : 'bg-indigo-50/20 dark:bg-indigo-950/10 hover:bg-indigo-50/30 dark:hover:bg-indigo-950/15'
+                      ? 'bg-card hover:bg-muted/40' 
+                      : 'bg-primary/5 hover:bg-primary/10'
                   }`}
                 >
                   {/* Status Indicator Dot */}
                   <div className="mt-1.5 flex h-2 w-2 shrink-0 rounded-full">
                     {!notif.isRead && (
-                      <span className="h-2 w-2 rounded-full bg-indigo-600 dark:bg-indigo-400" />
+                      <span className="h-2 w-2 rounded-full bg-primary" />
                     )}
                   </div>
 
                   {/* Body Content */}
                   <div className="flex-1 min-w-0">
-                    <p className={`text-sm ${notif.isRead ? 'text-gray-800 dark:text-zinc-300' : 'font-bold text-zinc-900 dark:text-zinc-50'}`}>
+                    <p className={`text-sm ${notif.isRead ? 'text-muted-foreground' : 'font-bold text-foreground'}`}>
                       {notif.title}
                     </p>
-                    <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5 leading-relaxed break-words">
+                    <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed break-words">
                       {notif.message}
                     </p>
-                    <span className="text-[10px] text-zinc-400 dark:text-zinc-500 mt-1 block">
+                    <span className="text-[11px] text-muted-foreground mt-1 block">
                       {formatRelativeTime(notif.createdAt)}
                     </span>
                   </div>
@@ -196,7 +196,7 @@ export function NotificationCenter() {
                     <button 
                       onClick={(e) => handleMarkAsRead(notif.id, e)}
                       title="Mark as read"
-                      className="mt-0.5 p-1 rounded-full text-zinc-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-all shrink-0"
+                      className="mt-0.5 p-1 rounded-full text-muted-foreground hover:text-primary hover:bg-muted transition-all shrink-0 cursor-pointer"
                     >
                       <Check className="h-3.5 w-3.5" />
                     </button>

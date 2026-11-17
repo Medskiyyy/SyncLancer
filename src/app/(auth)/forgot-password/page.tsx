@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { AuthShell } from '@/components/auth/auth-shell';
 
 export default function ForgotPasswordPage() {
   const [success, setSuccess] = useState(false);
@@ -47,10 +48,10 @@ export default function ForgotPasswordPage() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 p-4 dark:bg-zinc-950">
-      <Card className="w-full max-w-md shadow-lg">
+    <AuthShell>
+      <Card className="w-full max-w-md border-border bg-card shadow-sm">
         <CardHeader className="space-y-1 text-center">
-          <CardTitle className="text-2xl font-bold tracking-tight">Forgot Password</CardTitle>
+          <CardTitle className="text-2xl font-bold tracking-tight font-heading">Forgot Password</CardTitle>
           <CardDescription>
             Enter your email address and we will send you a password reset link
           </CardDescription>
@@ -76,7 +77,7 @@ export default function ForgotPasswordPage() {
                     <FormItem>
                       <FormLabel>Email Address</FormLabel>
                       <FormControl>
-                        <Input type="email" placeholder="john@example.com" disabled={isLoading} {...field} />
+                        <Input type="email" placeholder="nama@studio.id" disabled={isLoading} {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -97,6 +98,6 @@ export default function ForgotPasswordPage() {
           </Link>
         </CardFooter>
       </Card>
-    </div>
+    </AuthShell>
   );
 }

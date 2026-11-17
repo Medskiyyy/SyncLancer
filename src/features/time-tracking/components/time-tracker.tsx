@@ -426,14 +426,14 @@ export function TimeTracker({ project, initialTimeEntries }: TimeTrackerProps) {
     <div className="space-y-6">
       {/* Metrics Summary Grid */}
       <div className="grid gap-4 sm:grid-cols-3">
-        <Card className="border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 rounded-xl shadow-sm">
+        <Card className="border-border bg-card rounded-xl shadow-xs">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-xs font-semibold text-slate-500 dark:text-slate-400">Total Hours Logged</CardTitle>
-            <Clock className="h-4 w-4 text-indigo-500" />
+            <CardTitle className="text-xs font-semibold text-muted-foreground">Total Hours Logged</CardTitle>
+            <Clock className="h-4 w-4 text-primary" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-black text-slate-950 dark:text-slate-50">{totalHours} hrs</div>
-            <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-1">All entries combined</p>
+            <div className="font-mono text-2xl font-semibold tabular-nums text-foreground">{totalHours} hrs</div>
+            <p className="text-xs text-muted-foreground mt-1">All entries combined</p>
           </CardContent>
         </Card>
 
@@ -477,22 +477,19 @@ export function TimeTracker({ project, initialTimeEntries }: TimeTrackerProps) {
       <Card className="border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 rounded-xl shadow-sm overflow-hidden">
         {activeTimer ? (
           /* Running Timer UI */
-          <div className="bg-gradient-to-r from-indigo-50/60 via-white to-violet-50/50 dark:from-indigo-950/20 dark:via-slate-900 dark:to-violet-950/15 p-6 md:p-8">
+          <div className="bg-muted/40 p-6 md:p-8">
             <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
               <div className="space-y-3">
                 <div className="flex items-center gap-2">
-                  <span className="relative flex h-2 w-2">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
-                  </span>
-                  <span className="text-xs font-bold text-slate-500 dark:text-slate-400 tracking-wider uppercase">TIMER ACTIVE</span>
+                  <span className="inline-block h-2 w-2 rounded-full bg-red-600" />
+                  <span className="text-xs font-semibold text-muted-foreground tracking-wider uppercase">Timer Active</span>
                 </div>
-                <div className="text-4xl font-extrabold text-slate-900 dark:text-white font-mono tracking-tight">
+                <div className="text-4xl font-bold text-foreground font-mono tabular-nums tracking-tight">
                   {formatSeconds(elapsedSeconds)}
                 </div>
                 <div className="space-y-1">
                   {activeTimer.taskId && (
-                    <div className="flex items-center gap-1.5 text-xs text-indigo-600 dark:text-indigo-400 font-semibold">
+                    <div className="flex items-center gap-1.5 text-xs text-primary font-semibold">
                       <Tag className="h-3.5 w-3.5" />
                       <span>
                         {project.tasks?.find(t => t.id === activeTimer.taskId)?.title || 'Task'}
@@ -535,14 +532,14 @@ export function TimeTracker({ project, initialTimeEntries }: TimeTrackerProps) {
           <div className="p-6">
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200 flex items-center gap-2">
-                  <Play className="h-4.5 w-4.5 text-indigo-500 fill-indigo-500" /> Start Live Time Tracker
+                <h3 className="text-sm font-bold text-foreground flex items-center gap-2">
+                  <Play className="h-4.5 w-4.5 text-primary fill-primary" /> Start Live Time Tracker
                 </h3>
                 <Button
                   type="button"
                   variant="ghost"
                   onClick={() => setIsManualOpen(true)}
-                  className="text-xs text-indigo-600 dark:text-indigo-400 font-semibold hover:bg-indigo-50 dark:hover:bg-indigo-950/30 px-3 h-8"
+                  className="text-xs text-primary font-semibold hover:bg-primary/10 px-3 h-8"
                 >
                   <Plus className="mr-1 h-3.5 w-3.5" /> Log Manual Time
                 </Button>
@@ -581,7 +578,7 @@ export function TimeTracker({ project, initialTimeEntries }: TimeTrackerProps) {
                       <input
                         type="checkbox"
                         id="timerBillableCheck"
-                        className="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 h-4 w-4 cursor-pointer"
+                        className="rounded border-input text-primary focus:ring-ring h-4 w-4 cursor-pointer"
                         checked={timerBillable}
                         onChange={(e) => setTimerBillable(e.target.checked)}
                       />
@@ -592,9 +589,9 @@ export function TimeTracker({ project, initialTimeEntries }: TimeTrackerProps) {
                     <Button 
                       onClick={handleStartTimer}
                       disabled={!!otherTimerRunning}
-                      className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold shrink-0 h-9 px-4.5 text-xs shadow-md shadow-indigo-500/10"
+                      className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold shrink-0 h-9 px-4.5 text-xs"
                     >
-                      <Play className="mr-1.5 h-3.5 w-3.5 fill-white" /> Start
+                      <Play className="mr-1.5 h-3.5 w-3.5 fill-current" /> Start
                     </Button>
                   </div>
                 </div>
@@ -605,10 +602,10 @@ export function TimeTracker({ project, initialTimeEntries }: TimeTrackerProps) {
       </Card>
 
       {/* Log History */}
-      <Card className="border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 rounded-xl shadow-sm overflow-hidden">
-        <CardHeader className="border-b border-slate-100 dark:border-gray-800 pb-4">
-          <CardTitle className="text-base font-bold text-slate-900 dark:text-slate-50 flex items-center gap-2">
-            <Calendar className="h-5 w-5 text-indigo-500" /> Log History
+      <Card className="border-border bg-card rounded-xl shadow-xs overflow-hidden">
+        <CardHeader className="border-b border-border pb-4">
+          <CardTitle className="text-base font-bold text-foreground flex items-center gap-2">
+            <Calendar className="h-5 w-5 text-primary" /> Log History
           </CardTitle>
         </CardHeader>
         <CardContent className="p-0">
@@ -642,7 +639,7 @@ export function TimeTracker({ project, initialTimeEntries }: TimeTrackerProps) {
                       </td>
                       <td className="py-3.5 px-4 max-w-[150px] truncate">
                         {entry.task ? (
-                          <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-indigo-600 dark:text-indigo-400 bg-indigo-50/50 dark:bg-indigo-950/25 px-2 py-0.5 rounded border border-indigo-100 dark:border-indigo-900/30">
+                          <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-primary bg-primary/10 px-2 py-0.5 rounded border border-primary/20">
                             <Tag className="h-3 w-3 shrink-0" />
                             <span className="truncate">{entry.task.title}</span>
                           </span>
@@ -653,11 +650,11 @@ export function TimeTracker({ project, initialTimeEntries }: TimeTrackerProps) {
                       <td className="py-3.5 px-4 text-slate-600 dark:text-slate-400 font-normal max-w-[250px] break-words">
                         {entry.notes}
                       </td>
-                      <td className="py-3.5 px-4 text-center font-bold text-slate-900 dark:text-slate-100">
+                      <td className="py-3.5 px-4 text-center font-mono font-semibold tabular-nums text-foreground">
                         {formatDuration(entry.durationMinutes)}
                       </td>
                       <td className="py-3.5 px-4 text-center">
-                        <Badge variant="outline" className={`text-[9px] font-semibold uppercase px-1.5 py-0 ${entry.billable ? 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/20 dark:text-emerald-300 dark:border-emerald-900/30' : 'bg-slate-50 text-slate-600 border-slate-200 dark:bg-slate-950/20 dark:text-slate-300 dark:border-slate-800'}`}>
+                        <Badge variant="outline" className={`text-[11px] font-semibold uppercase px-1.5 py-0 ${entry.billable ? 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/20 dark:text-emerald-300 dark:border-emerald-900/30' : 'bg-slate-50 text-slate-600 border-slate-200 dark:bg-slate-950/20 dark:text-slate-300 dark:border-slate-800'}`}>
                           {entry.billable ? 'Billable' : 'Non-Bill'}
                         </Badge>
                       </td>
@@ -697,8 +694,8 @@ export function TimeTracker({ project, initialTimeEntries }: TimeTrackerProps) {
       <Dialog open={isManualOpen} onOpenChange={setIsManualOpen}>
         <DialogContent className="border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 sm:max-w-md">
           <DialogHeader>
-            <DialogTitle className="text-slate-900 dark:text-slate-100 flex items-center gap-2">
-              <Clock className="h-5 w-5 text-indigo-500" /> Log Time Manually
+            <DialogTitle className="text-foreground flex items-center gap-2">
+              <Clock className="h-5 w-5 text-primary" /> Log Time Manually
             </DialogTitle>
             <DialogDescription className="text-gray-500 dark:text-slate-400 text-xs">
               Log project progress by manually specifying date, hours, and notes.
@@ -773,7 +770,7 @@ export function TimeTracker({ project, initialTimeEntries }: TimeTrackerProps) {
               <input
                 type="checkbox"
                 id="manualBillable"
-                className="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 h-4 w-4 cursor-pointer"
+                className="rounded border-input text-primary focus:ring-ring h-4 w-4 cursor-pointer"
                 checked={manualBillable}
                 onChange={(e) => setManualBillable(e.target.checked)}
               />
@@ -794,7 +791,7 @@ export function TimeTracker({ project, initialTimeEntries }: TimeTrackerProps) {
               <Button 
                 type="submit" 
                 disabled={isLoading}
-                className="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold"
+                className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold"
               >
                 {isLoading ? 'Saving...' : 'Log Time'}
               </Button>
@@ -807,8 +804,8 @@ export function TimeTracker({ project, initialTimeEntries }: TimeTrackerProps) {
       <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
         <DialogContent className="border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 sm:max-w-md">
           <DialogHeader>
-            <DialogTitle className="text-slate-900 dark:text-slate-100 flex items-center gap-2">
-              <Edit className="h-5 w-5 text-indigo-500" /> Edit Time Entry
+            <DialogTitle className="text-foreground flex items-center gap-2">
+              <Edit className="h-5 w-5 text-primary" /> Edit Time Entry
             </DialogTitle>
             <DialogDescription className="text-gray-500 dark:text-slate-400 text-xs">
               Modify the start/end logs, note details, or status of this entry.
@@ -883,7 +880,7 @@ export function TimeTracker({ project, initialTimeEntries }: TimeTrackerProps) {
               <input
                 type="checkbox"
                 id="editBillable"
-                className="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 h-4 w-4 cursor-pointer"
+                className="rounded border-input text-primary focus:ring-ring h-4 w-4 cursor-pointer"
                 checked={editBillable}
                 onChange={(e) => setEditBillable(e.target.checked)}
               />
@@ -907,7 +904,7 @@ export function TimeTracker({ project, initialTimeEntries }: TimeTrackerProps) {
               <Button 
                 type="submit" 
                 disabled={isLoading}
-                className="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold"
+                className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold"
               >
                 {isLoading ? 'Saving...' : 'Save Changes'}
               </Button>

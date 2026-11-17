@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { AuthShell } from '@/components/auth/auth-shell';
 
 export default function OnboardingPage() {
   const router = useRouter();
@@ -45,10 +46,10 @@ export default function OnboardingPage() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 p-4 dark:bg-zinc-950">
-      <Card className="w-full max-w-md shadow-lg">
+    <AuthShell>
+      <Card className="w-full max-w-md border-border bg-card shadow-sm">
         <CardHeader className="space-y-1 text-center">
-          <CardTitle className="text-2xl font-bold tracking-tight">Create your workspace</CardTitle>
+          <CardTitle className="text-2xl font-bold tracking-tight font-heading">Create your workspace</CardTitle>
           <CardDescription>
             Let&apos;s set up a workspace for your freelancing business to track projects, clients, and invoices
           </CardDescription>
@@ -100,6 +101,6 @@ export default function OnboardingPage() {
           </Form>
         </CardContent>
       </Card>
-    </div>
+    </AuthShell>
   );
 }

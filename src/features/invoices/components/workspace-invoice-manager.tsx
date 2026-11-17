@@ -305,63 +305,63 @@ export function WorkspaceInvoiceManager({
     <FadeIn direction="up" delay={0.02} duration={0.35} className="space-y-6">
       {/* KPI Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-        <Card variant="elevated" className="border-l-[3px] border-l-zinc-500/70 p-5 h-[120px] flex flex-col justify-between">
+        <Card className="border border-border bg-card p-5 h-[120px] flex flex-col justify-between shadow-xs">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Total Invoiced</span>
-            <div className="p-1.5 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/50 dark:border-gray-800 rounded-lg">
-              <Receipt className="h-4 w-4 text-zinc-500" />
+            <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Total Invoiced</span>
+            <div className="p-1.5 bg-muted/60 border border-border rounded-lg">
+              <Receipt className="h-4 w-4 text-muted-foreground" />
             </div>
           </div>
           <div className="flex flex-col">
-            <span className="text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50 font-mono">
+            <span className="text-2xl font-semibold tabular-nums tracking-tight text-foreground font-mono">
               {formatCurrency(totalInvoiced, 'USD')}
             </span>
-            <span className="text-[10px] text-zinc-400 dark:text-zinc-500 mt-0.5">Cumulative billing volume</span>
+            <span className="text-xs text-muted-foreground mt-0.5">Cumulative billing volume</span>
           </div>
         </Card>
 
-        <Card variant="elevated" className="border-l-[3px] border-l-emerald-500/70 p-5 h-[120px] flex flex-col justify-between">
+        <Card className="border border-border bg-card p-5 h-[120px] flex flex-col justify-between shadow-xs">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Paid Amount</span>
-            <div className="p-1.5 bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-100 dark:border-emerald-900/20 rounded-lg">
-              <CheckCircle className="h-4 w-4 text-emerald-500" />
+            <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Paid Amount</span>
+            <div className="p-1.5 bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-900/40 rounded-lg">
+              <CheckCircle className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
             </div>
           </div>
           <div className="flex flex-col">
-            <span className="text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50 font-mono">
+            <span className="text-2xl font-semibold tabular-nums tracking-tight text-foreground font-mono">
               {formatCurrency(paidInvoices, 'USD')}
             </span>
-            <span className="text-[10px] text-emerald-500 mt-0.5">Received payments</span>
+            <span className="text-xs text-emerald-600 dark:text-emerald-400 mt-0.5">Received payments</span>
           </div>
         </Card>
 
-        <Card variant="elevated" className="border-l-[3px] border-l-amber-500/70 p-5 h-[120px] flex flex-col justify-between">
+        <Card className="border border-border bg-card p-5 h-[120px] flex flex-col justify-between shadow-xs">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Outstanding</span>
-            <div className="p-1.5 bg-amber-50 dark:bg-amber-950/20 border border-amber-100 dark:border-amber-900/20 rounded-lg">
-              <AlertCircle className="h-4 w-4 text-amber-500" />
+            <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Outstanding</span>
+            <div className="p-1.5 bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900/40 rounded-lg">
+              <AlertCircle className="h-4 w-4 text-amber-600 dark:text-amber-400" />
             </div>
           </div>
           <div className="flex flex-col">
-            <span className="text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50 font-mono">
+            <span className="text-2xl font-semibold tabular-nums tracking-tight text-foreground font-mono">
               {formatCurrency(outstandingInvoices, 'USD')}
             </span>
-            <span className="text-[10px] text-amber-500 mt-0.5">Awaiting settlement</span>
+            <span className="text-xs text-amber-600 dark:text-amber-400 mt-0.5">Awaiting settlement</span>
           </div>
         </Card>
 
-        <Card variant="elevated" className="border-l-[3px] border-l-blue-500/70 p-5 h-[120px] flex flex-col justify-between">
+        <Card className="border border-border bg-card p-5 h-[120px] flex flex-col justify-between shadow-xs">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Drafts</span>
-            <div className="p-1.5 bg-blue-50 dark:bg-blue-950/20 border border-blue-100 dark:border-blue-900/20 rounded-lg">
-              <FileText className="h-4 w-4 text-blue-500" />
+            <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Drafts</span>
+            <div className="p-1.5 bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-900/40 rounded-lg">
+              <FileText className="h-4 w-4 text-primary" />
             </div>
           </div>
           <div className="flex flex-col">
-            <span className="text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50 font-mono">
+            <span className="text-2xl font-semibold tabular-nums tracking-tight text-foreground font-mono">
               {formatCurrency(draftInvoices, 'USD')}
             </span>
-            <span className="text-[10px] text-blue-500 mt-0.5">Unsent invoices</span>
+            <span className="text-xs text-primary mt-0.5">Unsent invoices</span>
           </div>
         </Card>
       </div>
@@ -441,24 +441,24 @@ export function WorkspaceInvoiceManager({
                 <tbody className="divide-y divide-border/40 bg-transparent">
                   {filteredInvoices.map((invoice) => (
                     <tr key={invoice.id} className="hover:bg-zinc-50/50 dark:hover:bg-zinc-900/20 transition-colors h-[60px]">
-                      <td className="px-6 align-middle font-semibold text-zinc-900 dark:text-gray-500">
+                      <td className="px-6 align-middle font-mono font-semibold text-foreground">
                         {invoice.invoiceNumber}
                       </td>
-                      <td className="px-6 align-middle font-semibold text-zinc-800 dark:text-zinc-300">
+                      <td className="px-6 align-middle font-semibold text-foreground">
                         {invoice.client.companyName}
                       </td>
-                      <td className="px-6 align-middle text-slate-600 dark:text-zinc-400 font-medium">
-                        {invoice.project?.name || <span className="text-xs text-zinc-500 dark:text-gray-500">General Billing</span>}
+                      <td className="px-6 align-middle text-muted-foreground font-medium">
+                        {invoice.project?.name || <span className="text-xs text-muted-foreground">General Billing</span>}
                       </td>
-                      <td className="px-6 align-middle text-zinc-500 dark:text-zinc-400 text-xs">
+                      <td className="px-6 align-middle text-muted-foreground text-xs">
                         {new Date(invoice.dueDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                       </td>
                       <td className="px-6 align-middle">
-                        <Badge className={cn("text-[10px] font-medium px-2 py-0.5 rounded-full border shadow-none", STATUS_COLORS[invoice.status] || 'bg-slate-100 text-slate-800')}>
+                        <Badge className={cn("text-[11px] font-medium px-2 py-0.5 rounded-full border shadow-none", STATUS_COLORS[invoice.status] || 'bg-slate-100 text-slate-800')}>
                           {invoice.status}
                         </Badge>
                       </td>
-                      <td className="px-6 align-middle text-right font-mono font-semibold text-slate-900">
+                      <td className="px-6 align-middle text-right font-mono font-semibold tabular-nums text-foreground">
                         {formatCurrency(invoice.totalAmount, invoice.currency)}
                       </td>
                       <td className="px-6 align-middle text-right">
@@ -673,7 +673,7 @@ export function WorkspaceInvoiceManager({
                   variant="ghost" 
                   size="sm"
                   onClick={handleAddItem}
-                  className="cursor-pointer text-primary dark:text-indigo-400 text-xs font-semibold flex items-center gap-1"
+                  className="cursor-pointer text-primary text-xs font-semibold flex items-center gap-1"
                 >
                   <PlusCircle className="h-4 w-4" /> Add Item
                 </Button>

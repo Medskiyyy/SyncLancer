@@ -127,64 +127,64 @@ export default async function ClientPortalDashboardPage({ params }: PageProps) {
   };
 
   const STATUS_COLORS: Record<string, string> = {
-    DRAFT: 'bg-zinc-100 text-zinc-800 dark:bg-zinc-800 dark:text-zinc-200 border-zinc-200',
-    SENT: 'bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300 border-blue-200',
-    PAID: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 border-emerald-200',
-    OVERDUE: 'bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300 border-rose-200',
-    CANCELLED: 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300 border-amber-200',
+    DRAFT: 'bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-200 border-zinc-200 dark:border-zinc-700',
+    SENT: 'bg-blue-50 text-blue-700 dark:bg-blue-950/40 dark:text-blue-300 border-blue-200 dark:border-blue-800',
+    PAID: 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800',
+    OVERDUE: 'bg-red-50 text-red-700 dark:bg-red-950/40 dark:text-red-300 border-red-200 dark:border-red-800',
+    CANCELLED: 'bg-amber-50 text-amber-800 dark:bg-amber-950/40 dark:text-amber-300 border-amber-200 dark:border-amber-800',
   };
 
   return (
     <div className="space-y-6">
       {/* Welcome Banner */}
-      <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-6 rounded-xl shadow-sm">
-        <h1 className="text-2xl font-black text-zinc-900 dark:text-zinc-50">
+      <div className="bg-card border border-border p-6 rounded-xl shadow-xs">
+        <h1 className="font-heading text-2xl font-bold text-foreground">
           Welcome to your Client Portal, {session.user.name || 'Representative'}!
         </h1>
-        <p className="text-sm text-zinc-500 mt-1.5">
+        <p className="text-sm text-muted-foreground mt-1.5">
           Access project timelines, track progress, review shared files, and view or download invoices for{' '}
-          <strong className="text-zinc-800 dark:text-zinc-200">{client.companyName}</strong>.
+          <strong className="text-foreground">{client.companyName}</strong>.
         </p>
       </div>
 
       {/* KPI Cards Grid */}
       <div className="grid gap-4 sm:grid-cols-3">
-        <Card className="border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-sm rounded-xl">
+        <Card className="border-border bg-card shadow-xs rounded-xl">
           <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-            <CardTitle className="text-xs font-semibold text-zinc-500">Active Projects</CardTitle>
-            <FolderKanban className="h-4.5 w-4.5 text-indigo-500" />
+            <CardTitle className="text-xs font-semibold text-muted-foreground">Active Projects</CardTitle>
+            <FolderKanban className="h-4.5 w-4.5 text-primary" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-black text-zinc-900 dark:text-zinc-50">
+            <div className="font-mono text-2xl font-semibold tabular-nums text-foreground">
               {activeProjectsCount}
             </div>
-            <p className="text-[10px] text-zinc-400 mt-1">Out of {projects.length} total projects</p>
+            <p className="text-xs text-muted-foreground mt-1">Out of {projects.length} total projects</p>
           </CardContent>
         </Card>
 
-        <Card className="border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-sm rounded-xl">
+        <Card className="border-border bg-card shadow-xs rounded-xl">
           <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-            <CardTitle className="text-xs font-semibold text-zinc-500">Outstanding Balance</CardTitle>
-            <Receipt className="h-4.5 w-4.5 text-rose-500" />
+            <CardTitle className="text-xs font-semibold text-muted-foreground">Outstanding Balance</CardTitle>
+            <Receipt className="h-4.5 w-4.5 text-destructive" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-black text-zinc-900 dark:text-zinc-50 text-rose-700 dark:text-rose-500">
+            <div className="font-mono text-2xl font-semibold tabular-nums text-destructive">
               {formatCurrency(outstandingBalance)}
             </div>
-            <p className="text-[10px] text-zinc-400 mt-1">Awaiting your payment</p>
+            <p className="text-xs text-muted-foreground mt-1">Awaiting your payment</p>
           </CardContent>
         </Card>
 
-        <Card className="border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-sm rounded-xl">
+        <Card className="border-border bg-card shadow-xs rounded-xl">
           <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-            <CardTitle className="text-xs font-semibold text-zinc-500">Files Shared</CardTitle>
-            <FolderOpen className="h-4.5 w-4.5 text-emerald-500" />
+            <CardTitle className="text-xs font-semibold text-muted-foreground">Files Shared</CardTitle>
+            <FolderOpen className="h-4.5 w-4.5 text-emerald-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-black text-zinc-900 dark:text-zinc-50">
+            <div className="font-mono text-2xl font-semibold tabular-nums text-foreground">
               {totalFilesCount}
             </div>
-            <p className="text-[10px] text-zinc-400 mt-1">Project resources & deliverables</p>
+            <p className="text-xs text-muted-foreground mt-1">Project resources & deliverables</p>
           </CardContent>
         </Card>
       </div>
@@ -192,29 +192,29 @@ export default async function ClientPortalDashboardPage({ params }: PageProps) {
       {/* Main Grid: Projects & Invoices */}
       <div className="grid gap-6 md:grid-cols-2">
         {/* Projects Section */}
-        <Card className="border-zinc-200 dark:border-zinc-800 shadow-sm rounded-xl bg-white dark:bg-zinc-900 overflow-hidden">
-          <CardHeader className="border-b border-zinc-100 dark:border-gray-800 pb-4">
-            <CardTitle className="text-sm font-bold text-zinc-900 dark:text-zinc-50 flex items-center gap-2">
-              <Briefcase className="h-4.5 w-4.5 text-indigo-500" /> Projects
+        <Card className="border-border shadow-xs rounded-xl bg-card overflow-hidden">
+          <CardHeader className="border-b border-border pb-4">
+            <CardTitle className="text-sm font-bold text-foreground flex items-center gap-2">
+              <Briefcase className="h-4.5 w-4.5 text-primary" /> Projects
             </CardTitle>
           </CardHeader>
           <CardContent className="p-0">
             {projects.length === 0 ? (
-              <div className="text-center py-10 text-zinc-500 text-xs">
+              <div className="text-center py-10 text-muted-foreground text-xs">
                 No active projects assigned to your account.
               </div>
             ) : (
-              <div className="divide-y divide-zinc-100 dark:divide-gray-800">
+              <div className="divide-y divide-border">
                 {projects.map((project) => (
-                  <div key={project.id} className="p-4 flex items-center justify-between hover:bg-zinc-50/40 dark:hover:bg-zinc-950/10 transition-colors">
+                  <div key={project.id} className="p-4 flex items-center justify-between hover:bg-muted/40 transition-colors">
                     <div className="space-y-1 pr-4 min-w-0">
-                      <h3 className="text-xs font-bold text-zinc-900 dark:text-zinc-50 truncate">
+                      <h3 className="text-sm font-semibold text-foreground truncate">
                         {project.name}
                       </h3>
-                      <p className="text-[10px] text-zinc-400 truncate max-w-sm">
+                      <p className="text-xs text-muted-foreground truncate max-w-sm">
                         {project.description || 'No description provided.'}
                       </p>
-                      <div className="flex items-center gap-2 pt-1 text-[10px] text-zinc-400">
+                      <div className="flex items-center gap-2 pt-1 text-[11px] text-muted-foreground">
                         <span className="flex items-center">
                           <Calendar className="mr-1 h-3 w-3" /> Due {new Date(project.deadline).toLocaleDateString()}
                         </span>
@@ -224,18 +224,18 @@ export default async function ClientPortalDashboardPage({ params }: PageProps) {
                     </div>
                     <div className="flex items-center gap-3 shrink-0">
                       <div className="flex flex-col items-end gap-1.5">
-                        <div className="flex items-center gap-1">
-                          <div className="w-14 bg-zinc-100 dark:bg-zinc-800 h-1 rounded-full overflow-hidden">
-                            <div className="bg-indigo-600 h-full" style={{ width: `${project.progress}%` }}></div>
+                        <div className="flex items-center gap-1.5">
+                          <div className="w-14 bg-muted h-1.5 rounded-full overflow-hidden">
+                            <div className="bg-primary h-full" style={{ width: `${project.progress}%` }}></div>
                           </div>
-                          <span className="text-[9px] font-bold text-zinc-600 dark:text-zinc-400">{project.progress}%</span>
+                          <span className="font-mono text-[11px] font-semibold tabular-nums text-muted-foreground">{project.progress}%</span>
                         </div>
-                        <Badge variant="outline" className={`text-[9px] font-bold tracking-wider uppercase px-1.5 border py-0 ${STATUS_COLORS[project.status] || ''}`}>
+                        <Badge variant="outline" className={`text-[11px] font-semibold tracking-wider uppercase px-1.5 border py-0 ${STATUS_COLORS[project.status] || ''}`}>
                           {project.status}
                         </Badge>
                       </div>
                       <Link href={`/${workspaceSlug}/portal/projects/${project.id}`}>
-                        <Button variant="ghost" size="icon" className="h-7 w-7 text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200">
+                        <Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground hover:text-foreground">
                           <ExternalLink className="h-3.5 w-3.5" />
                         </Button>
                       </Link>
@@ -248,39 +248,39 @@ export default async function ClientPortalDashboardPage({ params }: PageProps) {
         </Card>
 
         {/* Recent Invoices Section */}
-        <Card className="border-zinc-200 dark:border-zinc-800 shadow-sm rounded-xl bg-white dark:bg-zinc-900 overflow-hidden">
-          <CardHeader className="border-b border-zinc-100 dark:border-gray-800 pb-4 flex flex-row items-center justify-between space-y-0">
-            <CardTitle className="text-sm font-bold text-zinc-900 dark:text-zinc-50 flex items-center gap-2">
-              <Receipt className="h-4.5 w-4.5 text-rose-500" /> Recent Invoices
+        <Card className="border-border shadow-xs rounded-xl bg-card overflow-hidden">
+          <CardHeader className="border-b border-border pb-4 flex flex-row items-center justify-between space-y-0">
+            <CardTitle className="text-sm font-bold text-foreground flex items-center gap-2">
+              <Receipt className="h-4.5 w-4.5 text-primary" /> Recent Invoices
             </CardTitle>
-            <Link href={`/${workspaceSlug}/portal/invoices`} className="text-[11px] font-bold text-indigo-600 hover:underline dark:text-indigo-400">
+            <Link href={`/${workspaceSlug}/portal/invoices`} className="text-xs font-semibold text-primary hover:underline">
               View All
             </Link>
           </CardHeader>
           <CardContent className="p-0">
             {invoices.length === 0 ? (
-              <div className="text-center py-10 text-zinc-500 text-xs">
+              <div className="text-center py-10 text-muted-foreground text-xs">
                 No invoices issued for your account.
               </div>
             ) : (
-              <div className="divide-y divide-zinc-100 dark:divide-gray-800">
+              <div className="divide-y divide-border">
                 {invoices.slice(0, 5).map((invoice) => (
-                  <div key={invoice.id} className="p-4 flex items-center justify-between hover:bg-zinc-50/40 dark:hover:bg-zinc-950/10 transition-colors">
+                  <div key={invoice.id} className="p-4 flex items-center justify-between hover:bg-muted/40 transition-colors">
                     <div className="space-y-0.5">
                       <div className="flex items-center gap-2">
-                        <span className="text-xs font-bold text-zinc-900 dark:text-zinc-50">
+                        <span className="font-mono text-xs font-bold text-foreground">
                           {invoice.invoiceNumber}
                         </span>
-                        <Badge variant="outline" className={`text-[8px] font-black uppercase px-1 border tracking-wide ${STATUS_COLORS[invoice.status]}`}>
+                        <Badge variant="outline" className={`text-[11px] font-semibold uppercase px-1.5 border tracking-wide ${STATUS_COLORS[invoice.status]}`}>
                           {invoice.status}
                         </Badge>
                       </div>
-                      <p className="text-[9px] text-zinc-400 mt-0.5">
+                      <p className="text-[11px] text-muted-foreground mt-0.5">
                         Due {new Date(invoice.dueDate).toLocaleDateString()}
                       </p>
                     </div>
                     <div className="flex items-center gap-3 shrink-0">
-                      <span className="text-xs font-black text-zinc-900 dark:text-zinc-50">
+                      <span className="font-mono text-xs font-semibold tabular-nums text-foreground">
                         {formatCurrency(Number(invoice.totalAmount), invoice.currency)}
                       </span>
                       <a 
@@ -288,7 +288,7 @@ export default async function ClientPortalDashboardPage({ params }: PageProps) {
                         target="_blank"
                         rel="noreferrer"
                       >
-                        <Button variant="ghost" size="icon" className="h-7 w-7 text-zinc-400 hover:text-slate-600 dark:hover:text-zinc-200">
+                        <Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground hover:text-foreground">
                           <Download className="h-3.5 w-3.5" />
                         </Button>
                       </a>
@@ -302,29 +302,29 @@ export default async function ClientPortalDashboardPage({ params }: PageProps) {
       </div>
 
       {/* Shared Files Panel */}
-      <Card className="border-zinc-200 dark:border-zinc-800 shadow-sm rounded-xl bg-white dark:bg-zinc-900 overflow-hidden">
-        <CardHeader className="border-b border-zinc-100 dark:border-gray-800 pb-4 flex flex-row items-center justify-between space-y-0">
-          <CardTitle className="text-sm font-bold text-zinc-900 dark:text-zinc-50 flex items-center gap-2">
-            <FolderOpen className="h-4.5 w-4.5 text-emerald-500" /> Recent Files
+      <Card className="border-border shadow-xs rounded-xl bg-card overflow-hidden">
+        <CardHeader className="border-b border-border pb-4 flex flex-row items-center justify-between space-y-0">
+          <CardTitle className="text-sm font-bold text-foreground flex items-center gap-2">
+            <FolderOpen className="h-4.5 w-4.5 text-primary" /> Recent Files
           </CardTitle>
-          <Link href={`/${workspaceSlug}/portal/files`} className="text-[11px] font-bold text-indigo-600 hover:underline dark:text-indigo-400">
+          <Link href={`/${workspaceSlug}/portal/files`} className="text-xs font-semibold text-primary hover:underline">
             View All
           </Link>
         </CardHeader>
         <CardContent className="p-0">
           {files.length === 0 ? (
-            <div className="text-center py-10 text-zinc-500 text-xs">
+            <div className="text-center py-10 text-muted-foreground text-xs">
               No files shared for your projects.
             </div>
           ) : (
-            <div className="divide-y divide-zinc-100 dark:divide-gray-800">
+            <div className="divide-y divide-border">
               {files.map((file) => (
-                <div key={file.id} className="p-3.5 flex items-center justify-between hover:bg-zinc-50/40 dark:hover:bg-zinc-950/10 transition-colors text-xs">
+                <div key={file.id} className="p-3.5 flex items-center justify-between hover:bg-muted/40 transition-colors text-xs">
                   <div className="flex items-center gap-2.5 min-w-0 pr-4">
-                    <FolderOpen className="h-4 w-4 text-zinc-400 shrink-0" />
+                    <FolderOpen className="h-4 w-4 text-muted-foreground shrink-0" />
                     <div className="min-w-0">
-                      <div className="font-bold text-zinc-900 dark:text-zinc-50 truncate max-w-md">{file.fileName}</div>
-                      <div className="text-[9px] text-zinc-400 mt-0.5">
+                      <div className="font-semibold text-foreground truncate max-w-md">{file.fileName}</div>
+                      <div className="text-[11px] text-muted-foreground mt-0.5">
                         {file.fileType.toUpperCase()} &bull; {new Intl.NumberFormat('en', { notation: 'compact', style: 'unit', unit: 'byte' }).format(Number(file.fileSize))} &bull; Shared {new Date(file.createdAt).toLocaleDateString()}
                       </div>
                     </div>
@@ -334,7 +334,7 @@ export default async function ClientPortalDashboardPage({ params }: PageProps) {
                     target="_blank"
                     rel="noreferrer"
                   >
-                    <Button variant="ghost" size="icon" className="h-7 w-7 text-zinc-400 hover:text-slate-600 dark:hover:text-zinc-200">
+                    <Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground hover:text-foreground">
                       <Download className="h-3.5 w-3.5" />
                     </Button>
                   </a>

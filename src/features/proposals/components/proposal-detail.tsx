@@ -136,31 +136,31 @@ export function ProposalDetail({ proposal: initialProposal, workspaceId, workspa
     switch (status) {
       case 'APPROVED':
         return (
-          <Badge className="text-[9px] font-bold px-1.5 py-0.5 bg-green-500/10 text-green-600 dark:text-green-400 border border-green-600/15" variant="secondary">
+          <Badge className="text-[11px] font-semibold px-2 py-0.5 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-600/20" variant="secondary">
             Approved
           </Badge>
         );
       case 'SENT':
         return (
-          <Badge className="text-[9px] font-bold px-1.5 py-0.5 bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-600/15" variant="secondary">
+          <Badge className="text-[11px] font-semibold px-2 py-0.5 bg-blue-500/10 text-blue-700 dark:text-blue-400 border border-blue-600/20" variant="secondary">
             Sent
           </Badge>
         );
       case 'REJECTED':
         return (
-          <Badge className="text-[9px] font-bold px-1.5 py-0.5 bg-red-500/10 text-red-700 dark:text-red-400 border border-red-600/15" variant="secondary">
+          <Badge className="text-[11px] font-semibold px-2 py-0.5 bg-red-500/10 text-red-700 dark:text-red-400 border border-red-600/20" variant="secondary">
             Rejected
           </Badge>
         );
       case 'EXPIRED':
         return (
-          <Badge className="text-[9px] font-bold px-1.5 py-0.5 bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 border border-zinc-200/30" variant="secondary">
+          <Badge className="text-[11px] font-semibold px-2 py-0.5 bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 border border-zinc-200/40" variant="secondary">
             Expired
           </Badge>
         );
       default:
         return (
-          <Badge className="text-[9px] font-bold px-1.5 py-0.5 bg-zinc-50 dark:bg-zinc-950 text-zinc-400 dark:text-slate-500 border border-zinc-200/60 dark:border-gray-800" variant="secondary">
+          <Badge className="text-[11px] font-semibold px-2 py-0.5 bg-zinc-50 dark:bg-zinc-950 text-zinc-600 dark:text-zinc-400 border border-zinc-200/60 dark:border-zinc-800" variant="secondary">
             Draft
           </Badge>
         );
@@ -230,12 +230,11 @@ export function ProposalDetail({ proposal: initialProposal, workspaceId, workspa
       {/* Grid details */}
       <div className="grid gap-6 md:grid-cols-3">
         {/* Proposal Document Main Sheet */}
-        <Card className="md:col-span-2 shadow-xs border border-zinc-200/60 dark:border-zinc-800/80 rounded-xl overflow-hidden bg-white dark:bg-zinc-900 relative">
-          {/* Subtle gold decoration dot */}
-          <div className="absolute top-0 left-0 w-full h-[3px] bg-gradient-to-r from-amber-500 to-amber-600" />
-          <CardHeader className="border-b border-gray-100 dark:border-zinc-800 pb-6 pt-7">
+        <Card className="md:col-span-2 shadow-xs border border-border rounded-xl overflow-hidden bg-card relative">
+          <div className="absolute top-0 left-0 w-full h-[3px] bg-primary" />
+          <CardHeader className="border-b border-border pb-6 pt-7">
             <div className="flex items-center justify-between">
-              <span className="text-[9px] font-mono tracking-wider font-bold text-zinc-400 uppercase">
+              <span className="text-xs font-mono tracking-wider font-semibold text-muted-foreground uppercase">
                 {proposal.proposalNumber}
               </span>
               {getStatusBadge(proposal.status)}
@@ -266,7 +265,7 @@ export function ProposalDetail({ proposal: initialProposal, workspaceId, workspa
                 <div className="overflow-x-auto">
                 <table className="w-full text-left border-collapse text-xs">
                   <thead>
-                    <tr className="bg-zinc-50/50 dark:bg-zinc-900/30 text-[9px] font-bold text-zinc-400 dark:text-slate-500 border-b border-zinc-200/60 dark:border-zinc-800 uppercase tracking-wider">
+                    <tr className="bg-muted/40 text-[11px] font-semibold text-muted-foreground border-b border-border uppercase tracking-wider">
                       <th className="px-4 py-2.5">Scope Description</th>
                       <th className="px-4 py-2.5 text-center">Qty</th>
                       <th className="px-4 py-2.5 text-right">Unit Rate</th>

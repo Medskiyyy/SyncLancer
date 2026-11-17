@@ -88,11 +88,11 @@ export default async function ClientInvoicesPage({ params }: PageProps) {
   };
 
   const STATUS_COLORS: Record<string, string> = {
-    DRAFT: 'bg-zinc-100 text-zinc-800 dark:bg-zinc-800 dark:text-zinc-200 border-zinc-200',
-    SENT: 'bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300 border-blue-200',
-    PAID: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 border-emerald-200',
-    OVERDUE: 'bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300 border-rose-200',
-    CANCELLED: 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300 border-amber-200',
+    DRAFT: 'bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-200 border-zinc-200 dark:border-zinc-700',
+    SENT: 'bg-blue-50 text-blue-700 dark:bg-blue-950/40 dark:text-blue-300 border-blue-200 dark:border-blue-800',
+    PAID: 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800',
+    OVERDUE: 'bg-red-50 text-red-700 dark:bg-red-950/40 dark:text-red-300 border-red-200 dark:border-red-800',
+    CANCELLED: 'bg-amber-50 text-amber-800 dark:bg-amber-950/40 dark:text-amber-300 border-amber-200 dark:border-amber-800',
   };
 
   return (
@@ -100,15 +100,15 @@ export default async function ClientInvoicesPage({ params }: PageProps) {
       {/* Header Panel */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">Invoices & Billing</h1>
-          <p className="text-sm text-zinc-500 mt-0.5">
+          <h1 className="font-heading text-2xl font-bold tracking-tight text-foreground">Invoices & Billing</h1>
+          <p className="text-sm text-muted-foreground mt-0.5">
             Review your billing statements, invoices, and payment history.
           </p>
         </div>
-        <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg p-3 px-4 flex items-center gap-3">
+        <div className="bg-card border border-border rounded-lg p-3 px-4 flex items-center gap-3">
           <div>
-            <span className="text-[10px] text-zinc-400 dark:text-zinc-500 uppercase font-semibold">Total Outstanding</span>
-            <div className="text-lg font-black text-zinc-900 dark:text-zinc-50">
+            <span className="text-[11px] text-muted-foreground uppercase font-semibold">Total Outstanding</span>
+            <div className="font-mono text-lg font-semibold tabular-nums text-foreground">
               {formatCurrency(outstandingBalance)}
             </div>
           </div>
@@ -116,10 +116,10 @@ export default async function ClientInvoicesPage({ params }: PageProps) {
       </div>
 
       {/* Invoices List Table */}
-      <Card className="border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 rounded-xl shadow-sm overflow-hidden">
-        <CardHeader className="border-b border-zinc-100 dark:border-gray-800 pb-4">
-          <CardTitle className="text-base font-bold text-zinc-900 dark:text-zinc-50 flex items-center gap-2">
-            <FileText className="h-5 w-5 text-indigo-500" /> Billing History
+      <Card className="border-border bg-card rounded-xl shadow-xs overflow-hidden">
+        <CardHeader className="border-b border-border pb-4">
+          <CardTitle className="text-base font-bold text-foreground flex items-center gap-2">
+            <FileText className="h-5 w-5 text-primary" /> Billing History
           </CardTitle>
           <CardDescription className="text-xs">
             A comprehensive list of all invoices issued to {clientUser.client.companyName}.
@@ -127,16 +127,16 @@ export default async function ClientInvoicesPage({ params }: PageProps) {
         </CardHeader>
         <CardContent className="p-0">
           {invoices.length === 0 ? (
-            <div className="text-center py-12 text-gray-500 dark:text-zinc-400 space-y-2">
-              <FileText className="h-10 w-10 mx-auto text-zinc-300 dark:text-zinc-700" />
-              <p className="text-sm font-semibold">No invoices found</p>
-              <p className="text-xs text-zinc-400">You have no invoices generated for your account.</p>
+            <div className="text-center py-12 text-muted-foreground space-y-2">
+              <FileText className="h-10 w-10 mx-auto text-muted-foreground/50" />
+              <p className="text-sm font-semibold text-foreground">No invoices found</p>
+              <p className="text-xs text-muted-foreground">You have no invoices generated for your account.</p>
             </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse">
                 <thead>
-                  <tr className="border-b border-gray-100 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-950/20 text-xs font-bold text-zinc-500 dark:text-zinc-400">
+                  <tr className="border-b border-border bg-muted/40 text-xs font-bold text-muted-foreground">
                     <th className="py-3 px-4 font-bold">Invoice Number</th>
                     <th className="py-3 px-4 font-bold">Project</th>
                     <th className="py-3 px-4 font-bold">Due Date</th>
@@ -145,24 +145,24 @@ export default async function ClientInvoicesPage({ params }: PageProps) {
                     <th className="py-3 px-4 font-bold text-right">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-100 dark:divide-gray-800 text-xs">
+                <tbody className="divide-y divide-border text-xs">
                   {invoices.map((invoice) => (
-                    <tr key={invoice.id} className="hover:bg-zinc-50/40 dark:hover:bg-zinc-950/10 transition-colors">
-                      <td className="py-3.5 px-4 font-bold text-zinc-900 dark:text-zinc-50">
+                    <tr key={invoice.id} className="hover:bg-muted/40 transition-colors">
+                      <td className="py-3.5 px-4 font-mono font-bold text-foreground">
                         {invoice.invoiceNumber}
                       </td>
-                      <td className="py-3.5 px-4 text-slate-600 dark:text-zinc-400 font-medium">
+                      <td className="py-3.5 px-4 text-muted-foreground font-medium">
                         {invoice.project?.name || 'General Billing'}
                       </td>
-                      <td className="py-3.5 px-4 text-slate-600 dark:text-zinc-400 font-medium">
+                      <td className="py-3.5 px-4 text-muted-foreground font-medium">
                         {formatDate(invoice.dueDate)}
                       </td>
                       <td className="py-3.5 px-4">
-                        <Badge variant="outline" className={`text-[9px] font-bold uppercase tracking-wider px-2 border ${STATUS_COLORS[invoice.status]}`}>
+                        <Badge variant="outline" className={`text-[11px] font-semibold uppercase tracking-wider px-2 border ${STATUS_COLORS[invoice.status]}`}>
                           {invoice.status}
                         </Badge>
                       </td>
-                      <td className="py-3.5 px-4 text-right font-bold text-zinc-900 dark:text-zinc-50">
+                      <td className="py-3.5 px-4 text-right font-mono font-semibold tabular-nums text-foreground">
                         {formatCurrency(Number(invoice.totalAmount), invoice.currency)}
                       </td>
                       <td className="py-3.5 px-4 text-right">

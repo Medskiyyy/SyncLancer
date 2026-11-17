@@ -419,7 +419,7 @@ export function ProposalBuilder({
                         />
 
                         <div className="flex flex-col justify-end text-right pb-1">
-                          <span className="text-[9px] text-zinc-400 dark:text-zinc-500 uppercase font-bold tracking-wider">Subtotal</span>
+                          <span className="text-[11px] text-zinc-500 dark:text-zinc-400 uppercase font-semibold tracking-wider">Subtotal</span>
                           <span className="text-sm font-bold text-zinc-900 dark:text-zinc-100 font-mono mt-0.5">
                             {new Intl.NumberFormat('en-US', {
                               style: 'currency',

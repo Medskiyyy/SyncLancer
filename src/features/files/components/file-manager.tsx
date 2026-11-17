@@ -222,7 +222,7 @@ export function FileManager({ projectId, workspaceId, initialFiles }: FileManage
   const getFileIconInfo = (fileName: string) => {
     const ext = fileName.split('.').pop()?.toLowerCase() || '';
     if (ext === 'pdf') {
-      return { icon: FileText, color: 'text-rose-600 bg-rose-50 border-rose-100' };
+      return { icon: FileText, color: 'text-red-600 bg-red-50 border-red-100' };
     }
     if (['xls', 'xlsx', 'csv'].includes(ext)) {
       return { icon: FileText, color: 'text-emerald-700 bg-emerald-50 border-emerald-100' };
@@ -283,7 +283,7 @@ export function FileManager({ projectId, workspaceId, initialFiles }: FileManage
                     style={{ width: `${storagePercentage}%` }}
                   ></div>
                 </div>
-                <div className="text-[9px] text-right font-semibold text-zinc-500">
+                <div className="text-[11px] text-right font-semibold text-zinc-500">
                   {storagePercentage.toFixed(1)}% full
                 </div>
               </div>
@@ -406,7 +406,7 @@ export function FileManager({ projectId, workspaceId, initialFiles }: FileManage
                   </div>
                   
                   <div className="flex items-center justify-between mt-auto">
-                    <span className="text-[9px] font-medium text-slate-500 truncate max-w-[120px]" title={`Uploaded by ${file.uploader?.fullName || 'Workspace member'}`}>
+                    <span className="text-[11px] font-medium text-slate-500 truncate max-w-[120px]" title={`Uploaded by ${file.uploader?.fullName || 'Workspace member'}`}>
                       By {file.uploader?.fullName?.split(' ')[0] || 'Member'}
                     </span>
                     <div className="flex items-center gap-0.5">

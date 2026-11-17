@@ -91,7 +91,7 @@ export default async function WorkspaceInvoicesPage({ params }: PageProps) {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-gray-500">Invoices</h1>
+        <h1 className="font-heading text-3xl font-bold tracking-tight text-foreground">Invoices</h1>
         <p className="text-sm text-zinc-500 dark:text-zinc-400">
           Manage, send, and track client billing invoices in this workspace.
         </p>

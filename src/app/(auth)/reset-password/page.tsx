@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { AuthShell } from '@/components/auth/auth-shell';
 
 function ResetPasswordForm() {
   const searchParams = useSearchParams();
@@ -133,16 +134,16 @@ function ResetPasswordForm() {
 
 export default function ResetPasswordPage() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 p-4 dark:bg-zinc-950">
+    <AuthShell>
       <Suspense fallback={
-        <Card className="w-full max-w-md shadow-lg">
+        <Card className="w-full max-w-md border-border bg-card shadow-sm">
           <CardHeader className="space-y-1 text-center">
-            <CardTitle className="text-2xl font-bold tracking-tight">Loading...</CardTitle>
+            <CardTitle className="text-2xl font-bold tracking-tight font-heading">Loading...</CardTitle>
           </CardHeader>
         </Card>
       }>
         <ResetPasswordForm />
       </Suspense>
-    </div>
+    </AuthShell>
   );
 }

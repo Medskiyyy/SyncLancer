@@ -13,6 +13,7 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { signIn } from 'next-auth/react';
+import { AuthShell } from '@/components/auth/auth-shell';
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -52,7 +53,7 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="relative flex min-h-screen items-center justify-center bg-background p-4 overflow-hidden">
+    <AuthShell>
       <Card className="w-full max-w-md border-border bg-card shadow-sm">
         <CardHeader className="space-y-1.5 text-center">
           <CardTitle className="text-2xl font-bold tracking-tight font-heading">Create an account</CardTitle>
@@ -76,7 +77,7 @@ export default function RegisterPage() {
                   <FormItem>
                     <FormLabel>Full Name</FormLabel>
                     <FormControl>
-                      <Input placeholder="John Doe" disabled={isLoading} {...field} />
+                      <Input placeholder="Raka Pratama" disabled={isLoading} {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -90,7 +91,7 @@ export default function RegisterPage() {
                   <FormItem>
                     <FormLabel>Email Address</FormLabel>
                     <FormControl>
-                      <Input type="email" placeholder="john@example.com" disabled={isLoading} {...field} />
+                      <Input type="email" placeholder="nama@studio.id" disabled={isLoading} {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -122,7 +123,7 @@ export default function RegisterPage() {
               <span className="w-full border-t border-border/60" />
             </div>
             <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-[#fcfbf9] px-3 text-muted-foreground dark:bg-[#12100e] rounded-md border border-border/40">
+              <span className="bg-card px-3 text-muted-foreground rounded-md border border-border/60">
                 Or continue with
               </span>
             </div>
@@ -153,6 +154,6 @@ export default function RegisterPage() {
           </Link>
         </CardFooter>
       </Card>
-    </div>
+    </AuthShell>
   );
 }

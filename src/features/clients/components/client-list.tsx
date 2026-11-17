@@ -427,7 +427,7 @@ export function ClientList({ initialClients, workspaceId, workspaceSlug }: Clien
                   <FormItem>
                     <FormLabel className="text-xs font-semibold text-zinc-700 dark:text-zinc-300">Company Name</FormLabel>
                     <FormControl>
-                      <Input placeholder="Acme Inc" disabled={isLoading} className="text-xs h-9 rounded-lg" {...field} />
+                      <Input placeholder="Nusantara Retail" disabled={isLoading} className="text-xs h-9 rounded-lg" {...field} />
                     </FormControl>
                     <FormMessage className="text-[10px]" />
                   </FormItem>
@@ -440,7 +440,7 @@ export function ClientList({ initialClients, workspaceId, workspaceSlug }: Clien
                   <FormItem>
                     <FormLabel className="text-xs font-semibold text-zinc-700 dark:text-zinc-300">Primary Contact Email</FormLabel>
                     <FormControl>
-                      <Input type="email" placeholder="billing@acme.com" disabled={isLoading} className="text-xs h-9 rounded-lg" {...field} />
+                      <Input type="email" placeholder="billing@nusantara.id" disabled={isLoading} className="text-xs h-9 rounded-lg" {...field} />
                     </FormControl>
                     <FormMessage className="text-[10px]" />
                   </FormItem>
@@ -503,7 +503,7 @@ export function ClientList({ initialClients, workspaceId, workspaceSlug }: Clien
                   <FormItem>
                     <FormLabel className="text-xs font-semibold text-zinc-700 dark:text-zinc-300">Company Name</FormLabel>
                     <FormControl>
-                      <Input placeholder="Acme Inc" disabled={isLoading} className="text-xs h-9 rounded-lg" {...field} />
+                      <Input placeholder="Nusantara Retail" disabled={isLoading} className="text-xs h-9 rounded-lg" {...field} />
                     </FormControl>
                     <FormMessage className="text-[10px]" />
                   </FormItem>
@@ -516,7 +516,7 @@ export function ClientList({ initialClients, workspaceId, workspaceSlug }: Clien
                   <FormItem>
                     <FormLabel className="text-xs font-semibold text-zinc-700 dark:text-zinc-300">Primary Contact Email</FormLabel>
                     <FormControl>
-                      <Input type="email" placeholder="billing@acme.com" disabled={isLoading} className="text-xs h-9 rounded-lg" {...field} />
+                      <Input type="email" placeholder="billing@nusantara.id" disabled={isLoading} className="text-xs h-9 rounded-lg" {...field} />
                     </FormControl>
                     <FormMessage className="text-[10px]" />
                   </FormItem>

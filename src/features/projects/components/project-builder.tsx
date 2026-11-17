@@ -166,7 +166,7 @@ export function ProjectBuilder({
           <Card className="border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 rounded-xl shadow-sm">
             <CardHeader className="border-b border-slate-100 dark:border-gray-800 pb-4">
               <CardTitle className="text-base font-bold text-slate-900 dark:text-slate-50 flex items-center gap-2">
-                <Briefcase className="h-5 w-5 text-indigo-500" /> Project Specifications
+                <Briefcase className="h-5 w-5 text-primary" /> Project Specifications
               </CardTitle>
               <CardDescription className="text-xs">
                 Fill in the basic workspace parameters for this engagement.
@@ -181,7 +181,7 @@ export function ProjectBuilder({
                     <FormLabel className="text-slate-700 dark:text-slate-300 font-medium">Project Name</FormLabel>
                     <FormControl>
                       <Input 
-                        placeholder="e.g. Acme Website Redesign" 
+                        placeholder="e.g. Nusantara Portal Redesign" 
                         {...field} 
                         className="bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800"
                       />
@@ -284,7 +284,7 @@ export function ProjectBuilder({
           <Card className="border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 rounded-xl shadow-sm">
             <CardHeader className="border-b border-slate-100 dark:border-gray-800 pb-4">
               <CardTitle className="text-base font-bold text-slate-900 dark:text-slate-50 flex items-center gap-2">
-                <DollarSign className="h-5 w-5 text-indigo-500" /> Budget & Timeline
+                <DollarSign className="h-5 w-5 text-primary" /> Budget & Timeline
               </CardTitle>
               <CardDescription className="text-xs">
                 Configure financials and dates.
@@ -384,7 +384,7 @@ export function ProjectBuilder({
             <Card className="border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 rounded-xl shadow-sm">
               <CardHeader className="border-b border-slate-100 dark:border-gray-800 pb-4">
                 <CardTitle className="text-base font-bold text-slate-900 dark:text-slate-50 flex items-center gap-2">
-                  <Calendar className="h-5 w-5 text-indigo-500" /> Predefined Milestones & Tasks Template
+                  <Calendar className="h-5 w-5 text-primary" /> Predefined Milestones & Tasks Template
                 </CardTitle>
                 <CardDescription className="text-xs">
                   Optional: Automatically pre-populate your milestones and task list.
@@ -437,7 +437,7 @@ export function ProjectBuilder({
             <Button
               type="submit"
               disabled={isLoading || showLimitWarning}
-              className="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold shadow-md shadow-indigo-500/10"
+              className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold"
             >
               {isLoading ? 'Saving...' : isEdit ? 'Save Changes' : 'Create Project'}
             </Button>

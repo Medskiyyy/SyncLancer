@@ -75,31 +75,31 @@ export function ProposalList({ initialProposals, workspaceId, workspaceSlug }: P
     switch (status) {
       case 'APPROVED':
         return (
-          <Badge className="text-[9px] font-bold px-1.5 py-0.5 bg-green-500/10 text-green-600 dark:text-green-400 border border-green-600/15" variant="secondary">
+          <Badge className="text-[11px] font-semibold px-2 py-0.5 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-600/20" variant="secondary">
             Approved
           </Badge>
         );
       case 'SENT':
         return (
-          <Badge className="text-[9px] font-bold px-1.5 py-0.5 bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-600/15" variant="secondary">
+          <Badge className="text-[11px] font-semibold px-2 py-0.5 bg-blue-500/10 text-blue-700 dark:text-blue-400 border border-blue-600/20" variant="secondary">
             Sent
           </Badge>
         );
       case 'REJECTED':
         return (
-          <Badge className="text-[9px] font-bold px-1.5 py-0.5 bg-red-500/10 text-red-700 dark:text-red-400 border border-red-600/15" variant="secondary">
+          <Badge className="text-[11px] font-semibold px-2 py-0.5 bg-red-500/10 text-red-700 dark:text-red-400 border border-red-600/20" variant="secondary">
             Rejected
           </Badge>
         );
       case 'EXPIRED':
         return (
-          <Badge className="text-[9px] font-bold px-1.5 py-0.5 bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 border border-zinc-200/30" variant="secondary">
+          <Badge className="text-[11px] font-semibold px-2 py-0.5 bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 border border-zinc-200/40" variant="secondary">
             Expired
           </Badge>
         );
       default:
         return (
-          <Badge className="text-[9px] font-bold px-1.5 py-0.5 bg-zinc-50 dark:bg-zinc-950 text-zinc-400 dark:text-zinc-500 border border-zinc-200/60 dark:border-gray-800" variant="secondary">
+          <Badge className="text-[11px] font-semibold px-2 py-0.5 bg-zinc-50 dark:bg-zinc-950 text-zinc-600 dark:text-zinc-400 border border-zinc-200/60 dark:border-zinc-800" variant="secondary">
             Draft
           </Badge>
         );
@@ -155,8 +155,8 @@ export function ProposalList({ initialProposals, workspaceId, workspaceSlug }: P
 
       {/* Grid Table */}
       {filteredProposals.length === 0 ? (
-        <Card className="flex flex-col items-center justify-center p-12 text-center border-dashed border-zinc-200/60 dark:border-zinc-800">
-          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-zinc-50 dark:bg-zinc-950 text-zinc-400 mb-4 border border-zinc-200/50 dark:border-zinc-800/80 animate-pulse">
+        <Card className="flex flex-col items-center justify-center p-12 text-center border-dashed border-border">
+          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-muted text-muted-foreground mb-4 border border-border">
             <FileText className="h-6 w-6" />
           </div>
           <CardTitle className="text-sm font-bold text-zinc-900 dark:text-zinc-50">
@@ -180,34 +180,34 @@ export function ProposalList({ initialProposals, workspaceId, workspaceSlug }: P
         <Card className="overflow-hidden border border-zinc-200/60 dark:border-zinc-800/80 rounded-xl shadow-xs">
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse text-xs">
-              <thead>
-                <tr className="border-b border-zinc-200 dark:border-zinc-800 text-[10px] font-bold text-zinc-400 dark:text-slate-500 uppercase tracking-wider bg-zinc-50/50 dark:bg-zinc-900/30">
-                  <th className="px-5 py-3">Number</th>
-                  <th className="px-5 py-3">Client</th>
-                  <th className="px-5 py-3">Proposal Title</th>
-                  <th className="px-5 py-3">Total Amount</th>
-                  <th className="px-5 py-3">Expires</th>
-                  <th className="px-5 py-3">Status</th>
-                  <th className="px-5 py-3 text-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-zinc-200/60 dark:divide-zinc-800/60 bg-white dark:bg-zinc-900">
-                {filteredProposals.map((proposal) => {
-                  const formattedTotal = new Intl.NumberFormat('en-US', {
-                    style: 'currency',
-                    currency: proposal.currency || 'USD',
-                    minimumFractionDigits: 0,
-                    maximumFractionDigits: 0,
-                  }).format(Number(proposal.totalAmount));
+                <thead>
+                  <tr className="border-b border-border text-[11px] font-semibold text-muted-foreground uppercase tracking-wider bg-muted/40">
+                    <th className="px-5 py-3">Number</th>
+                    <th className="px-5 py-3">Client</th>
+                    <th className="px-5 py-3">Proposal Title</th>
+                    <th className="px-5 py-3">Total Amount</th>
+                    <th className="px-5 py-3">Expires</th>
+                    <th className="px-5 py-3">Status</th>
+                    <th className="px-5 py-3 text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border bg-card">
+                  {filteredProposals.map((proposal) => {
+                    const formattedTotal = new Intl.NumberFormat('en-US', {
+                      style: 'currency',
+                      currency: proposal.currency || 'USD',
+                      minimumFractionDigits: 0,
+                      maximumFractionDigits: 0,
+                    }).format(Number(proposal.totalAmount));
 
-                  return (
-                    <tr key={proposal.id} className="hover:bg-zinc-50/40 dark:hover:bg-zinc-900/40 transition-colors">
-                      <td className="px-5 py-3.5 font-mono text-[10px] font-bold text-zinc-500 dark:text-zinc-400">{proposal.proposalNumber}</td>
-                      <td className="px-5 py-3.5">
-                        <div className="flex items-center gap-2">
-                          <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded bg-amber-500/10 text-amber-600 dark:text-amber-400 font-bold border border-amber-500/15 text-[10px]">
-                            {proposal.client.companyName.substring(0, 2).toUpperCase()}
-                          </div>
+                    return (
+                      <tr key={proposal.id} className="hover:bg-muted/40 transition-colors">
+                        <td className="px-5 py-3.5 font-mono text-xs font-semibold text-muted-foreground">{proposal.proposalNumber}</td>
+                        <td className="px-5 py-3.5">
+                          <div className="flex items-center gap-2">
+                            <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded bg-primary/10 text-primary font-bold border border-primary/20 text-[11px]">
+                              {proposal.client.companyName.substring(0, 2).toUpperCase()}
+                            </div>
                           <span className="font-semibold text-zinc-900 dark:text-zinc-100">
                             {proposal.client.companyName}
                           </span>

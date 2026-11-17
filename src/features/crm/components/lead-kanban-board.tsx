@@ -48,12 +48,12 @@ interface LeadKanbanBoardProps {
 }
 
 const COLUMNS = [
-  { label: 'Lead', status: LeadStatus.NEW, theme: 'border-zinc-200/60 dark:border-zinc-800/60 bg-zinc-50/40 dark:bg-zinc-900/10' },
-  { label: 'Contacted', status: LeadStatus.CONTACTED, theme: 'border-blue-200/60 dark:border-blue-900/30 bg-blue-50/50 dark:bg-blue-950/20' },
-  { label: 'Proposal Sent', status: LeadStatus.PROPOSAL_SENT, theme: 'border-violet-200/60 dark:border-violet-900/30 bg-violet-50/50 dark:bg-violet-950/20' },
-  { label: 'Negotiation', status: LeadStatus.NEGOTIATION, theme: 'border-amber-200/60 dark:border-amber-900/30 bg-amber-50/50 dark:bg-amber-950/20' },
-  { label: 'Won', status: LeadStatus.WON, theme: 'border-green-200/60 dark:border-green-900/30 bg-green-50/50 dark:bg-green-950/20' },
-  { label: 'Lost', status: LeadStatus.LOST, theme: 'border-red-200/60 dark:border-red-900/30 bg-red-50/50 dark:bg-red-950/20' },
+  { label: 'Lead', status: LeadStatus.NEW, theme: 'border-border border-t-2 border-t-slate-400 bg-muted/50 dark:bg-muted/20' },
+  { label: 'Contacted', status: LeadStatus.CONTACTED, theme: 'border-border border-t-2 border-t-blue-400 bg-muted/50 dark:bg-muted/20' },
+  { label: 'Proposal Sent', status: LeadStatus.PROPOSAL_SENT, theme: 'border-border border-t-2 border-t-blue-600 bg-muted/50 dark:bg-muted/20' },
+  { label: 'Negotiation', status: LeadStatus.NEGOTIATION, theme: 'border-border border-t-2 border-t-amber-500 bg-muted/50 dark:bg-muted/20' },
+  { label: 'Won', status: LeadStatus.WON, theme: 'border-border border-t-2 border-t-emerald-500 bg-muted/50 dark:bg-muted/20' },
+  { label: 'Lost', status: LeadStatus.LOST, theme: 'border-border border-t-2 border-t-red-500 bg-muted/50 dark:bg-muted/20' },
 ];
 
 interface KanbanColumnProps {
@@ -81,7 +81,7 @@ function KanbanColumn({ id, title, leadsCount, children, theme }: KanbanColumnPr
       className={cn(
         "flex flex-col rounded-xl border p-3 min-h-[550px] w-[280px] shrink-0 transition-all duration-200",
         theme,
-        isOver ? "ring-2 ring-primary/20 border-primary/40 bg-zinc-100/50 dark:bg-zinc-800/20" : ""
+        isOver ? "ring-2 ring-primary/25 border-primary/50 bg-primary/5" : ""
       )}
     >
       <div className="flex items-center justify-between mb-3.5 px-1.5">
@@ -459,7 +459,7 @@ export function LeadKanbanBoard({ initialLeads, workspaceId }: LeadKanbanBoardPr
                   <FormItem>
                     <FormLabel className="text-xs font-semibold text-zinc-700 dark:text-zinc-300">Contact Name</FormLabel>
                     <FormControl>
-                      <Input placeholder="John Doe" disabled={isLoading} className="text-xs h-9 rounded-lg" {...field} />
+                      <Input placeholder="Raka Pratama" disabled={isLoading} className="text-xs h-9 rounded-lg" {...field} />
                     </FormControl>
                     <FormMessage className="text-[10px]" />
                   </FormItem>
@@ -472,7 +472,7 @@ export function LeadKanbanBoard({ initialLeads, workspaceId }: LeadKanbanBoardPr
                   <FormItem>
                     <FormLabel className="text-xs font-semibold text-zinc-700 dark:text-zinc-300">Email Address</FormLabel>
                     <FormControl>
-                      <Input type="email" placeholder="john@example.com" disabled={isLoading} className="text-xs h-9 rounded-lg" {...field} />
+                      <Input type="email" placeholder="raka@studio.id" disabled={isLoading} className="text-xs h-9 rounded-lg" {...field} />
                     </FormControl>
                     <FormMessage className="text-[10px]" />
                   </FormItem>
@@ -485,7 +485,7 @@ export function LeadKanbanBoard({ initialLeads, workspaceId }: LeadKanbanBoardPr
                   <FormItem>
                     <FormLabel className="text-xs font-semibold text-zinc-700 dark:text-zinc-300">Company Name</FormLabel>
                     <FormControl>
-                      <Input placeholder="Acme Corporation" disabled={isLoading} className="text-xs h-9 rounded-lg" {...field} />
+                      <Input placeholder="Nusantara Retail" disabled={isLoading} className="text-xs h-9 rounded-lg" {...field} />
                     </FormControl>
                     <FormMessage className="text-[10px]" />
                   </FormItem>
@@ -548,7 +548,7 @@ export function LeadKanbanBoard({ initialLeads, workspaceId }: LeadKanbanBoardPr
                   <FormItem>
                     <FormLabel className="text-xs font-semibold text-zinc-700 dark:text-zinc-300">Contact Name</FormLabel>
                     <FormControl>
-                      <Input placeholder="John Doe" disabled={isLoading} className="text-xs h-9 rounded-lg" {...field} />
+                      <Input placeholder="Raka Pratama" disabled={isLoading} className="text-xs h-9 rounded-lg" {...field} />
                     </FormControl>
                     <FormMessage className="text-[10px]" />
                   </FormItem>
@@ -561,7 +561,7 @@ export function LeadKanbanBoard({ initialLeads, workspaceId }: LeadKanbanBoardPr
                   <FormItem>
                     <FormLabel className="text-xs font-semibold text-zinc-700 dark:text-zinc-300">Email Address</FormLabel>
                     <FormControl>
-                      <Input type="email" placeholder="john@example.com" disabled={isLoading} className="text-xs h-9 rounded-lg" {...field} />
+                      <Input type="email" placeholder="raka@studio.id" disabled={isLoading} className="text-xs h-9 rounded-lg" {...field} />
                     </FormControl>
                     <FormMessage className="text-[10px]" />
                   </FormItem>
@@ -574,7 +574,7 @@ export function LeadKanbanBoard({ initialLeads, workspaceId }: LeadKanbanBoardPr
                   <FormItem>
                     <FormLabel className="text-xs font-semibold text-zinc-700 dark:text-zinc-300">Company Name</FormLabel>
                     <FormControl>
-                      <Input placeholder="Acme Corporation" disabled={isLoading} className="text-xs h-9 rounded-lg" {...field} />
+                      <Input placeholder="Nusantara Retail" disabled={isLoading} className="text-xs h-9 rounded-lg" {...field} />
                     </FormControl>
                     <FormMessage className="text-[10px]" />
                   </FormItem>
