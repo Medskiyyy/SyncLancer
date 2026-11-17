@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- **Full Anti-Slop UI Overhaul & Typography Wiring (2026-11-18)**:
+  - Loaded `Plus_Jakarta_Sans`, `Onest`, and `JetBrains_Mono` via `next/font/google` in `src/app/layout.tsx` and mapped Tailwind v4 theme variables + `tabular-nums` in `src/app/globals.css`.
+  - Redesigned the landing page (`src/components/landing/*`) with an asymmetric split hero, open hairline feature matrix, 01/02/03 input/output workflow ledger, crisp `bg-slate-950` CTA section, and a new `#portal` showcase section (`landing-portal.tsx`) while eliminating em-dashes, macOS traffic-light dots, blurred blobs, pulsing dots, eyebrow badges, and placeholder names (`Acme`, `John Doe`).
+  - Added shared `AuthShell` (`src/components/auth/auth-shell.tsx`) for Login, Register, Forgot Password, Reset Password, and Onboarding pages, and cleaned up the Offline fallback page.
+  - Unified Dashboard/Analytics KPIs (removed rainbow left borders, added `tabular-nums`), Loading skeleton (replaced spinning circle placeholder with bar skeletons), CRM & Task Kanban boards, Client Portal, Notification Center, Time Tracker, Proposals, Files, and Invoices onto semantic Slate/Blue tokens, raising sub-10px micro-labels (`text-[8px]`/`text-[9px]`) to `text-[11px]`+ and removing animated ping/pulse status dots.
+
+### Fixed
+- **Client State Re-Sync, Navigation Wiring & Serialization Hardening (2026-11-18)**:
+  - Fixed stale state after `router.refresh()` using React 19 render-time prop sync across `project-list.tsx`, `task-kanban-board.tsx`, `proposal-detail.tsx`, `workspace-invoice-manager.tsx`, `invoice-manager.tsx`, and `time-tracker.tsx`.
+  - Wired `CRM Pipeline` into workspace `sidebar-nav.tsx` and turned the sidebar user badge into a settings `<Link>` for non-client members.
+  - Wired `?add=true` and `?create=true` dashboard quick-action query parameters in `client-list.tsx` and `workspace-invoice-manager.tsx`.
+  - Fixed invalid Tailwind classes in `project-detail.tsx`, cleaned ESLint unused-variable warnings across auth/portal/file components, and stabilized workspace/API auth, CSP, and serialization updates.
+
 ### Added
 - **Slate/Blue SaaS Theme Redesign**:
   - Rebuilt the color scheme from Stone/Amber to a light-mode-first Slate/Blue palette, mapping Tailwind variables to modern slate tones.
