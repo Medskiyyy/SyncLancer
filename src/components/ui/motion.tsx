@@ -22,13 +22,8 @@ export function FadeIn({
   className,
   ...props
 }: FadeInProps) {
-  const shouldReduceMotion = useReducedMotion();
   const ref = React.useRef<HTMLDivElement>(null);
   const isInView = useInView(ref, { once: true, margin: '-80px' });
-
-  if (shouldReduceMotion) {
-    return <div className={className}>{children}</div>;
-  }
 
   const directions = {
     up: { y: 24 },
@@ -69,13 +64,8 @@ export function StaggerContainer({
   className,
   ...props
 }: StaggerContainerProps) {
-  const shouldReduceMotion = useReducedMotion();
   const ref = React.useRef<HTMLDivElement>(null);
   const isInView = useInView(ref, { once: true, margin: '-80px' });
-
-  if (shouldReduceMotion) {
-    return <div className={className}>{children}</div>;
-  }
 
   return (
     <motion.div
@@ -110,12 +100,6 @@ export function StaggerItem({
   className,
   ...props
 }: StaggerItemProps) {
-  const shouldReduceMotion = useReducedMotion();
-
-  if (shouldReduceMotion) {
-    return <div className={className}>{children}</div>;
-  }
-
   const directions = {
     up: { y: 16 },
     down: { y: -16 },
@@ -156,13 +140,8 @@ export function Reveal({
   className,
   ...props
 }: RevealProps) {
-  const shouldReduceMotion = useReducedMotion();
   const ref = React.useRef<HTMLDivElement>(null);
   const isInView = useInView(ref, { once: true, margin: '-100px' });
-
-  if (shouldReduceMotion) {
-    return <div className={className}>{children}</div>;
-  }
 
   return (
     <motion.div
@@ -197,13 +176,8 @@ export function SlideIn({
   className,
   ...props
 }: SlideInProps) {
-  const shouldReduceMotion = useReducedMotion();
   const ref = React.useRef<HTMLDivElement>(null);
   const isInView = useInView(ref, { once: true, margin: '-80px' });
-
-  if (shouldReduceMotion) {
-    return <div className={className}>{children}</div>;
-  }
 
   const xOffset = from === 'left' ? -40 : 40;
 
@@ -234,6 +208,12 @@ interface AnimatedNumberProps {
   delay?: number;
 }
 
+const formatCountValue = (num: number) =>
+  new Intl.NumberFormat('en-US', {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(Math.round(num));
+
 export function AnimatedNumber({
   value,
   prefix = '',
@@ -244,33 +224,35 @@ export function AnimatedNumber({
 }: AnimatedNumberProps) {
   const count = useMotionValue(0);
   const shouldReduceMotion = useReducedMotion();
-  const [displayValue, setDisplayValue] = React.useState(`${prefix}${shouldReduceMotion ? value.toLocaleString() : '0'}${suffix}`);
-
-  const formatNumber = (num: number) => {
-    return new Intl.NumberFormat('en-US', {
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(Math.round(num));
-  };
+  const [displayValue, setDisplayValue] = React.useState(`${prefix}0${suffix}`);
 
   React.useEffect(() => {
-    if (shouldReduceMotion) {
-      setDisplayValue(`${prefix}${value.toLocaleString()}${suffix}`);
-      return;
-    }
+    // Reduced motion runs the same animation at zero duration instead of calling
+    // setState straight from the effect body, so state only ever moves inside the
+    // animation callbacks.
+    let controls: ReturnType<typeof animate> | undefined;
 
-    const timer = setTimeout(() => {
-      const controls = animate(count, value, {
-        duration,
+    const start = () => {
+      controls = animate(count, value, {
+        duration: shouldReduceMotion ? 0 : duration,
         ease: easeOutQuart,
         onUpdate: (latest) => {
-          setDisplayValue(`${prefix}${formatNumber(latest)}${suffix}`);
+          setDisplayValue(`${prefix}${formatCountValue(latest)}${suffix}`);
+        },
+        onComplete: () => {
+          setDisplayValue(`${prefix}${formatCountValue(value)}${suffix}`);
         },
       });
-      return () => controls.stop();
-    }, delay * 1000);
+    };
 
-    return () => clearTimeout(timer);
+    const timer = setTimeout(start, shouldReduceMotion ? 0 : delay * 1000);
+
+    // The previous version returned controls.stop() from inside setTimeout, where
+    // React never saw it, so the animation kept running after unmount.
+    return () => {
+      clearTimeout(timer);
+      controls?.stop();
+    };
   }, [value, prefix, suffix, duration, delay, shouldReduceMotion, count]);
 
   return <span className={className}>{displayValue}</span>;

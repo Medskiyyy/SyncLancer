@@ -212,7 +212,7 @@ export function AnimatedWorkloadActivity({
 }: AnimatedWorkloadActivityProps) {
   return (
     <div className="grid gap-6 md:grid-cols-7">
-      <FadeIn direction="up" delay={0.32} duration={0.35} className="md:col-span-3">
+      <FadeIn direction="up" delay={0.32} duration={0.35} className="min-w-0 md:col-span-3">
         <Card className="h-full p-5">
           <div className="border-b border-border pb-3">
             <h3 className="font-heading text-base font-semibold text-foreground">Workload</h3>
@@ -266,7 +266,7 @@ export function AnimatedWorkloadActivity({
         </Card>
       </FadeIn>
 
-      <FadeIn direction="up" delay={0.36} duration={0.35} className="md:col-span-4">
+      <FadeIn direction="up" delay={0.36} duration={0.35} className="min-w-0 md:col-span-4">
         <Card className="h-full p-5">
           <div className="border-b border-border pb-3">
             <h3 className="font-heading text-base font-semibold text-foreground">Recent activity</h3>

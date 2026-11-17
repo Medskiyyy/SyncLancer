@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { Toaster } from "sonner";
 import { PwaRegister } from "@/components/pwa-register";
+import { MotionProvider } from "@/app/providers/motion-provider";
 
 export const metadata: Metadata = {
   title: "SyncLancer",
@@ -20,7 +21,7 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col">
         <PwaRegister />
-        {children}
+        <MotionProvider>{children}</MotionProvider>
         <Toaster position="top-right" richColors />
       </body>
     </html>

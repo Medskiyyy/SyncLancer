@@ -1,5 +1,5 @@
 import prisma from '@/lib/prisma';
-import { Proposal, ProposalItem, ProposalStatus } from '@prisma/client';
+import { ProposalStatus, Prisma } from '@prisma/client';
 import { CreateProposalInput, UpdateProposalInput } from '../schemas/proposal';
 import { Decimal } from '@prisma/client/runtime/library';
 
@@ -116,7 +116,7 @@ export class ProposalRepository {
         taxRate = data.taxRate;
       }
 
-      const updateData: any = {};
+      const updateData: Prisma.ProposalUpdateInput = {};
       if (data.title !== undefined) updateData.title = data.title;
       if (data.description !== undefined) updateData.description = data.description;
       if (data.currency !== undefined) updateData.currency = data.currency;
@@ -167,7 +167,8 @@ export class ProposalRepository {
     });
   }
 
-  async updateStatus(id: string, status: ProposalStatus): Promise<Proposal> {
+  // No explicit return type: it would erase the include and force casts upstream.
+  async updateStatus(id: string, status: ProposalStatus) {
     return prisma.proposal.update({
       where: { id },
       data: { status },
@@ -178,7 +179,7 @@ export class ProposalRepository {
     });
   }
 
-  async softDelete(id: string): Promise<Proposal> {
+  async softDelete(id: string) {
     return prisma.proposal.update({
       where: { id },
       data: { deletedAt: new Date() },

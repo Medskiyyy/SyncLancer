@@ -1,5 +1,7 @@
 'use client';
 
+import { getErrorMessage } from '@/lib/errors';
+
 import React, { useState, useEffect } from 'react';
 import { Task, TaskStatus, Priority, Milestone } from '@prisma/client';
 import {
@@ -77,10 +79,6 @@ interface TaskFormValues {
   priority: Priority;
   dueDate: Date | string;
 }
-
-const getErrorMessage = (error: unknown, fallback = 'An error occurred') => {
-  return error instanceof Error ? error.message : fallback;
-};
 
 // Column definitions
 const COLUMNS: { label: string; status: TaskStatus; color: string; dotColor: string }[] = [
@@ -211,6 +209,11 @@ function DraggableTaskCard({
 export function TaskKanbanBoard({ initialTasks, milestones, projectId, workspaceId }: TaskKanbanBoardProps) {
   const router = useRouter();
   const [tasks, setTasks] = useState<ExtendedTask[]>(initialTasks);
+  const [syncedTasks, setSyncedTasks] = useState(initialTasks);
+  if (initialTasks !== syncedTasks) {
+    setSyncedTasks(initialTasks);
+    setTasks(initialTasks);
+  }
   const [activeTask, setActiveTask] = useState<ExtendedTask | null>(null);
 
   const [isAddOpen, setIsAddOpen] = useState(false);
@@ -420,7 +423,7 @@ export function TaskKanbanBoard({ initialTasks, milestones, projectId, workspace
           </FormItem>
         )}
       />
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <FormField
           control={form.control}
           name="priority"

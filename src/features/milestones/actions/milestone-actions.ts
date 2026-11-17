@@ -1,5 +1,6 @@
 'use server';
 
+import { getErrorMessage } from '@/lib/errors';
 import { auth } from '@/auth';
 import { MilestoneService } from '../services/milestone-service';
 import { CreateMilestoneInput, UpdateMilestoneInput } from '../schemas/milestone';
@@ -17,8 +18,8 @@ export async function createMilestoneAction(workspaceId: string, input: CreateMi
     const milestone = await milestoneService.createMilestone(workspaceId, session.user.id, input);
     revalidatePath(`/[workspaceSlug]/projects/${input.projectId}`);
     return { success: true, data: milestone };
-  } catch (error: any) {
-    return { success: false, error: error.message || 'Failed to create milestone' };
+  } catch (error: unknown) {
+    return { success: false, error: getErrorMessage(error, 'Failed to create milestone') };
   }
 }
 
@@ -32,8 +33,8 @@ export async function updateMilestoneAction(id: string, workspaceId: string, pro
     const milestone = await milestoneService.updateMilestone(id, workspaceId, session.user.id, input);
     revalidatePath(`/[workspaceSlug]/projects/${projectId}`);
     return { success: true, data: milestone };
-  } catch (error: any) {
-    return { success: false, error: error.message || 'Failed to update milestone' };
+  } catch (error: unknown) {
+    return { success: false, error: getErrorMessage(error, 'Failed to update milestone') };
   }
 }
 
@@ -47,7 +48,7 @@ export async function deleteMilestoneAction(id: string, workspaceId: string, pro
     await milestoneService.deleteMilestone(id, workspaceId, session.user.id);
     revalidatePath(`/[workspaceSlug]/projects/${projectId}`);
     return { success: true };
-  } catch (error: any) {
-    return { success: false, error: error.message || 'Failed to delete milestone' };
+  } catch (error: unknown) {
+    return { success: false, error: getErrorMessage(error, 'Failed to delete milestone') };
   }
 }

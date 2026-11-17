@@ -1,5 +1,6 @@
 'use client';
 
+import { getErrorMessage } from '@/lib/errors';
 import React, { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
@@ -76,8 +77,8 @@ export function ClientFilesPortal({ projects, files, workspaceId }: ClientFilesP
       } else {
         toast.error(res.error || 'Failed to get download URL');
       }
-    } catch (e: any) {
-      toast.error(e.message || 'An error occurred');
+    } catch (e: unknown) {
+      toast.error(getErrorMessage(e, 'An error occurred'));
     }
   };
 
@@ -111,8 +112,8 @@ export function ClientFilesPortal({ projects, files, workspaceId }: ClientFilesP
       } else {
         toast.error(res.error?.message || 'Failed to upload file');
       }
-    } catch (err: any) {
-      toast.error(err.message || 'An error occurred');
+    } catch (err: unknown) {
+      toast.error(getErrorMessage(err, 'An error occurred'));
     } finally {
       setIsUploading(false);
     }
@@ -145,7 +146,7 @@ export function ClientFilesPortal({ projects, files, workspaceId }: ClientFilesP
     <div className="space-y-6">
       {/* File Upload card */}
       <Card className="border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 rounded-xl shadow-sm overflow-hidden">
-        <CardHeader className="border-b border-zinc-100 dark:border-zinc-850 pb-4">
+        <CardHeader className="border-b border-zinc-100 dark:border-gray-800 pb-4">
           <CardTitle className="text-sm font-bold text-zinc-900 dark:text-zinc-50 flex items-center gap-2">
             <UploadCloud className="h-4.5 w-4.5 text-indigo-500" /> Share a File
           </CardTitle>
@@ -155,11 +156,11 @@ export function ClientFilesPortal({ projects, files, workspaceId }: ClientFilesP
         </CardHeader>
         <CardContent className="pt-5 space-y-4">
           {projects.length === 0 ? (
-            <div className="flex items-start gap-2.5 p-3.5 bg-amber-50 dark:bg-amber-955/20 text-amber-850 dark:text-amber-300 rounded-lg border border-amber-100 dark:border-amber-900/60 text-xs">
-              <AlertCircle className="h-4.5 w-4.5 shrink-0 mt-0.5 text-amber-600 dark:text-amber-450" />
+            <div className="flex items-start gap-2.5 p-3.5 bg-amber-50 dark:bg-amber-950/20 text-amber-900 dark:text-amber-300 rounded-lg border border-amber-100 dark:border-amber-900/60 text-xs">
+              <AlertCircle className="h-4.5 w-4.5 shrink-0 mt-0.5 text-amber-600 dark:text-amber-500" />
               <div className="space-y-1">
                 <p className="font-bold">No Active Projects</p>
-                <p className="text-zinc-650 dark:text-zinc-350 font-medium">
+                <p className="text-slate-600 dark:text-zinc-300 font-medium">
                   You must be linked to at least one project before you can upload files.
                 </p>
               </div>
@@ -167,16 +168,16 @@ export function ClientFilesPortal({ projects, files, workspaceId }: ClientFilesP
           ) : (
             <div className="space-y-4">
               <div className="space-y-1.5 max-w-xs">
-                <label className="text-xs font-semibold text-zinc-700 dark:text-zinc-350">Target Project</label>
+                <label className="text-xs font-semibold text-zinc-700 dark:text-zinc-300">Target Project</label>
                 <Select
                   value={selectedProjectId}
                   onValueChange={(val) => setSelectedProjectId(val || '')}
                   disabled={isUploading}
                 >
-                  <SelectTrigger className="bg-white dark:bg-zinc-900 border-zinc-250 dark:border-zinc-800 h-9 text-xs">
+                  <SelectTrigger className="bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 h-9 text-xs">
                     <SelectValue placeholder="Select Project" />
                   </SelectTrigger>
-                  <SelectContent className="bg-white dark:bg-zinc-955 border-zinc-250 dark:border-zinc-800">
+                  <SelectContent className="bg-white dark:bg-zinc-950 border-zinc-200 dark:border-zinc-800">
                     {projects.map((p) => (
                       <SelectItem key={p.id} value={p.id}>
                         {p.name}
@@ -193,8 +194,8 @@ export function ClientFilesPortal({ projects, files, workspaceId }: ClientFilesP
                   onDrop={handleDrop}
                   className={`border-2 border-dashed rounded-xl p-8 text-center transition-all cursor-pointer flex flex-col items-center justify-center space-y-3 ${
                     isDragOver 
-                      ? 'border-indigo-500 bg-indigo-50/20 dark:bg-indigo-955/10' 
-                      : 'border-zinc-250 hover:border-indigo-400 bg-white dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-indigo-500'
+                      ? 'border-indigo-500 bg-indigo-50/20 dark:bg-indigo-950/10' 
+                      : 'border-zinc-200 hover:border-indigo-400 bg-white dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-indigo-500'
                   }`}
                   onClick={() => fileInputRef.current?.click()}
                 >
@@ -214,9 +215,9 @@ export function ClientFilesPortal({ projects, files, workspaceId }: ClientFilesP
                     </>
                   ) : (
                     <>
-                      <UploadCloud className="h-10 w-10 text-zinc-450 dark:text-zinc-550" />
-                      <p className="text-sm font-bold text-zinc-850 dark:text-zinc-200">
-                        Drag & drop a file here, or <span className="text-indigo-650 dark:text-indigo-400 hover:underline">browse files</span>
+                      <UploadCloud className="h-10 w-10 text-zinc-400 dark:text-gray-500" />
+                      <p className="text-sm font-bold text-gray-800 dark:text-zinc-200">
+                        Drag & drop a file here, or <span className="text-indigo-600 dark:text-indigo-400 hover:underline">browse files</span>
                       </p>
                       <p className="text-xs text-zinc-400 max-w-sm">
                         Supports images, PDF, documents up to 10MB.
@@ -232,7 +233,7 @@ export function ClientFilesPortal({ projects, files, workspaceId }: ClientFilesP
 
       {/* Files List Card */}
       <Card className="border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 rounded-xl shadow-sm overflow-hidden">
-        <CardHeader className="border-b border-zinc-100 dark:border-zinc-850 pb-4">
+        <CardHeader className="border-b border-zinc-100 dark:border-gray-800 pb-4">
           <CardTitle className="text-base font-bold text-zinc-900 dark:text-zinc-50 flex items-center gap-2">
             <FolderOpen className="h-5 w-5 text-indigo-500" /> Shared Files & Assets
           </CardTitle>
@@ -242,7 +243,7 @@ export function ClientFilesPortal({ projects, files, workspaceId }: ClientFilesP
         </CardHeader>
         <CardContent className="p-0">
           {files.length === 0 ? (
-            <div className="text-center py-12 text-zinc-550 dark:text-zinc-400 space-y-2">
+            <div className="text-center py-12 text-gray-500 dark:text-zinc-400 space-y-2">
               <FileText className="h-10 w-10 mx-auto text-zinc-300 dark:text-zinc-700" />
               <p className="text-sm font-semibold">No files shared yet</p>
               <p className="text-xs text-zinc-400 font-medium">Select a project and upload a file above to begin.</p>
@@ -251,7 +252,7 @@ export function ClientFilesPortal({ projects, files, workspaceId }: ClientFilesP
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse">
                 <thead>
-                  <tr className="border-b border-zinc-150 dark:border-zinc-805 bg-zinc-50/50 dark:bg-zinc-955/20 text-xs font-bold text-zinc-500 dark:text-zinc-400">
+                  <tr className="border-b border-gray-100 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-950/20 text-xs font-bold text-zinc-500 dark:text-zinc-400">
                     <th className="py-3 px-4 font-bold">File Name</th>
                     <th className="py-3 px-4 font-bold">Linked Project</th>
                     <th className="py-3 px-4 font-bold">Size</th>
@@ -260,32 +261,32 @@ export function ClientFilesPortal({ projects, files, workspaceId }: ClientFilesP
                     <th className="py-3 px-4 font-bold text-right">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-zinc-150 dark:divide-zinc-850 text-xs">
+                <tbody className="divide-y divide-gray-100 dark:divide-gray-800 text-xs">
                   {files.map((file) => (
-                    <tr key={file.id} className="hover:bg-zinc-50/40 dark:hover:bg-zinc-955/10 transition-colors">
+                    <tr key={file.id} className="hover:bg-zinc-50/40 dark:hover:bg-zinc-950/10 transition-colors">
                       <td className="py-3.5 px-4 font-medium text-zinc-800 dark:text-zinc-200">
                         <div className="flex items-center gap-2 max-w-[250px] sm:max-w-md truncate">
                           <FileText className="h-4 w-4 text-indigo-500 shrink-0" />
                           <span className="truncate" title={file.fileName}>{file.fileName}</span>
                         </div>
                       </td>
-                      <td className="py-3.5 px-4 text-zinc-650 dark:text-zinc-400 font-medium">
+                      <td className="py-3.5 px-4 text-slate-600 dark:text-zinc-400 font-medium">
                         {file.project?.name || 'Workspace Document'}
                       </td>
-                      <td className="py-3.5 px-4 text-zinc-650 dark:text-zinc-400">
+                      <td className="py-3.5 px-4 text-slate-600 dark:text-zinc-400">
                         {formatBytes(file.fileSize)}
                       </td>
-                      <td className="py-3.5 px-4 text-zinc-655 dark:text-zinc-400 font-medium">
+                      <td className="py-3.5 px-4 text-slate-600 dark:text-zinc-400 font-medium">
                         {file.uploader?.fullName || 'Workspace member'}
                       </td>
-                      <td className="py-3.5 px-4 text-zinc-650 dark:text-zinc-400 font-medium">
+                      <td className="py-3.5 px-4 text-slate-600 dark:text-zinc-400 font-medium">
                         {formatDate(file.createdAt)}
                       </td>
                       <td className="py-3.5 px-4 text-right">
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="h-7 w-7 text-zinc-450 hover:text-zinc-650 dark:hover:text-zinc-250"
+                          className="h-7 w-7 text-zinc-400 hover:text-slate-600 dark:hover:text-zinc-200"
                           onClick={() => handleDownload(file.id)}
                           title="Download file"
                         >

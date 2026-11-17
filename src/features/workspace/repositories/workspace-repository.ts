@@ -1,5 +1,5 @@
 import prisma from '@/lib/prisma';
-import { Workspace, WorkspaceMember, Role } from '@prisma/client';
+import { Workspace, WorkspaceMember, Role, Plan } from '@prisma/client';
 
 export class WorkspaceRepository {
   async findById(id: string): Promise<Workspace | null> {
@@ -63,7 +63,7 @@ export class WorkspaceRepository {
     });
   }
 
-  async update(id: string, data: { name?: string; logoUrl?: string | null; plan?: any }): Promise<Workspace> {
+  async update(id: string, data: { name?: string; logoUrl?: string | null; plan?: Plan }): Promise<Workspace> {
     return prisma.workspace.update({
       where: { id },
       data,

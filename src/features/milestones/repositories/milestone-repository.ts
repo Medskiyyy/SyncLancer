@@ -1,3 +1,4 @@
+import { Prisma } from '@prisma/client';
 import prisma from '@/lib/prisma';
 import { CreateMilestoneInput, UpdateMilestoneInput } from '../schemas/milestone';
 
@@ -33,7 +34,7 @@ export class MilestoneRepository {
   }
 
   async update(id: string, data: UpdateMilestoneInput) {
-    const updateData: any = {};
+    const updateData: Prisma.MilestoneUpdateInput = {};
     if (data.title !== undefined) updateData.title = data.title;
     if (data.description !== undefined) updateData.description = data.description;
     if (data.dueDate !== undefined) updateData.dueDate = data.dueDate;

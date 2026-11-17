@@ -1,7 +1,9 @@
+import { getErrorMessage } from '@/lib/errors';
 import { NextResponse } from 'next/server';
 import { resetPasswordSchema } from '@/features/auth/schemas/auth';
-import prisma from '@/lib/prisma';
-import * as argon2 from 'argon2';
+import { AuthService } from '@/features/auth/services/auth-service';
+
+const authService = new AuthService();
 
 export async function POST(request: Request) {
   try {
@@ -21,28 +23,33 @@ export async function POST(request: Request) {
       );
     }
 
-    // In a real application:
-    // 1. Verify token exists & not expired
-    // 2. Fetch associated user
-    // 3. Hash new password: const hash = await argon2.hash(parsed.data.password);
-    // 4. Update user.passwordHash
-    // 5. Delete token
-    
-    // For MVP validation mock, we'll hash the password and just return success
-    const passwordHash = await argon2.hash(parsed.data.password);
+    try {
+      await authService.resetPassword(parsed.data.token, parsed.data.password);
+    } catch (resetError: unknown) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: {
+            code: 'INVALID_TOKEN',
+            message: getErrorMessage(resetError, 'This reset link is invalid or has expired.'),
+          },
+        },
+        { status: 400 }
+      );
+    }
 
     return NextResponse.json({
       success: true,
       message: 'Password reset successful.',
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Reset password API error:', error);
     return NextResponse.json(
       {
         success: false,
         error: {
           code: 'API_ERROR',
-          message: error.message || 'An error occurred',
+          message: getErrorMessage(error, 'An error occurred'),
         },
       },
       { status: 500 }

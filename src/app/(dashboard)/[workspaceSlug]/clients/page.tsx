@@ -1,4 +1,5 @@
 import { auth } from '@/auth';
+import { serialize } from '@/lib/serialize';
 import { redirect, notFound } from 'next/navigation';
 import { WorkspaceService } from '@/features/workspace/services/workspace-service';
 import { ClientService } from '@/features/clients/services/client-service';
@@ -26,7 +27,7 @@ export default async function ClientsPage({ params }: PageProps) {
   try {
     // Validate workspace membership
     await workspaceService.validateWorkspaceAccess(workspace.id, session.user.id);
-  } catch (error) {
+  } catch {
     redirect('/');
   }
 
@@ -34,7 +35,7 @@ export default async function ClientsPage({ params }: PageProps) {
 
   return (
     <ClientList
-      initialClients={clients}
+      initialClients={serialize(clients)}
       workspaceId={workspace.id}
       workspaceSlug={workspaceSlug}
     />

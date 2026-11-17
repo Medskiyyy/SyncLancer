@@ -1,8 +1,9 @@
+import { getErrorMessage } from '@/lib/errors';
 import { RecurringInvoiceRepository } from '../repositories/recurring-invoice-repository';
 import { WorkspaceService } from '@/features/workspace/services/workspace-service';
 import { InvoiceService } from './invoice-service';
 import { InvoiceRepository } from '../repositories/invoice-repository';
-import { CreateRecurringInvoiceInput, UpdateRecurringInvoiceInput } from '../schemas/recurring-invoice';
+import { CreateRecurringInvoiceInput } from '../schemas/recurring-invoice';
 import { Role, Frequency, InvoiceStatus } from '@prisma/client';
 import prisma from '@/lib/prisma';
 
@@ -173,12 +174,12 @@ export class RecurringInvoiceService {
           newInvoiceNumber: clonedInvoice.invoiceNumber,
           nextRunAt: nextRun,
         });
-      } catch (err: any) {
+      } catch (err: unknown) {
         results.push({
           clientId: config.clientId,
           workspaceId: config.workspaceId,
           success: false,
-          error: err.message || 'Unknown error occurred during cloning.',
+          error: getErrorMessage(err, 'Unknown error occurred during cloning.'),
         });
       }
     }

@@ -1,5 +1,6 @@
 'use server';
 
+import { getErrorMessage } from '@/lib/errors';
 import { auth } from '@/auth';
 import { ClientService } from '../services/client-service';
 import { CreateClientInput, UpdateClientInput } from '../schemas/client';
@@ -17,8 +18,8 @@ export async function createClientAction(workspaceId: string, input: CreateClien
     const client = await clientService.createClient(workspaceId, session.user.id, input);
     revalidatePath(`/[workspaceSlug]/clients`);
     return { success: true, data: client };
-  } catch (error: any) {
-    return { success: false, error: error.message || 'Failed to create client' };
+  } catch (error: unknown) {
+    return { success: false, error: getErrorMessage(error, 'Failed to create client') };
   }
 }
 
@@ -33,8 +34,8 @@ export async function updateClientAction(clientId: string, workspaceId: string, 
     revalidatePath(`/[workspaceSlug]/clients`);
     revalidatePath(`/[workspaceSlug]/clients/${clientId}`);
     return { success: true, data: client };
-  } catch (error: any) {
-    return { success: false, error: error.message || 'Failed to update client' };
+  } catch (error: unknown) {
+    return { success: false, error: getErrorMessage(error, 'Failed to update client') };
   }
 }
 
@@ -49,8 +50,8 @@ export async function archiveClientAction(clientId: string, workspaceId: string,
     revalidatePath(`/[workspaceSlug]/clients`);
     revalidatePath(`/[workspaceSlug]/clients/${clientId}`);
     return { success: true, data: client };
-  } catch (error: any) {
-    return { success: false, error: error.message || 'Failed to archive client' };
+  } catch (error: unknown) {
+    return { success: false, error: getErrorMessage(error, 'Failed to archive client') };
   }
 }
 
@@ -64,8 +65,8 @@ export async function deleteClientAction(clientId: string, workspaceId: string) 
     await clientService.deleteClient(clientId, workspaceId, session.user.id);
     revalidatePath(`/[workspaceSlug]/clients`);
     return { success: true };
-  } catch (error: any) {
-    return { success: false, error: error.message || 'Failed to delete client' };
+  } catch (error: unknown) {
+    return { success: false, error: getErrorMessage(error, 'Failed to delete client') };
   }
 }
 
@@ -90,7 +91,7 @@ export async function inviteClientPortalAction(
     );
     revalidatePath(`/[workspaceSlug]/clients/${clientId}`);
     return { success: true, data: clientUser };
-  } catch (error: any) {
-    return { success: false, error: error.message || 'Failed to invite client user' };
+  } catch (error: unknown) {
+    return { success: false, error: getErrorMessage(error, 'Failed to invite client user') };
   }
 }

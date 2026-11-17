@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import * as React from 'react';
+import { useState, useEffect, useSyncExternalStore } from 'react';
 import { Lead, LeadStatus } from '@prisma/client';
 import {
   DndContext,
@@ -55,8 +56,23 @@ const COLUMNS = [
   { label: 'Lost', status: LeadStatus.LOST, theme: 'border-red-200/60 dark:border-red-900/30 bg-red-50/50 dark:bg-red-950/20' },
 ];
 
+interface KanbanColumnProps {
+  id: LeadStatus;
+  title: string;
+  leadsCount: number;
+  children: React.ReactNode;
+  theme: string;
+}
+
+interface KanbanCardProps {
+  lead: Lead;
+  onEdit: (lead: Lead) => void;
+  onDelete: (leadId: string) => void;
+  onConvert: (leadId: string) => void;
+}
+
 // Droppable Column Component
-function KanbanColumn({ id, title, leadsCount, children, theme }: any) {
+function KanbanColumn({ id, title, leadsCount, children, theme }: KanbanColumnProps) {
   const { setNodeRef, isOver } = useDroppable({ id });
 
   return (
@@ -70,7 +86,7 @@ function KanbanColumn({ id, title, leadsCount, children, theme }: any) {
     >
       <div className="flex items-center justify-between mb-3.5 px-1.5">
         <span className="font-bold text-xs text-zinc-950 dark:text-zinc-100 tracking-wide uppercase">{title}</span>
-        <Badge variant="secondary" className="rounded-full font-mono text-[10px] px-2 py-0.5 border border-zinc-200/50 dark:border-zinc-850">
+        <Badge variant="secondary" className="rounded-full font-mono text-[10px] px-2 py-0.5 border border-zinc-200/50 dark:border-gray-800">
           {leadsCount}
         </Badge>
       </div>
@@ -82,7 +98,7 @@ function KanbanColumn({ id, title, leadsCount, children, theme }: any) {
 }
 
 // Draggable Lead Card Component
-function KanbanCard({ lead, onEdit, onDelete, onConvert }: any) {
+function KanbanCard({ lead, onEdit, onDelete, onConvert }: KanbanCardProps) {
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
     id: lead.id,
   });
@@ -110,11 +126,11 @@ function KanbanCard({ lead, onEdit, onDelete, onConvert }: any) {
             <div 
               {...listeners} 
               {...attributes} 
-              className="text-zinc-400 dark:text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-350 cursor-grab active:cursor-grabbing p-0.5 rounded hover:bg-zinc-100 dark:hover:bg-zinc-800"
+              className="text-zinc-400 dark:text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-300 cursor-grab active:cursor-grabbing p-0.5 rounded hover:bg-zinc-100 dark:hover:bg-zinc-800"
             >
               <GripVertical className="h-3.5 w-3.5 shrink-0" />
             </div>
-            <h4 className="font-bold text-xs text-zinc-850 dark:text-zinc-150 truncate leading-none">
+            <h4 className="font-bold text-xs text-gray-800 dark:text-gray-100 truncate leading-none">
               {lead.name}
             </h4>
           </div>
@@ -123,7 +139,7 @@ function KanbanCard({ lead, onEdit, onDelete, onConvert }: any) {
             <Button
               variant="ghost"
               size="icon"
-              className="h-5 w-5 text-zinc-550 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 cursor-pointer"
+              className="h-5 w-5 text-gray-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 cursor-pointer"
               onClick={(e) => {
                 e.stopPropagation();
                 onEdit(lead);
@@ -179,7 +195,7 @@ function KanbanCard({ lead, onEdit, onDelete, onConvert }: any) {
           <Button
             variant="secondary"
             size="sm"
-            className="w-full mt-2 text-[10px] font-bold bg-green-500/10 hover:bg-green-500/20 text-green-600 dark:text-green-400 border border-green-550/15 cursor-pointer"
+            className="w-full mt-2 text-[10px] font-bold bg-green-500/10 hover:bg-green-500/20 text-green-600 dark:text-green-400 border border-green-600/15 cursor-pointer"
             onClick={(e) => {
               e.stopPropagation();
               onConvert(lead.id);
@@ -194,23 +210,26 @@ function KanbanCard({ lead, onEdit, onDelete, onConvert }: any) {
   );
 }
 
+const subscribeNoop = () => () => {};
+
 export function LeadKanbanBoard({ initialLeads, workspaceId }: LeadKanbanBoardProps) {
   const [leads, setLeads] = useState<Lead[]>(initialLeads);
   const [searchQuery, setSearchQuery] = useState('');
-  const [isMounted, setIsMounted] = useState(false);
+  // dnd-kit must not render during SSR. useSyncExternalStore reports false on the
+  // server and true on the client without a setState-in-effect round trip.
+  const isMounted = useSyncExternalStore(subscribeNoop, () => true, () => false);
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [editingLead, setEditingLead] = useState<Lead | null>(null);
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  // Prevent SSR Hydration Mismatch
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
-
-  useEffect(() => {
+  // Re-sync when the server sends a fresh list (router.refresh()). Done during
+  // render rather than in an effect so there is no extra commit with stale cards.
+  const [syncedLeads, setSyncedLeads] = useState(initialLeads);
+  if (initialLeads !== syncedLeads) {
+    setSyncedLeads(initialLeads);
     setLeads(initialLeads);
-  }, [initialLeads]);
+  }
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -271,7 +290,7 @@ export function LeadKanbanBoard({ initialLeads, workspaceId }: LeadKanbanBoardPr
       } else {
         toast.success(`Lead moved to ${newStatus}`);
       }
-    } catch (err) {
+    } catch {
       setLeads(previousLeads);
       toast.error('An error occurred');
     }
@@ -288,7 +307,7 @@ export function LeadKanbanBoard({ initialLeads, workspaceId }: LeadKanbanBoardPr
       } else {
         toast.error(result.error || 'Failed to create lead');
       }
-    } catch (err) {
+    } catch {
       toast.error('An error occurred');
     } finally {
       setIsLoading(false);
@@ -307,7 +326,7 @@ export function LeadKanbanBoard({ initialLeads, workspaceId }: LeadKanbanBoardPr
       } else {
         toast.error(result.error || 'Failed to update lead');
       }
-    } catch (err) {
+    } catch {
       toast.error('An error occurred');
     } finally {
       setIsLoading(false);
@@ -323,7 +342,7 @@ export function LeadKanbanBoard({ initialLeads, workspaceId }: LeadKanbanBoardPr
       } else {
         toast.error(result.error || 'Failed to delete lead');
       }
-    } catch (err) {
+    } catch {
       toast.error('An error occurred');
     }
   };
@@ -336,7 +355,7 @@ export function LeadKanbanBoard({ initialLeads, workspaceId }: LeadKanbanBoardPr
       } else {
         toast.error(result.error || 'Failed to convert lead to client');
       }
-    } catch (err) {
+    } catch {
       toast.error('An error occurred');
     }
   };
@@ -363,20 +382,20 @@ export function LeadKanbanBoard({ initialLeads, workspaceId }: LeadKanbanBoardPr
             <p className="text-sm text-zinc-500 dark:text-zinc-400">Track and manage your client pipeline stages interactively.</p>
           </div>
           
-          <div className="flex items-center gap-3">
+          <div className="flex w-full items-center gap-3 sm:w-auto">
             {/* Search bar inside header */}
-            <div className="relative">
+            <div className="relative min-w-0 flex-1 sm:flex-initial">
               <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-zinc-400" />
               <input
                 type="text"
                 placeholder="Search leads..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="h-9 w-48 sm:w-56 rounded-lg border border-zinc-200 bg-white pl-8 pr-3 text-xs outline-none focus:border-primary dark:border-zinc-800 dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100"
+                className="h-9 w-full sm:w-56 rounded-lg border border-zinc-200 bg-white pl-8 pr-3 text-xs outline-none focus:border-primary dark:border-zinc-800 dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100"
               />
             </div>
 
-            <Button onClick={() => setIsAddOpen(true)} className="cursor-pointer font-semibold text-xs h-9">
+            <Button onClick={() => setIsAddOpen(true)} className="shrink-0 cursor-pointer font-semibold text-xs h-9">
               <Plus className="mr-1.5 h-4 w-4" /> Add Lead
             </Button>
           </div>
@@ -409,7 +428,7 @@ export function LeadKanbanBoard({ initialLeads, workspaceId }: LeadKanbanBoardPr
                   />
                 ))}
                 {columnLeads.length === 0 && (
-                  <div className="flex h-32 items-center justify-center border border-dashed border-zinc-200/40 dark:border-zinc-800/40 rounded-lg text-[10px] text-zinc-400 dark:text-zinc-550 font-medium">
+                  <div className="flex h-32 items-center justify-center border border-dashed border-zinc-200/40 dark:border-zinc-800/40 rounded-lg text-[10px] text-zinc-400 dark:text-gray-500 font-medium">
                     No leads here
                   </div>
                 )}
@@ -421,7 +440,7 @@ export function LeadKanbanBoard({ initialLeads, workspaceId }: LeadKanbanBoardPr
 
       {/* Dialog Add Lead */}
       <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
-        <DialogContent className="max-w-md p-6 bg-white dark:bg-zinc-900 border border-zinc-250 dark:border-zinc-800 rounded-xl">
+        <DialogContent className="sm:max-w-md p-6 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl">
           <DialogHeader>
             <DialogTitle className="text-base font-bold text-zinc-900 dark:text-zinc-50 flex items-center gap-2">
               <Plus className="h-4 w-4 text-primary" />
@@ -438,7 +457,7 @@ export function LeadKanbanBoard({ initialLeads, workspaceId }: LeadKanbanBoardPr
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-xs font-semibold text-zinc-700 dark:text-zinc-350">Contact Name</FormLabel>
+                    <FormLabel className="text-xs font-semibold text-zinc-700 dark:text-zinc-300">Contact Name</FormLabel>
                     <FormControl>
                       <Input placeholder="John Doe" disabled={isLoading} className="text-xs h-9 rounded-lg" {...field} />
                     </FormControl>
@@ -451,7 +470,7 @@ export function LeadKanbanBoard({ initialLeads, workspaceId }: LeadKanbanBoardPr
                 name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-xs font-semibold text-zinc-700 dark:text-zinc-350">Email Address</FormLabel>
+                    <FormLabel className="text-xs font-semibold text-zinc-700 dark:text-zinc-300">Email Address</FormLabel>
                     <FormControl>
                       <Input type="email" placeholder="john@example.com" disabled={isLoading} className="text-xs h-9 rounded-lg" {...field} />
                     </FormControl>
@@ -464,7 +483,7 @@ export function LeadKanbanBoard({ initialLeads, workspaceId }: LeadKanbanBoardPr
                 name="company"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-xs font-semibold text-zinc-700 dark:text-zinc-350">Company Name</FormLabel>
+                    <FormLabel className="text-xs font-semibold text-zinc-700 dark:text-zinc-300">Company Name</FormLabel>
                     <FormControl>
                       <Input placeholder="Acme Corporation" disabled={isLoading} className="text-xs h-9 rounded-lg" {...field} />
                     </FormControl>
@@ -477,7 +496,7 @@ export function LeadKanbanBoard({ initialLeads, workspaceId }: LeadKanbanBoardPr
                 name="phone"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-xs font-semibold text-zinc-700 dark:text-zinc-350">Phone Number</FormLabel>
+                    <FormLabel className="text-xs font-semibold text-zinc-700 dark:text-zinc-300">Phone Number</FormLabel>
                     <FormControl>
                       <Input placeholder="+62xxxxxxxx" disabled={isLoading} className="text-xs h-9 rounded-lg" {...field} />
                     </FormControl>
@@ -490,7 +509,7 @@ export function LeadKanbanBoard({ initialLeads, workspaceId }: LeadKanbanBoardPr
                 name="notes"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-xs font-semibold text-zinc-700 dark:text-zinc-350">Notes / Details</FormLabel>
+                    <FormLabel className="text-xs font-semibold text-zinc-700 dark:text-zinc-300">Notes / Details</FormLabel>
                     <FormControl>
                       <Textarea placeholder="Describe the deal, value, or timeline..." disabled={isLoading} className="text-xs min-h-[80px] rounded-lg resize-none" {...field} />
                     </FormControl>
@@ -510,7 +529,7 @@ export function LeadKanbanBoard({ initialLeads, workspaceId }: LeadKanbanBoardPr
 
       {/* Dialog Edit Lead */}
       <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
-        <DialogContent className="max-w-md p-6 bg-white dark:bg-zinc-900 border border-zinc-250 dark:border-zinc-800 rounded-xl">
+        <DialogContent className="sm:max-w-md p-6 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl">
           <DialogHeader>
             <DialogTitle className="text-base font-bold text-zinc-900 dark:text-zinc-50 flex items-center gap-2">
               <Edit2 className="h-4 w-4 text-primary" />
@@ -527,7 +546,7 @@ export function LeadKanbanBoard({ initialLeads, workspaceId }: LeadKanbanBoardPr
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-xs font-semibold text-zinc-700 dark:text-zinc-350">Contact Name</FormLabel>
+                    <FormLabel className="text-xs font-semibold text-zinc-700 dark:text-zinc-300">Contact Name</FormLabel>
                     <FormControl>
                       <Input placeholder="John Doe" disabled={isLoading} className="text-xs h-9 rounded-lg" {...field} />
                     </FormControl>
@@ -540,7 +559,7 @@ export function LeadKanbanBoard({ initialLeads, workspaceId }: LeadKanbanBoardPr
                 name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-xs font-semibold text-zinc-700 dark:text-zinc-350">Email Address</FormLabel>
+                    <FormLabel className="text-xs font-semibold text-zinc-700 dark:text-zinc-300">Email Address</FormLabel>
                     <FormControl>
                       <Input type="email" placeholder="john@example.com" disabled={isLoading} className="text-xs h-9 rounded-lg" {...field} />
                     </FormControl>
@@ -553,7 +572,7 @@ export function LeadKanbanBoard({ initialLeads, workspaceId }: LeadKanbanBoardPr
                 name="company"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-xs font-semibold text-zinc-700 dark:text-zinc-350">Company Name</FormLabel>
+                    <FormLabel className="text-xs font-semibold text-zinc-700 dark:text-zinc-300">Company Name</FormLabel>
                     <FormControl>
                       <Input placeholder="Acme Corporation" disabled={isLoading} className="text-xs h-9 rounded-lg" {...field} />
                     </FormControl>
@@ -566,7 +585,7 @@ export function LeadKanbanBoard({ initialLeads, workspaceId }: LeadKanbanBoardPr
                 name="phone"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-xs font-semibold text-zinc-700 dark:text-zinc-350">Phone Number</FormLabel>
+                    <FormLabel className="text-xs font-semibold text-zinc-700 dark:text-zinc-300">Phone Number</FormLabel>
                     <FormControl>
                       <Input placeholder="+62xxxxxxxx" disabled={isLoading} className="text-xs h-9 rounded-lg" {...field} />
                     </FormControl>
@@ -579,7 +598,7 @@ export function LeadKanbanBoard({ initialLeads, workspaceId }: LeadKanbanBoardPr
                 name="notes"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-xs font-semibold text-zinc-700 dark:text-zinc-350">Notes / Details</FormLabel>
+                    <FormLabel className="text-xs font-semibold text-zinc-700 dark:text-zinc-300">Notes / Details</FormLabel>
                     <FormControl>
                       <Textarea placeholder="Describe the deal, value, or timeline..." disabled={isLoading} className="text-xs min-h-[80px] rounded-lg resize-none" {...field} />
                     </FormControl>

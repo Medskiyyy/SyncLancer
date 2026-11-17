@@ -1,5 +1,6 @@
 'use client';
 
+import { getErrorMessage } from '@/lib/errors';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -40,7 +41,7 @@ export default function RegisterPage() {
       // Successfully registered, auto login or redirect to login
       router.push('/login?registered=true');
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'An unexpected error occurred');
+      setError(err instanceof Error ? getErrorMessage(err) : 'An unexpected error occurred');
     } finally {
       setIsLoading(false);
     }
@@ -147,7 +148,7 @@ export default function RegisterPage() {
         </CardContent>
         <CardFooter className="flex flex-wrap items-center justify-center gap-1 text-center text-sm text-muted-foreground border-t border-border/40 mt-4 pt-4">
           Already have an account?{' '}
-          <Link href="/login" className="font-semibold text-primary hover:underline">
+          <Link href="/login" className="inline-flex min-h-6 items-center font-semibold text-primary hover:underline">
             Sign in
           </Link>
         </CardFooter>

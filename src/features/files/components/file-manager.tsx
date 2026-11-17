@@ -1,5 +1,6 @@
 'use client';
 
+import { getErrorMessage } from '@/lib/errors';
 import React, { useState, useEffect, useRef } from 'react';
 import { File as PrismaFile } from '@prisma/client';
 import { 
@@ -45,7 +46,7 @@ interface FileManagerProps {
   workspaceSlug: string;
 }
 
-export function FileManager({ projectId, workspaceId, initialFiles, workspaceSlug }: FileManagerProps) {
+export function FileManager({ projectId, workspaceId, initialFiles }: FileManagerProps) {
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [files, setFiles] = useState<ExtendedFile[]>(initialFiles);
@@ -65,22 +66,30 @@ export function FileManager({ projectId, workspaceId, initialFiles, workspaceSlu
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  // Sync initialFiles prop with local state when it updates
-  useEffect(() => {
+  // Re-sync when the server sends a fresh list (router.refresh()). Done during
+  // render rather than in an effect so there is no extra commit with stale files.
+  const [syncedFiles, setSyncedFiles] = useState(initialFiles);
+  if (initialFiles !== syncedFiles) {
+    setSyncedFiles(initialFiles);
     setFiles(initialFiles);
-  }, [initialFiles]);
+  }
 
-  // Load storage usage
-  const fetchStorageUsage = async () => {
-    const res = await getWorkspaceStorageUsageAction(workspaceId);
-    if (res.success && res.data) {
-      setStorageUsage(res.data);
-    }
-  };
-
+  // Load storage usage. Keyed on the file count, not the `files` array: the array
+  // identity changes on every sync, which re-ran this fetch needlessly.
+  const fileCount = files.length;
   useEffect(() => {
+    let cancelled = false;
+    const fetchStorageUsage = async () => {
+      const res = await getWorkspaceStorageUsageAction(workspaceId);
+      if (!cancelled && res.success && res.data) {
+        setStorageUsage(res.data);
+      }
+    };
     fetchStorageUsage();
-  }, [workspaceId, files]);
+    return () => {
+      cancelled = true;
+    };
+  }, [workspaceId, fileCount]);
 
   const handleUpload = async (selectedFile: File) => {
     // Basic Client Validations
@@ -115,8 +124,8 @@ export function FileManager({ projectId, workspaceId, initialFiles, workspaceSlu
       } else {
         toast.error(result.error?.message || 'Failed to upload file');
       }
-    } catch (e: any) {
-      toast.error(e.message || 'An error occurred during upload');
+    } catch (e: unknown) {
+      toast.error(getErrorMessage(e, 'An error occurred during upload'));
     } finally {
       setIsUploading(false);
     }
@@ -155,8 +164,8 @@ export function FileManager({ projectId, workspaceId, initialFiles, workspaceSlu
       } else {
         toast.error(res.error || 'Failed to get download URL');
       }
-    } catch (e: any) {
-      toast.error(e.message || 'An error occurred');
+    } catch (e: unknown) {
+      toast.error(getErrorMessage(e, 'An error occurred'));
     }
   };
 
@@ -174,8 +183,8 @@ export function FileManager({ projectId, workspaceId, initialFiles, workspaceSlu
       } else {
         toast.error(res.error || 'Failed to delete file');
       }
-    } catch (e: any) {
-      toast.error(e.message || 'An error occurred');
+    } catch (e: unknown) {
+      toast.error(getErrorMessage(e, 'An error occurred'));
     } finally {
       setIsLoading(false);
     }
@@ -189,17 +198,6 @@ export function FileManager({ projectId, workspaceId, initialFiles, workspaceSlu
     const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
-  };
-
-  // Helper: Format date
-  const formatDate = (date: Date | string) => {
-    return new Date(date).toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    });
   };
 
   // Compute storage progress percentage
@@ -227,7 +225,7 @@ export function FileManager({ projectId, workspaceId, initialFiles, workspaceSlu
       return { icon: FileText, color: 'text-rose-600 bg-rose-50 border-rose-100' };
     }
     if (['xls', 'xlsx', 'csv'].includes(ext)) {
-      return { icon: FileText, color: 'text-emerald-650 bg-emerald-50 border-emerald-100' };
+      return { icon: FileText, color: 'text-emerald-700 bg-emerald-50 border-emerald-100' };
     }
     if (['png', 'jpg', 'jpeg', 'gif', 'svg', 'webp'].includes(ext)) {
       return { icon: FileImage, color: 'text-violet-600 bg-violet-50 border-violet-100' };
@@ -238,11 +236,12 @@ export function FileManager({ projectId, workspaceId, initialFiles, workspaceSlu
     return { icon: FileText, color: 'text-blue-600 bg-blue-50 border-blue-100' };
   };
 
-  const folderCategories = [
+  type FileCategory = 'Documents' | 'Images' | 'Archives' | 'Others';
+  const folderCategories: { name: FileCategory; count: number; color: string }[] = [
     { name: 'Documents', count: files.filter(f => getFileCategory(f.fileName) === 'Documents').length, color: 'text-blue-600 bg-blue-50 border-blue-100' },
-    { name: 'Images', count: files.filter(f => getFileCategory(f.fileName) === 'Images').length, color: 'text-violet-650 bg-violet-50 border-violet-100' },
+    { name: 'Images', count: files.filter(f => getFileCategory(f.fileName) === 'Images').length, color: 'text-violet-600 bg-violet-50 border-violet-100' },
     { name: 'Archives', count: files.filter(f => getFileCategory(f.fileName) === 'Archives').length, color: 'text-amber-600 bg-amber-50 border-amber-100' },
-    { name: 'Others', count: files.filter(f => getFileCategory(f.fileName) === 'Others').length, color: 'text-slate-650 bg-slate-50 border-slate-100' },
+    { name: 'Others', count: files.filter(f => getFileCategory(f.fileName) === 'Others').length, color: 'text-slate-600 bg-slate-50 border-slate-100' },
   ];
 
   const filteredCategoryFiles = selectedCategory
@@ -260,9 +259,9 @@ export function FileManager({ projectId, workspaceId, initialFiles, workspaceSlu
               <div>
                 <p className="text-xs font-bold text-zinc-800 dark:text-zinc-200">Workspace Storage Usage</p>
                 <p className="text-[10px] text-zinc-500 dark:text-zinc-400">
-                  Used: <span className="font-semibold text-zinc-700 dark:text-slate-350">{formatBytes(storageUsage.usedBytes)}</span>
+                  Used: <span className="font-semibold text-zinc-700 dark:text-slate-400">{formatBytes(storageUsage.usedBytes)}</span>
                   {storageUsage.limitBytes !== Infinity ? (
-                    <> of <span className="font-semibold text-zinc-700 dark:text-slate-350">{formatBytes(storageUsage.limitBytes)}</span> (Free Plan)</>
+                    <> of <span className="font-semibold text-zinc-700 dark:text-slate-400">{formatBytes(storageUsage.limitBytes)}</span> (Free Plan)</>
                   ) : (
                     <> (Pro Plan - Unlimited)</>
                   )}
@@ -320,7 +319,7 @@ export function FileManager({ projectId, workspaceId, initialFiles, workspaceSlu
           </>
         ) : (
           <>
-            <UploadCloud className="h-10 w-10 text-slate-450 dark:text-slate-550" />
+            <UploadCloud className="h-10 w-10 text-slate-500 dark:text-gray-500" />
             <p className="text-sm font-bold text-zinc-800 dark:text-zinc-200">
               Drag & drop a file here, or <span className="text-primary hover:underline">browse files</span>
             </p>
@@ -339,7 +338,7 @@ export function FileManager({ projectId, workspaceId, initialFiles, workspaceSlu
             {folderCategories.map((cat) => (
               <button
                 key={cat.name}
-                onClick={() => setSelectedCategory(selectedCategory === cat.name ? null : cat.name as any)}
+                onClick={() => setSelectedCategory(selectedCategory === cat.name ? null : cat.name)}
                 className={cn(
                   "flex items-center gap-3 p-4 border rounded-lg bg-white shadow-sm transition-colors hover:bg-muted/50 cursor-pointer text-left",
                   selectedCategory === cat.name ? "border-primary ring-2 ring-primary/10 bg-blue-50/50" : "border-slate-200"
@@ -350,7 +349,7 @@ export function FileManager({ projectId, workspaceId, initialFiles, workspaceSlu
                 </div>
                 <div className="flex flex-col min-w-0">
                   <span className="text-sm font-semibold text-slate-900 truncate">{cat.name}</span>
-                  <span className="text-xs text-slate-505">{cat.count} {cat.count === 1 ? 'file' : 'files'}</span>
+                  <span className="text-xs text-slate-500">{cat.count} {cat.count === 1 ? 'file' : 'files'}</span>
                 </div>
               </button>
             ))}
@@ -378,7 +377,7 @@ export function FileManager({ projectId, workspaceId, initialFiles, workspaceSlu
           <Card className="border-slate-200 bg-white rounded-xl shadow-sm p-12 text-center">
             <FileText className="h-10 w-10 mx-auto text-slate-300 mb-3" />
             <p className="text-sm font-semibold text-slate-900">No files found</p>
-            <p className="text-xs text-slate-450 mt-1 max-w-xs mx-auto">
+            <p className="text-xs text-slate-500 mt-1 max-w-xs mx-auto">
               There are no files uploaded in this category.
             </p>
           </Card>
@@ -407,7 +406,7 @@ export function FileManager({ projectId, workspaceId, initialFiles, workspaceSlu
                   </div>
                   
                   <div className="flex items-center justify-between mt-auto">
-                    <span className="text-[9px] font-medium text-slate-450 truncate max-w-[120px]" title={`Uploaded by ${file.uploader?.fullName || 'Workspace member'}`}>
+                    <span className="text-[9px] font-medium text-slate-500 truncate max-w-[120px]" title={`Uploaded by ${file.uploader?.fullName || 'Workspace member'}`}>
                       By {file.uploader?.fullName?.split(' ')[0] || 'Member'}
                     </span>
                     <div className="flex items-center gap-0.5">
@@ -423,7 +422,7 @@ export function FileManager({ projectId, workspaceId, initialFiles, workspaceSlu
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="h-7 w-7 text-slate-405 hover:text-red-650 hover:bg-red-50 rounded-md shrink-0 cursor-pointer"
+                        className="h-7 w-7 text-zinc-400 hover:text-red-700 hover:bg-red-50 rounded-md shrink-0 cursor-pointer"
                         onClick={() => {
                           setFileToDelete(file);
                           setIsDeleteOpen(true);
@@ -446,7 +445,7 @@ export function FileManager({ projectId, workspaceId, initialFiles, workspaceSlu
         <DialogContent className="border-zinc-200/60 dark:border-zinc-800/80 bg-white dark:bg-zinc-950/20 sm:max-w-md">
           <DialogHeader>
             <DialogTitle className="text-zinc-950 dark:text-zinc-100">Delete File</DialogTitle>
-            <DialogDescription className="text-slate-550 dark:text-zinc-400 text-xs">
+            <DialogDescription className="text-gray-500 dark:text-zinc-400 text-xs">
               Are you sure you want to permanently delete this file? This will remove the file from cloud storage and database.
             </DialogDescription>
           </DialogHeader>
@@ -470,7 +469,7 @@ export function FileManager({ projectId, workspaceId, initialFiles, workspaceSlu
                 setIsDeleteOpen(false);
                 setFileToDelete(null);
               }}
-              className="cursor-pointer border-zinc-200/60 dark:border-zinc-800/80 text-slate-750 dark:text-slate-350"
+              className="cursor-pointer border-zinc-200/60 dark:border-zinc-800/80 text-gray-700 dark:text-slate-400"
             >
               Cancel
             </Button>
@@ -478,7 +477,7 @@ export function FileManager({ projectId, workspaceId, initialFiles, workspaceSlu
               variant="destructive"
               disabled={isLoading}
               onClick={handleDelete}
-              className="cursor-pointer bg-red-650 hover:bg-red-700 text-white font-medium"
+              className="cursor-pointer bg-red-700 hover:bg-red-700 text-white font-medium"
             >
               {isLoading ? 'Deleting...' : 'Delete'}
             </Button>

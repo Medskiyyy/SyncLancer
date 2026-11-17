@@ -1,5 +1,6 @@
 'use server';
 
+import { getErrorMessage } from '@/lib/errors';
 import { signIn, signOut } from '@/auth';
 import { AuthService } from '../services/auth-service';
 import { RegisterInput, LoginInput } from '../schemas/auth';
@@ -11,8 +12,8 @@ export async function registerAction(input: RegisterInput) {
   try {
     const user = await authService.register(input);
     return { success: true, data: { userId: user.id } };
-  } catch (error: any) {
-    return { success: false, error: error.message || 'Registration failed' };
+  } catch (error: unknown) {
+    return { success: false, error: getErrorMessage(error, 'Registration failed') };
   }
 }
 

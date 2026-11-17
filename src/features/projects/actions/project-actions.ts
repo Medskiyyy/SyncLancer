@@ -1,5 +1,6 @@
 'use server';
 
+import { getErrorMessage } from '@/lib/errors';
 import { auth } from '@/auth';
 import { ProjectService } from '../services/project-service';
 import { CreateProjectInput, UpdateProjectInput } from '../schemas/project';
@@ -17,8 +18,8 @@ export async function createProjectAction(workspaceId: string, input: CreateProj
     const project = await projectService.createProject(workspaceId, session.user.id, input);
     revalidatePath(`/[workspaceSlug]/projects`);
     return { success: true, data: project };
-  } catch (error: any) {
-    return { success: false, error: error.message || 'Failed to create project' };
+  } catch (error: unknown) {
+    return { success: false, error: getErrorMessage(error, 'Failed to create project') };
   }
 }
 
@@ -34,8 +35,8 @@ export async function updateProjectAction(projectId: string, workspaceId: string
     revalidatePath(`/[workspaceSlug]/projects/${projectId}`);
     revalidatePath(`/[workspaceSlug]/projects/${projectId}/edit`);
     return { success: true, data: project };
-  } catch (error: any) {
-    return { success: false, error: error.message || 'Failed to update project' };
+  } catch (error: unknown) {
+    return { success: false, error: getErrorMessage(error, 'Failed to update project') };
   }
 }
 
@@ -49,7 +50,7 @@ export async function deleteProjectAction(projectId: string, workspaceId: string
     await projectService.deleteProject(projectId, workspaceId, session.user.id);
     revalidatePath(`/[workspaceSlug]/projects`);
     return { success: true };
-  } catch (error: any) {
-    return { success: false, error: error.message || 'Failed to delete project' };
+  } catch (error: unknown) {
+    return { success: false, error: getErrorMessage(error, 'Failed to delete project') };
   }
 }

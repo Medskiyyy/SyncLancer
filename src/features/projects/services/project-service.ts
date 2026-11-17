@@ -1,7 +1,8 @@
+import { AppError } from '@/lib/errors';
 import { ProjectRepository } from '../repositories/project-repository';
 import { WorkspaceService } from '@/features/workspace/services/workspace-service';
 import { CreateProjectInput, UpdateProjectInput } from '../schemas/project';
-import { Project, Role, ProjectStatus } from '@prisma/client';
+import { Role, ProjectStatus , Prisma } from '@prisma/client';
 import prisma from '@/lib/prisma';
 import { Decimal } from '@prisma/client/runtime/library';
 
@@ -56,9 +57,10 @@ export class ProjectService {
         });
 
         if (workspace.plan === 'FREE' && activeProjectsCount >= 3) {
-          const error = new Error('Active project limit reached (max 3 active projects on Free plan). Please upgrade to Pro.');
-          (error as any).code = 'LIMIT_EXCEEDED';
-          throw error;
+          throw new AppError(
+            'Active project limit reached (max 3 active projects on Free plan). Please upgrade to Pro.',
+            'LIMIT_EXCEEDED'
+          );
         }
       }
 
@@ -187,9 +189,10 @@ export class ProjectService {
         });
 
         if (workspace.plan === 'FREE' && activeProjectsCount >= 3) {
-          const error = new Error('Active project limit reached (max 3 active projects on Free plan). Please upgrade to Pro.');
-          (error as any).code = 'LIMIT_EXCEEDED';
-          throw error;
+          throw new AppError(
+            'Active project limit reached (max 3 active projects on Free plan). Please upgrade to Pro.',
+            'LIMIT_EXCEEDED'
+          );
         }
 
         // Increment usage count
@@ -214,7 +217,7 @@ export class ProjectService {
       }
 
       // Perform update
-      const updateData: any = {};
+      const updateData: Prisma.ProjectUpdateInput = {};
       if (input.name !== undefined) updateData.name = input.name;
       if (input.description !== undefined) updateData.description = input.description;
       if (input.budget !== undefined) updateData.budget = new Decimal(input.budget);

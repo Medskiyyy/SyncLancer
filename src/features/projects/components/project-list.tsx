@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import type { Serialized } from '@/lib/serialize';
 import { Project, Client } from '@prisma/client';
 import { 
   Plus, 
@@ -30,9 +31,9 @@ import { deleteProjectAction } from '../actions/project-actions';
 import { cn } from '@/lib/utils';
 import { FadeIn } from '@/components/ui/motion';
 
-interface ExtendedProject extends Project {
-  client?: Client;
-}
+// Serialized<> because the page converts Prisma Decimal (budget) to number
+// before handing this across the Server -> Client Component boundary.
+type ExtendedProject = Serialized<Project & { client?: Client }>;
 
 interface ProjectListProps {
   initialProjects: ExtendedProject[];
@@ -41,16 +42,21 @@ interface ProjectListProps {
 }
 
 const STATUS_THEMES: Record<string, string> = {
-  DRAFT: 'bg-zinc-100/80 text-zinc-650 border-zinc-200/50 dark:bg-zinc-800/40 dark:text-zinc-400 dark:border-zinc-800 shadow-none',
-  ACTIVE: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-450 border-emerald-500/20 shadow-none',
-  ON_HOLD: 'bg-amber-500/10 text-amber-600 dark:text-amber-450 border-amber-500/20 shadow-none',
-  REVIEW: 'bg-violet-500/10 text-violet-600 dark:text-violet-450 border-violet-500/20 shadow-none',
+  DRAFT: 'bg-zinc-100/80 text-slate-600 border-zinc-200/50 dark:bg-zinc-800/40 dark:text-zinc-400 dark:border-zinc-800 shadow-none',
+  ACTIVE: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-500 border-emerald-500/20 shadow-none',
+  ON_HOLD: 'bg-amber-500/10 text-amber-600 dark:text-amber-500 border-amber-500/20 shadow-none',
+  REVIEW: 'bg-violet-500/10 text-violet-600 dark:text-violet-500 border-violet-500/20 shadow-none',
   COMPLETED: 'bg-primary/10 text-primary border-primary/20 shadow-none',
-  CANCELLED: 'bg-red-500/10 text-red-600 dark:text-red-450 border-red-500/20 shadow-none',
+  CANCELLED: 'bg-red-500/10 text-red-600 dark:text-red-500 border-red-500/20 shadow-none',
 };
 
 export function ProjectList({ initialProjects, workspaceId, workspaceSlug }: ProjectListProps) {
   const [projects, setProjects] = useState<ExtendedProject[]>(initialProjects);
+  const [syncedProjects, setSyncedProjects] = useState(initialProjects);
+  if (initialProjects !== syncedProjects) {
+    setSyncedProjects(initialProjects);
+    setProjects(initialProjects);
+  }
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('ALL');
   
@@ -78,7 +84,7 @@ export function ProjectList({ initialProjects, workspaceId, workspaceSlug }: Pro
       } else {
         toast.error(result.error || 'Failed to delete project');
       }
-    } catch (err) {
+    } catch {
       toast.error('An error occurred while deleting the project');
     } finally {
       setIsLoading(false);
@@ -93,7 +99,7 @@ export function ProjectList({ initialProjects, workspaceId, workspaceSlug }: Pro
     });
   };
 
-  const formatCurrency = (amount: any, currency = 'USD') => {
+  const formatCurrency = (amount: number | string, currency = 'USD') => {
     const num = parseFloat(amount.toString());
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
@@ -193,7 +199,7 @@ export function ProjectList({ initialProjects, workspaceId, workspaceSlug }: Pro
                           {project.name}
                         </Link>
                       </td>
-                      <td className="px-6 align-middle text-zinc-650 dark:text-zinc-400 font-medium">
+                      <td className="px-6 align-middle text-slate-600 dark:text-zinc-400 font-medium">
                         {project.client?.companyName || '—'}
                       </td>
                       <td className="px-6 align-middle">
@@ -215,18 +221,18 @@ export function ProjectList({ initialProjects, workspaceId, workspaceSlug }: Pro
                           <span className="font-mono text-xs font-semibold text-zinc-700 dark:text-zinc-400">{project.progress}%</span>
                         </div>
                       </td>
-                      <td className="px-6 align-middle text-zinc-500 dark:text-zinc-450 text-xs">
+                      <td className="px-6 align-middle text-zinc-500 dark:text-zinc-400 text-xs">
                         {formatDate(project.deadline)}
                       </td>
                       <td className="px-6 align-middle text-right">
                         <div className="flex items-center justify-end gap-1">
                           <Link href={`/${workspaceSlug}/projects/${project.id}`}>
-                            <Button variant="ghost" size="icon" title="View details" className="h-8 w-8 text-zinc-450 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 rounded-md cursor-pointer">
+                            <Button variant="ghost" size="icon" title="View details" className="h-8 w-8 text-zinc-400 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 rounded-md cursor-pointer">
                               <ExternalLink className="h-4 w-4" />
                             </Button>
                           </Link>
                           <Link href={`/${workspaceSlug}/projects/${project.id}/edit`}>
-                            <Button variant="ghost" size="icon" title="Edit project" className="h-8 w-8 text-zinc-450 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 rounded-md cursor-pointer">
+                            <Button variant="ghost" size="icon" title="Edit project" className="h-8 w-8 text-zinc-400 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 rounded-md cursor-pointer">
                               <Edit className="h-4 w-4" />
                             </Button>
                           </Link>
@@ -238,7 +244,7 @@ export function ProjectList({ initialProjects, workspaceId, workspaceSlug }: Pro
                               setDeletingProject(project);
                               setIsDeleteOpen(true);
                             }}
-                            className="h-8 w-8 text-zinc-450 hover:bg-destructive/10 hover:text-destructive rounded-md cursor-pointer"
+                            className="h-8 w-8 text-zinc-400 hover:bg-destructive/10 hover:text-destructive rounded-md cursor-pointer"
                           >
                             <Trash2 className="h-4 w-4" />
                           </Button>
@@ -255,14 +261,14 @@ export function ProjectList({ initialProjects, workspaceId, workspaceSlug }: Pro
 
       {/* Delete Dialog */}
       <Dialog open={isDeleteOpen} onOpenChange={setIsDeleteOpen}>
-        <DialogContent className="max-w-md p-6 bg-white dark:bg-zinc-900 border border-zinc-250 dark:border-zinc-800 rounded-xl">
+        <DialogContent className="sm:max-w-md p-6 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl">
           <DialogHeader>
             <DialogTitle className="text-base font-bold text-zinc-900 dark:text-zinc-50 flex items-center gap-2">
               <Trash2 className="h-4 w-4 text-destructive" />
               <span>Delete Project</span>
             </DialogTitle>
-            <DialogDescription className="text-zinc-400 dark:text-zinc-550 text-xs mt-2">
-              Are you sure you want to delete project <strong className="text-zinc-850 dark:text-zinc-100">&ldquo;{deletingProject?.name}&rdquo;</strong>? 
+            <DialogDescription className="text-zinc-400 dark:text-gray-500 text-xs mt-2">
+              Are you sure you want to delete project <strong className="text-gray-800 dark:text-zinc-100">&ldquo;{deletingProject?.name}&rdquo;</strong>? 
               This will hide this project and remove it from active plan limits, but will not delete related invoices or uploaded files.
             </DialogDescription>
           </DialogHeader>

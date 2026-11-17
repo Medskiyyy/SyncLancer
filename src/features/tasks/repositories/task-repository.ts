@@ -1,6 +1,6 @@
 import prisma from '@/lib/prisma';
 import { CreateTaskInput, UpdateTaskInput } from '../schemas/task';
-import { TaskStatus } from '@prisma/client';
+import { TaskStatus , Prisma } from '@prisma/client';
 
 export class TaskRepository {
   async findById(id: string) {
@@ -38,7 +38,7 @@ export class TaskRepository {
   }
 
   async update(id: string, data: UpdateTaskInput) {
-    const updateData: any = {};
+    const updateData: Prisma.TaskUncheckedUpdateInput = {};
     if (data.title !== undefined) updateData.title = data.title;
     if (data.description !== undefined) updateData.description = data.description;
     if (data.milestoneId !== undefined) updateData.milestoneId = data.milestoneId ?? null;

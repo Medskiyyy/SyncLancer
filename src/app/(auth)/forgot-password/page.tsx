@@ -26,16 +26,20 @@ export default function ForgotPasswordPage() {
     setIsLoading(true);
     setError(null);
     try {
-      // API call placeholder
       const response = await fetch('/api/v1/auth/forgot-password', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),
       });
-      
-      // In MVP, we show success regardless of user existence for security reasons
+
+      const result = await response.json();
+      if (!response.ok || !result.success) {
+        setError(result.error?.message || 'Unable to send reset link. Please try again.');
+        return;
+      }
+
       setSuccess(true);
-    } catch (err: any) {
+    } catch {
       setError('An unexpected error occurred. Please try again.');
     } finally {
       setIsLoading(false);
@@ -88,7 +92,7 @@ export default function ForgotPasswordPage() {
         </CardContent>
         <CardFooter className="flex items-center justify-center text-center text-sm text-muted-foreground">
           Back to{' '}
-          <Link href="/login" className="ml-1 font-medium text-primary hover:underline">
+          <Link href="/login" className="ml-1 inline-flex min-h-6 items-center font-medium text-primary hover:underline">
             Sign in
           </Link>
         </CardFooter>

@@ -1,5 +1,6 @@
 'use server';
 
+import { getErrorMessage } from '@/lib/errors';
 import { auth } from '@/auth';
 import { LeadService } from '../services/lead-service';
 import { CreateLeadInput, UpdateLeadInput } from '../schemas/lead';
@@ -18,8 +19,8 @@ export async function createLeadAction(workspaceId: string, input: CreateLeadInp
     const lead = await leadService.createLead(workspaceId, session.user.id, input);
     revalidatePath(`/[workspaceSlug]/crm`);
     return { success: true, data: lead };
-  } catch (error: any) {
-    return { success: false, error: error.message || 'Failed to create lead' };
+  } catch (error: unknown) {
+    return { success: false, error: getErrorMessage(error, 'Failed to create lead') };
   }
 }
 
@@ -33,8 +34,8 @@ export async function updateLeadAction(leadId: string, workspaceId: string, inpu
     const lead = await leadService.updateLead(leadId, workspaceId, session.user.id, input);
     revalidatePath(`/[workspaceSlug]/crm`);
     return { success: true, data: lead };
-  } catch (error: any) {
-    return { success: false, error: error.message || 'Failed to update lead' };
+  } catch (error: unknown) {
+    return { success: false, error: getErrorMessage(error, 'Failed to update lead') };
   }
 }
 
@@ -48,8 +49,8 @@ export async function updateLeadStatusAction(leadId: string, workspaceId: string
     const lead = await leadService.updateLeadStatus(leadId, workspaceId, session.user.id, status);
     revalidatePath(`/[workspaceSlug]/crm`);
     return { success: true, data: lead };
-  } catch (error: any) {
-    return { success: false, error: error.message || 'Failed to update lead status' };
+  } catch (error: unknown) {
+    return { success: false, error: getErrorMessage(error, 'Failed to update lead status') };
   }
 }
 
@@ -63,8 +64,8 @@ export async function deleteLeadAction(leadId: string, workspaceId: string) {
     await leadService.deleteLead(leadId, workspaceId, session.user.id);
     revalidatePath(`/[workspaceSlug]/crm`);
     return { success: true };
-  } catch (error: any) {
-    return { success: false, error: error.message || 'Failed to delete lead' };
+  } catch (error: unknown) {
+    return { success: false, error: getErrorMessage(error, 'Failed to delete lead') };
   }
 }
 
@@ -78,7 +79,7 @@ export async function convertLeadToClientAction(leadId: string, workspaceId: str
     const client = await leadService.convertLeadToClient(leadId, workspaceId, session.user.id);
     revalidatePath(`/[workspaceSlug]/crm`);
     return { success: true, data: client };
-  } catch (error: any) {
-    return { success: false, error: error.message || 'Failed to convert lead to client' };
+  } catch (error: unknown) {
+    return { success: false, error: getErrorMessage(error, 'Failed to convert lead to client') };
   }
 }

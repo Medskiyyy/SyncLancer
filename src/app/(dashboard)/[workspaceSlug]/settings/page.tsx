@@ -26,7 +26,7 @@ export default async function WorkspaceSettingsPage({ params }: PageProps) {
   try {
     // Only workspace owners are allowed to modify settings or subscriptions
     await workspaceService.validateWorkspaceAccess(workspace.id, session.user.id, [Role.OWNER]);
-  } catch (error) {
+  } catch {
     redirect(`/${workspaceSlug}`);
   }
 

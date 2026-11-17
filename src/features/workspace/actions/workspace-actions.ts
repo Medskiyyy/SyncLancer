@@ -1,5 +1,6 @@
 'use server';
 
+import { getErrorMessage } from '@/lib/errors';
 import { auth } from '@/auth';
 import { WorkspaceService } from '../services/workspace-service';
 import { CreateWorkspaceInput, UpdateWorkspaceInput } from '../schemas/workspace';
@@ -16,8 +17,8 @@ export async function createWorkspaceAction(input: CreateWorkspaceInput) {
 
     const workspace = await workspaceService.createWorkspace(session.user.id, input);
     return { success: true, data: workspace };
-  } catch (error: any) {
-    return { success: false, error: error.message || 'Failed to create workspace' };
+  } catch (error: unknown) {
+    return { success: false, error: getErrorMessage(error, 'Failed to create workspace') };
   }
 }
 
@@ -30,8 +31,8 @@ export async function updateWorkspaceAction(workspaceId: string, input: UpdateWo
 
     const workspace = await workspaceService.updateWorkspace(workspaceId, session.user.id, input);
     return { success: true, data: workspace };
-  } catch (error: any) {
-    return { success: false, error: error.message || 'Failed to update workspace' };
+  } catch (error: unknown) {
+    return { success: false, error: getErrorMessage(error, 'Failed to update workspace') };
   }
 }
 
@@ -44,8 +45,8 @@ export async function deleteWorkspaceAction(workspaceId: string) {
 
     await workspaceService.deleteWorkspace(workspaceId, session.user.id);
     return { success: true };
-  } catch (error: any) {
-    return { success: false, error: error.message || 'Failed to delete workspace' };
+  } catch (error: unknown) {
+    return { success: false, error: getErrorMessage(error, 'Failed to delete workspace') };
   }
 }
 
@@ -60,7 +61,7 @@ export async function updateWorkspacePlanAction(workspaceId: string, plan: 'FREE
     revalidatePath(`/${workspace.slug}/settings`);
     revalidatePath(`/`);
     return { success: true, data: workspace };
-  } catch (error: any) {
-    return { success: false, error: error.message || 'Failed to update workspace plan' };
+  } catch (error: unknown) {
+    return { success: false, error: getErrorMessage(error, 'Failed to update workspace plan') };
   }
 }

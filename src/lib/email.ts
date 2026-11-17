@@ -36,7 +36,7 @@ export async function sendEmail({ to, subject, html }: { to: string; subject: st
 
     const data = await res.json();
     return { success: true, data };
-  } catch (e: any) {
+  } catch (e: unknown) {
     console.error('Email dispatch error:', e);
     throw e;
   }

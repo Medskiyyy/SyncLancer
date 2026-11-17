@@ -1,6 +1,8 @@
 'use client';
+import type { Serialized } from '@/lib/serialize';
 
-import React, { useState, useEffect } from 'react';
+import { getErrorMessage } from '@/lib/errors';
+import React, { useState } from 'react';
 import { Project, Client, ProjectTemplate, ProjectStatus } from '@prisma/client';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -19,9 +21,9 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDes
 import { createProjectSchema, updateProjectSchema } from '../schemas/project';
 import { createProjectAction, updateProjectAction } from '../actions/project-actions';
 
-interface ExtendedProject extends Project {
-  client?: Client;
-}
+// Serialized<>: the page converts Prisma Decimal (budget) to number before this
+// crosses the Server -> Client Component boundary.
+type ExtendedProject = Serialized<Project & { client?: Client }>;
 
 interface ProjectBuilderProps {
   workspaceId: string;
@@ -46,7 +48,7 @@ export function ProjectBuilder({
   const [isLoading, setIsLoading] = useState(false);
   const isEdit = !!project;
 
-  const formatDateForInput = (date: any) => {
+  const formatDateForInput = (date: Date | string | null | undefined) => {
     if (!date) return '';
     const d = new Date(date);
     return d.toISOString().split('T')[0];
@@ -74,7 +76,11 @@ export function ProjectBuilder({
   const isLimitReached = plan === 'FREE' && activeProjectsCount >= 3;
   const showLimitWarning = selectedStatus === ProjectStatus.ACTIVE && !originalStatusWasActive && isLimitReached;
 
-  const onSubmit = async (values: any) => {
+  // Derived from the form itself: the resolver switches between the create and
+  // update schema, so this stays correct without restating either shape.
+  type ProjectFormValues = Parameters<Parameters<typeof form.handleSubmit>[0]>[0];
+
+  const onSubmit = async (values: ProjectFormValues) => {
     if (showLimitWarning) {
       toast.error('Limit Exceeded: Cannot set project to ACTIVE status. Upgrade to Pro.');
       return;
@@ -82,14 +88,19 @@ export function ProjectBuilder({
 
     setIsLoading(true);
     try {
+      // The update schema marks the dates optional, so guard instead of calling
+      // new Date(undefined), which would silently persist an Invalid Date.
+      const toDate = (value: Date | string | undefined) =>
+        value === undefined || value === '' ? undefined : new Date(value);
+
       if (isEdit && project) {
         const updateInput = {
           name: values.name,
           description: values.description,
           budget: Number(values.budget),
           currency: values.currency,
-          startDate: new Date(values.startDate),
-          deadline: new Date(values.deadline),
+          startDate: toDate(values.startDate),
+          deadline: toDate(values.deadline),
           status: values.status,
         };
         const res = await updateProjectAction(project.id, workspaceId, updateInput);
@@ -101,16 +112,20 @@ export function ProjectBuilder({
           toast.error(res.error || 'Failed to update project');
         }
       } else {
+        // `values` is typed as the union of both schemas because the resolver is
+        // chosen at runtime. Re-parsing narrows it to the create shape, where
+        // clientId and the dates are guaranteed present.
+        const created = createProjectSchema.parse(values);
         const createInput = {
-          name: values.name,
-          description: values.description,
-          clientId: values.clientId,
-          budget: Number(values.budget),
-          currency: values.currency,
-          startDate: new Date(values.startDate),
-          deadline: new Date(values.deadline),
-          status: values.status,
-          templateId: values.templateId === '' ? undefined : values.templateId,
+          name: created.name,
+          description: created.description,
+          clientId: created.clientId,
+          budget: Number(created.budget),
+          currency: created.currency,
+          startDate: new Date(created.startDate),
+          deadline: new Date(created.deadline),
+          status: created.status,
+          templateId: created.templateId === '' ? undefined : created.templateId,
         };
         const res = await createProjectAction(workspaceId, createInput);
         if (res.success && res.data) {
@@ -121,8 +136,8 @@ export function ProjectBuilder({
           toast.error(res.error || 'Failed to create project');
         }
       }
-    } catch (err: any) {
-      toast.error(err.message || 'An error occurred');
+    } catch (err: unknown) {
+      toast.error(getErrorMessage(err, 'An error occurred'));
     } finally {
       setIsLoading(false);
     }
@@ -149,7 +164,7 @@ export function ProjectBuilder({
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
           <Card className="border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 rounded-xl shadow-sm">
-            <CardHeader className="border-b border-slate-100 dark:border-slate-850 pb-4">
+            <CardHeader className="border-b border-slate-100 dark:border-gray-800 pb-4">
               <CardTitle className="text-base font-bold text-slate-900 dark:text-slate-50 flex items-center gap-2">
                 <Briefcase className="h-5 w-5 text-indigo-500" /> Project Specifications
               </CardTitle>
@@ -267,7 +282,7 @@ export function ProjectBuilder({
           </Card>
 
           <Card className="border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 rounded-xl shadow-sm">
-            <CardHeader className="border-b border-slate-100 dark:border-slate-850 pb-4">
+            <CardHeader className="border-b border-slate-100 dark:border-gray-800 pb-4">
               <CardTitle className="text-base font-bold text-slate-900 dark:text-slate-50 flex items-center gap-2">
                 <DollarSign className="h-5 w-5 text-indigo-500" /> Budget & Timeline
               </CardTitle>
@@ -367,7 +382,7 @@ export function ProjectBuilder({
 
           {!isEdit && (
             <Card className="border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 rounded-xl shadow-sm">
-              <CardHeader className="border-b border-slate-100 dark:border-slate-850 pb-4">
+              <CardHeader className="border-b border-slate-100 dark:border-gray-800 pb-4">
                 <CardTitle className="text-base font-bold text-slate-900 dark:text-slate-50 flex items-center gap-2">
                   <Calendar className="h-5 w-5 text-indigo-500" /> Predefined Milestones & Tasks Template
                 </CardTitle>

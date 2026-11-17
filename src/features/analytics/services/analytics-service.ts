@@ -1,7 +1,6 @@
 import prisma from '@/lib/prisma';
 import { WorkspaceService } from '@/features/workspace/services/workspace-service';
 import { 
-  Role, 
   InvoiceStatus, 
   ProjectStatus, 
   TaskStatus, 

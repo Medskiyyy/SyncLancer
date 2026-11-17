@@ -1,5 +1,6 @@
+import { safeUserSelect } from '@/lib/safe-user-select';
 import prisma from '@/lib/prisma';
-import { Project, ProjectStatus } from '@prisma/client';
+import { Prisma } from '@prisma/client';
 import { CreateProjectInput, UpdateProjectInput } from '../schemas/project';
 import { Decimal } from '@prisma/client/runtime/library';
 
@@ -48,7 +49,7 @@ export class ProjectRepository {
             createdAt: 'desc',
           },
           include: {
-            uploader: true,
+            uploader: { select: safeUserSelect },
           },
         },
         invoices: {
@@ -74,12 +75,12 @@ export class ProjectRepository {
         ...file,
         fileSize: Number(file.fileSize),
       })) || [],
-      invoices: (project as any).invoices?.map((invoice: any) => ({
+      invoices: project.invoices?.map((invoice) => ({
         ...invoice,
         subtotal: Number(invoice.subtotal),
         taxAmount: Number(invoice.taxAmount),
         totalAmount: Number(invoice.totalAmount),
-        items: invoice.items?.map((item: any) => ({
+        items: invoice.items?.map((item) => ({
           ...item,
           unitPrice: Number(item.unitPrice),
           totalPrice: Number(item.totalPrice),
@@ -152,7 +153,7 @@ export class ProjectRepository {
   }
 
   async update(id: string, data: UpdateProjectInput) {
-    const updateData: any = {};
+    const updateData: Prisma.ProjectUpdateInput = {};
     if (data.name !== undefined) updateData.name = data.name;
     if (data.description !== undefined) updateData.description = data.description;
     if (data.budget !== undefined) updateData.budget = new Decimal(data.budget);

@@ -1,4 +1,5 @@
 import React from 'react';
+import type { Prisma } from '@prisma/client';
 import { Document, Page, Text, View, StyleSheet } from '@react-pdf/renderer';
 
 const styles = StyleSheet.create({
@@ -170,8 +171,13 @@ const styles = StyleSheet.create({
   },
 });
 
+/** Exactly what ProposalRepository.findById() returns — kept in sync by the compiler. */
+export type ProposalPdfPayload = Prisma.ProposalGetPayload<{
+  include: { items: true; client: true };
+}>;
+
 interface ProposalPdfDocumentProps {
-  proposal: any; // casting is easier than deep typing prisma include
+  proposal: ProposalPdfPayload;
 }
 
 export function ProposalPdfDocument({ proposal }: ProposalPdfDocumentProps) {
@@ -252,7 +258,7 @@ export function ProposalPdfDocument({ proposal }: ProposalPdfDocumentProps) {
             </View>
           </View>
 
-          {proposal.items.map((item: any, index: number) => (
+          {proposal.items.map((item, index) => (
             <View key={item.id || index} style={styles.tableRow}>
               <View style={styles.colDescription}>
                 <Text style={styles.itemTitle}>{item.name}</Text>

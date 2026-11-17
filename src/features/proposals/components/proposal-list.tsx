@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
+import type { Serialized } from '@/lib/serialize';
 import { Proposal, Client } from '@prisma/client';
 import { 
   Plus, 
@@ -21,9 +22,9 @@ import { Badge } from '@/components/ui/badge';
 import { deleteProposalAction } from '../actions/proposal-actions';
 import { cn } from '@/lib/utils';
 
-interface ExtendedProposal extends Proposal {
-  client: Client;
-}
+// Serialized<> because the page converts Prisma Decimal (subtotal, taxAmount,
+// totalAmount) to number before this crosses the Server -> Client boundary.
+type ExtendedProposal = Serialized<Proposal & { client: Client }>;
 
 interface ProposalListProps {
   initialProposals: ExtendedProposal[];
@@ -36,9 +37,13 @@ export function ProposalList({ initialProposals, workspaceId, workspaceSlug }: P
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
 
-  useEffect(() => {
+  // Re-sync when the server sends a fresh list (router.refresh()). Done during
+  // render rather than in an effect so there is no extra commit with stale rows.
+  const [syncedProposals, setSyncedProposals] = useState(initialProposals);
+  if (initialProposals !== syncedProposals) {
+    setSyncedProposals(initialProposals);
     setProposals(initialProposals);
-  }, [initialProposals]);
+  }
 
   const handleDeleteProposal = async (proposalId: string) => {
     if (!confirm('Are you sure you want to delete this proposal? This action is irreversible.')) return;
@@ -50,7 +55,7 @@ export function ProposalList({ initialProposals, workspaceId, workspaceSlug }: P
       } else {
         toast.error(result.error || 'Failed to delete proposal');
       }
-    } catch (err) {
+    } catch {
       toast.error('An error occurred');
     }
   };
@@ -70,19 +75,19 @@ export function ProposalList({ initialProposals, workspaceId, workspaceSlug }: P
     switch (status) {
       case 'APPROVED':
         return (
-          <Badge className="text-[9px] font-bold px-1.5 py-0.5 bg-green-500/10 text-green-600 dark:text-green-400 border border-green-550/15" variant="secondary">
+          <Badge className="text-[9px] font-bold px-1.5 py-0.5 bg-green-500/10 text-green-600 dark:text-green-400 border border-green-600/15" variant="secondary">
             Approved
           </Badge>
         );
       case 'SENT':
         return (
-          <Badge className="text-[9px] font-bold px-1.5 py-0.5 bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-550/15" variant="secondary">
+          <Badge className="text-[9px] font-bold px-1.5 py-0.5 bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-600/15" variant="secondary">
             Sent
           </Badge>
         );
       case 'REJECTED':
         return (
-          <Badge className="text-[9px] font-bold px-1.5 py-0.5 bg-red-500/10 text-red-655 dark:text-red-400 border border-red-550/15" variant="secondary">
+          <Badge className="text-[9px] font-bold px-1.5 py-0.5 bg-red-500/10 text-red-700 dark:text-red-400 border border-red-600/15" variant="secondary">
             Rejected
           </Badge>
         );
@@ -94,7 +99,7 @@ export function ProposalList({ initialProposals, workspaceId, workspaceSlug }: P
         );
       default:
         return (
-          <Badge className="text-[9px] font-bold px-1.5 py-0.5 bg-zinc-50 dark:bg-zinc-950 text-zinc-400 dark:text-zinc-500 border border-zinc-200/60 dark:border-zinc-850" variant="secondary">
+          <Badge className="text-[9px] font-bold px-1.5 py-0.5 bg-zinc-50 dark:bg-zinc-950 text-zinc-400 dark:text-zinc-500 border border-zinc-200/60 dark:border-gray-800" variant="secondary">
             Draft
           </Badge>
         );
@@ -106,7 +111,7 @@ export function ProposalList({ initialProposals, workspaceId, workspaceSlug }: P
       {/* Page Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-zinc-200/60 dark:border-zinc-800/80 pb-5">
         <div>
-          <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight text-zinc-900 dark:text-zinc-55">Proposals</h1>
+          <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight text-zinc-900 dark:text-zinc-50">Proposals</h1>
           <p className="text-sm text-zinc-500 dark:text-zinc-400">
             Create professional quotations, manage pricing sheets, and review client approvals.
           </p>
@@ -128,7 +133,7 @@ export function ProposalList({ initialProposals, workspaceId, workspaceSlug }: P
               className={cn(
                 "px-3.5 py-1.5 text-xs font-semibold rounded-md transition-all cursor-pointer whitespace-nowrap",
                 statusFilter === status
-                  ? "bg-white dark:bg-zinc-900 text-zinc-955 dark:text-zinc-50 shadow-xs"
+                  ? "bg-white dark:bg-zinc-900 text-zinc-950 dark:text-zinc-50 shadow-xs"
                   : "text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-200"
               )}
             >
@@ -138,7 +143,7 @@ export function ProposalList({ initialProposals, workspaceId, workspaceSlug }: P
         </div>
 
         <div className="relative w-full max-w-sm">
-          <Search className="absolute left-3 top-2.5 h-4 w-4 text-zinc-400 dark:text-zinc-505" />
+          <Search className="absolute left-3 top-2.5 h-4 w-4 text-zinc-400 dark:text-slate-500" />
           <Input
             placeholder="Search proposals..."
             value={searchQuery}
@@ -176,7 +181,7 @@ export function ProposalList({ initialProposals, workspaceId, workspaceSlug }: P
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse text-xs">
               <thead>
-                <tr className="border-b border-zinc-200 dark:border-zinc-800 text-[10px] font-bold text-zinc-400 dark:text-zinc-505 uppercase tracking-wider bg-zinc-50/50 dark:bg-zinc-900/30">
+                <tr className="border-b border-zinc-200 dark:border-zinc-800 text-[10px] font-bold text-zinc-400 dark:text-slate-500 uppercase tracking-wider bg-zinc-50/50 dark:bg-zinc-900/30">
                   <th className="px-5 py-3">Number</th>
                   <th className="px-5 py-3">Client</th>
                   <th className="px-5 py-3">Proposal Title</th>
@@ -208,7 +213,7 @@ export function ProposalList({ initialProposals, workspaceId, workspaceSlug }: P
                           </span>
                         </div>
                       </td>
-                      <td className="px-5 py-3.5 font-semibold text-zinc-755 dark:text-zinc-300 truncate max-w-[180px]">{proposal.title}</td>
+                      <td className="px-5 py-3.5 font-semibold text-gray-700 dark:text-zinc-300 truncate max-w-[180px]">{proposal.title}</td>
                       <td className="px-5 py-3.5 font-bold font-mono text-zinc-900 dark:text-zinc-100">{formattedTotal}</td>
                       <td className="px-5 py-3.5 text-zinc-400 dark:text-zinc-500 font-medium">
                         {new Date(proposal.expiresAt).toLocaleDateString()}

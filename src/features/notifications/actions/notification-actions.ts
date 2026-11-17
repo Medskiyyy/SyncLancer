@@ -1,5 +1,6 @@
 'use server';
 
+import { getErrorMessage } from '@/lib/errors';
 import { auth } from '@/auth';
 import { NotificationService } from '../services/notification-service';
 import { revalidatePath } from 'next/cache';
@@ -15,8 +16,8 @@ export async function getNotificationsAction() {
 
     const notifications = await notificationService.getNotifications(session.user.id);
     return { success: true, data: notifications };
-  } catch (error: any) {
-    return { success: false, error: error.message || 'Failed to fetch notifications' };
+  } catch (error: unknown) {
+    return { success: false, error: getErrorMessage(error, 'Failed to fetch notifications') };
   }
 }
 
@@ -29,8 +30,8 @@ export async function getUnreadCountAction() {
 
     const count = await notificationService.getUnreadCount(session.user.id);
     return { success: true, data: count };
-  } catch (error: any) {
-    return { success: false, error: error.message || 'Failed to fetch unread count' };
+  } catch (error: unknown) {
+    return { success: false, error: getErrorMessage(error, 'Failed to fetch unread count') };
   }
 }
 
@@ -44,8 +45,8 @@ export async function markAsReadAction(notificationId: string) {
     await notificationService.markAsRead(notificationId, session.user.id);
     revalidatePath('/');
     return { success: true };
-  } catch (error: any) {
-    return { success: false, error: error.message || 'Failed to mark notification as read' };
+  } catch (error: unknown) {
+    return { success: false, error: getErrorMessage(error, 'Failed to mark notification as read') };
   }
 }
 
@@ -59,7 +60,7 @@ export async function markAllAsReadAction() {
     await notificationService.markAllAsRead(session.user.id);
     revalidatePath('/');
     return { success: true };
-  } catch (error: any) {
-    return { success: false, error: error.message || 'Failed to mark all notifications as read' };
+  } catch (error: unknown) {
+    return { success: false, error: getErrorMessage(error, 'Failed to mark all notifications as read') };
   }
 }

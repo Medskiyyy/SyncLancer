@@ -31,7 +31,7 @@ export default async function ClientProjectDetailPage({ params }: PageProps) {
   // Validate workspace membership
   try {
     await workspaceService.validateWorkspaceAccess(workspace.id, session.user.id);
-  } catch (error) {
+  } catch {
     redirect('/');
   }
 
@@ -46,7 +46,7 @@ export default async function ClientProjectDetailPage({ params }: PageProps) {
       <div className="flex flex-col items-center justify-center py-16 text-center space-y-4">
         <AlertCircle className="h-12 w-12 text-red-500" />
         <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-50">Access Denied</h2>
-        <p className="text-sm text-zinc-550 dark:text-zinc-400">
+        <p className="text-sm text-gray-500 dark:text-zinc-400">
           You do not have a client profile linked in this workspace.
         </p>
       </div>
@@ -109,14 +109,14 @@ export default async function ClientProjectDetailPage({ params }: PageProps) {
       {/* Breadcrumbs / Back button */}
       <div>
         <Link href={`/${workspaceSlug}/portal`}>
-          <Button variant="ghost" size="sm" className="text-zinc-650 dark:text-zinc-400 font-semibold p-0 hover:bg-transparent">
+          <Button variant="ghost" size="sm" className="text-slate-600 dark:text-zinc-400 font-semibold p-0 hover:bg-transparent">
             <ArrowLeft className="mr-1.5 h-4 w-4" /> Back to Dashboard
           </Button>
         </Link>
       </div>
 
       <ClientProjectPortal
-        project={mappedProject as any}
+        project={mappedProject}
         workspaceSlug={workspaceSlug}
       />
     </div>

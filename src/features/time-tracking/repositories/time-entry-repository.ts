@@ -1,3 +1,4 @@
+import { Prisma } from '@prisma/client';
 import prisma from '@/lib/prisma';
 import { CreateTimeEntryInput, UpdateTimeEntryInput } from '../schemas/time-entry';
 
@@ -40,7 +41,7 @@ export class TimeEntryRepository {
   }
 
   async update(id: string, data: UpdateTimeEntryInput) {
-    const updateData: any = {};
+    const updateData: Prisma.TimeEntryUncheckedUpdateInput = {};
     if (data.taskId !== undefined) updateData.taskId = data.taskId ?? null;
     if (data.startTime !== undefined) updateData.startTime = data.startTime;
     if (data.endTime !== undefined) updateData.endTime = data.endTime;

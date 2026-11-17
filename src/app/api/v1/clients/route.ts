@@ -1,3 +1,4 @@
+import { getErrorMessage } from '@/lib/errors';
 import { NextResponse } from 'next/server';
 import { auth } from '@/auth';
 import { ClientService } from '@/features/clients/services/client-service';
@@ -37,10 +38,10 @@ export async function GET(request: Request) {
       success: true,
       data: filteredClients,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Get clients API error:', error);
     return NextResponse.json(
-      { success: false, error: { code: 'API_ERROR', message: error.message || 'An error occurred' } },
+      { success: false, error: { code: 'API_ERROR', message: getErrorMessage(error, 'An error occurred') } },
       { status: 500 }
     );
   }
@@ -88,10 +89,10 @@ export async function POST(request: Request) {
       success: true,
       data: client,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Create client API error:', error);
     return NextResponse.json(
-      { success: false, error: { code: 'API_ERROR', message: error.message || 'An error occurred' } },
+      { success: false, error: { code: 'API_ERROR', message: getErrorMessage(error, 'An error occurred') } },
       { status: 500 }
     );
   }

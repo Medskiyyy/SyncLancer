@@ -1,3 +1,4 @@
+import { getErrorMessage } from '@/lib/errors';
 import { NextRequest, NextResponse } from 'next/server';
 import { RecurringInvoiceService } from '@/features/invoices/services/recurring-invoice-service';
 
@@ -23,9 +24,9 @@ async function handler(request: NextRequest) {
       processedCount: results.length,
       results,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     return NextResponse.json(
-      { error: error.message || 'Internal Server Error' },
+      { error: getErrorMessage(error, 'Internal Server Error') },
       { status: 500 }
     );
   }

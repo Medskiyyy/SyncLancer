@@ -1,3 +1,4 @@
+import { serialize } from '@/lib/serialize';
 import { auth } from '@/auth';
 import { redirect, notFound } from 'next/navigation';
 import { WorkspaceService } from '@/features/workspace/services/workspace-service';
@@ -33,7 +34,7 @@ export default async function EditProjectPage({ params }: PageProps) {
   try {
     // Only workspace owners can edit projects
     await workspaceService.validateWorkspaceAccess(workspace.id, session.user.id, [Role.OWNER]);
-  } catch (error) {
+  } catch {
     redirect(`/${workspaceSlug}/projects`);
   }
 
@@ -58,11 +59,11 @@ export default async function EditProjectPage({ params }: PageProps) {
     <ProjectBuilder
       workspaceId={workspace.id}
       workspaceSlug={workspaceSlug}
-      clients={clients}
-      templates={templates}
+      clients={serialize(clients)}
+      templates={serialize(templates)}
       activeProjectsCount={activeProjectsCount}
       plan={workspace.plan}
-      project={project}
+      project={serialize(project)}
     />
   );
 }

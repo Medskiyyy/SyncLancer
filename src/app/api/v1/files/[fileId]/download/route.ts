@@ -1,3 +1,4 @@
+import { getErrorMessage } from '@/lib/errors';
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/auth';
 import { FileService } from '@/features/files/services/file-service';
@@ -25,8 +26,8 @@ export async function GET(
     const signedUrl = await fileService.getFileDownloadUrl(fileId, workspaceId, session.user.id);
 
     return NextResponse.redirect(signedUrl);
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('File download API error:', error);
-    return new Response(error.message || 'An error occurred during file download', { status: 550 });
+    return new Response(getErrorMessage(error, 'An error occurred during file download'), { status: 550 });
   }
 }

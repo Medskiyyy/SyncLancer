@@ -1,5 +1,5 @@
 import prisma from '@/lib/prisma';
-import { Invoice, InvoiceItem, InvoiceStatus } from '@prisma/client';
+import { InvoiceStatus, Prisma } from '@prisma/client';
 import { CreateInvoiceInput, UpdateInvoiceInput } from '../schemas/invoice';
 import { Decimal } from '@prisma/client/runtime/library';
 
@@ -119,19 +119,15 @@ export class InvoiceRepository {
         throw new Error('Invoice not found');
       }
 
-      // If items or taxRate is provided, recalculate totals
+      // Recalculate totals from the existing subtotal unless new items replace them below.
       let subtotal = Number(existing.subtotal);
-      let taxRate = data.taxRate !== undefined ? data.taxRate : 0; // default tax rate if not changed, wait
-      // Actually, if existing items exist, we recalculate from them if no items input is provided,
-      // but if items input IS provided, we replace items.
-      
-      const updateData: any = {};
+
+      const updateData: Prisma.InvoiceUpdateInput = {};
       if (data.dueDate !== undefined) updateData.dueDate = data.dueDate;
       if (data.currency !== undefined) updateData.currency = data.currency;
       if (data.status !== undefined) updateData.status = data.status;
 
       if (data.items !== undefined || data.taxRate !== undefined) {
-        let currentItems = existing.items;
         let activeTaxRate = data.taxRate !== undefined ? data.taxRate : (existing.taxAmount.toNumber() / existing.subtotal.toNumber()) * 100 || 0;
         
         // Handle division by zero warning

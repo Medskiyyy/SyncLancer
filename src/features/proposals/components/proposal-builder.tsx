@@ -1,4 +1,5 @@
 'use client';
+import type { Serialized } from '@/lib/serialize';
 
 import React, { useState } from 'react';
 import { Client, Proposal, ProposalItem } from '@prisma/client';
@@ -21,7 +22,7 @@ import { createProposalSchema, type CreateProposalInput, type UpdateProposalInpu
 import { createProposalAction, updateProposalAction } from '../actions/proposal-actions';
 
 interface ProposalBuilderProps {
-  initialProposal?: Proposal & { items: ProposalItem[]; client: Client };
+  initialProposal?: Serialized<Proposal & { items: ProposalItem[]; client: Client }>;
   clients: Client[];
   workspaceId: string;
   workspaceSlug: string;
@@ -177,7 +178,7 @@ export function ProposalBuilder({
       </div>
 
       <div className="border-b border-zinc-200/60 dark:border-zinc-800/80 pb-5">
-        <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight text-zinc-900 dark:text-zinc-55">
+        <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight text-zinc-900 dark:text-zinc-50">
           {isEditMode ? `Edit Proposal — ${initialProposal.proposalNumber}` : 'New Proposal Draft'}
         </h1>
         <p className="text-sm text-zinc-500 dark:text-zinc-400">
@@ -188,7 +189,7 @@ export function ProposalBuilder({
       </div>
 
       {clients.length === 0 ? (
-        <Card className="p-8 text-center border-dashed border-zinc-250 dark:border-zinc-800 bg-white dark:bg-zinc-900 rounded-xl shadow-xs">
+        <Card className="p-8 text-center border-dashed border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 rounded-xl shadow-xs">
           <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 text-primary border border-primary/20 mx-auto mb-4">
             <AlertCircle className="h-6 w-6" />
           </div>
@@ -207,7 +208,7 @@ export function ProposalBuilder({
             <div className="md:col-span-2 space-y-6">
               {/* Basic Information */}
               <Card className="shadow-xs border border-zinc-200/60 dark:border-zinc-800/80 rounded-xl overflow-hidden bg-white dark:bg-zinc-900">
-                <CardHeader className="pb-4 border-b border-zinc-150 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/30">
+                <CardHeader className="pb-4 border-b border-gray-100 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/30">
                   <CardTitle className="text-xs font-bold uppercase tracking-wider text-zinc-900 dark:text-zinc-50 flex items-center gap-2">
                     <FileText className="h-4 w-4 text-primary" />
                     <span>Proposal Information</span>
@@ -220,7 +221,7 @@ export function ProposalBuilder({
                       name="clientId"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-xs font-semibold text-zinc-700 dark:text-zinc-350">Recipient Client</FormLabel>
+                          <FormLabel className="text-xs font-semibold text-zinc-700 dark:text-zinc-300">Recipient Client</FormLabel>
                           {isEditMode ? (
                             <div className="h-9 px-3 py-2 border border-zinc-200 bg-zinc-50 rounded-lg text-xs text-zinc-500 font-semibold select-none dark:bg-zinc-950 dark:border-zinc-800/80">
                               {initialProposal.client ? initialProposal.client.companyName : 'Selected Client'}
@@ -253,7 +254,7 @@ export function ProposalBuilder({
                       name="expiresAt"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-xs font-semibold text-zinc-700 dark:text-zinc-350">Expiry Date</FormLabel>
+                          <FormLabel className="text-xs font-semibold text-zinc-700 dark:text-zinc-300">Expiry Date</FormLabel>
                           <FormControl>
                             <Input
                               type="date"
@@ -276,7 +277,7 @@ export function ProposalBuilder({
                     name="title"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-xs font-semibold text-zinc-700 dark:text-zinc-350">Proposal Subject Title</FormLabel>
+                        <FormLabel className="text-xs font-semibold text-zinc-700 dark:text-zinc-300">Proposal Subject Title</FormLabel>
                         <FormControl>
                           <Input placeholder="E.g., Web Design & Development Scopes" className="text-xs h-9 rounded-lg bg-white dark:bg-zinc-900" {...field} />
                         </FormControl>
@@ -290,7 +291,7 @@ export function ProposalBuilder({
                     name="description"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-xs font-semibold text-zinc-700 dark:text-zinc-350">Scope Description / Conditions</FormLabel>
+                        <FormLabel className="text-xs font-semibold text-zinc-700 dark:text-zinc-300">Scope Description / Conditions</FormLabel>
                         <FormControl>
                           <Textarea 
                             placeholder="Introduce the objective, details of services, milestones, and payment conditions..." 
@@ -307,7 +308,7 @@ export function ProposalBuilder({
 
               {/* Service Line Items */}
               <Card className="shadow-xs border border-zinc-200/60 dark:border-zinc-800/80 rounded-xl overflow-hidden bg-white dark:bg-zinc-900">
-                <CardHeader className="flex flex-row items-center justify-between pb-4 border-b border-zinc-150 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/30">
+                <CardHeader className="flex flex-row items-center justify-between pb-4 border-b border-gray-100 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/30">
                   <div>
                     <CardTitle className="text-xs font-bold uppercase tracking-wider text-zinc-900 dark:text-zinc-50">Scope & Pricing Items</CardTitle>
                     <CardDescription className="text-[10px] text-zinc-500 dark:text-zinc-400">Add service line items with cost calculations</CardDescription>
@@ -372,7 +373,7 @@ export function ProposalBuilder({
                         )}
                       />
 
-                      <div className="grid gap-4 grid-cols-3">
+                      <div className="grid gap-4 grid-cols-2 sm:grid-cols-3">
                         <FormField
                           control={control}
                           name={`items.${index}.quantity`}
@@ -443,7 +444,7 @@ export function ProposalBuilder({
             <div className="md:col-span-1 space-y-6">
               {/* Invoice Calculations */}
               <Card className="shadow-xs border border-border rounded-xl overflow-hidden bg-white dark:bg-zinc-900">
-                <CardHeader className="bg-zinc-50 dark:bg-zinc-900/50 pb-4 border-b border-zinc-150 dark:border-zinc-800">
+                <CardHeader className="bg-zinc-50 dark:bg-zinc-900/50 pb-4 border-b border-gray-100 dark:border-zinc-800">
                   <CardTitle className="text-xs font-bold text-zinc-400 uppercase tracking-wider">Cost Summary</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4 pt-5 text-xs font-semibold">
@@ -453,7 +454,7 @@ export function ProposalBuilder({
                     name="currency"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-xs text-zinc-700 dark:text-zinc-350">Pricing Currency</FormLabel>
+                        <FormLabel className="text-xs text-zinc-700 dark:text-zinc-300">Pricing Currency</FormLabel>
                         <Select onValueChange={field.onChange} defaultValue={field.value}>
                           <FormControl>
                             <SelectTrigger className="text-xs h-9 rounded-lg bg-white dark:bg-zinc-950">
@@ -478,7 +479,7 @@ export function ProposalBuilder({
                     name="taxRate"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-xs text-zinc-700 dark:text-zinc-350">Tax Rate (%)</FormLabel>
+                        <FormLabel className="text-xs text-zinc-700 dark:text-zinc-300">Tax Rate (%)</FormLabel>
                         <FormControl>
                           <Input 
                             type="number" 
@@ -495,14 +496,14 @@ export function ProposalBuilder({
                     )}
                   />
 
-                  <div className="border-t border-zinc-150 dark:border-zinc-800 pt-4 space-y-2 font-medium">
-                    <div className="flex justify-between text-zinc-500 dark:text-zinc-450">
+                  <div className="border-t border-gray-100 dark:border-zinc-800 pt-4 space-y-2 font-medium">
+                    <div className="flex justify-between text-zinc-500 dark:text-zinc-400">
                       <span>Subtotal</span>
                       <span className="font-bold text-zinc-900 dark:text-zinc-100 font-mono">
                         {new Intl.NumberFormat('en-US', { style: 'currency', currency: watchCurrency, minimumFractionDigits: 0 }).format(subtotal)}
                       </span>
                     </div>
-                    <div className="flex justify-between text-zinc-500 dark:text-zinc-450">
+                    <div className="flex justify-between text-zinc-500 dark:text-zinc-400">
                       <span>Tax ({watchTaxRate}%)</span>
                       <span className="font-bold text-zinc-900 dark:text-zinc-100 font-mono">
                         {new Intl.NumberFormat('en-US', { style: 'currency', currency: watchCurrency, minimumFractionDigits: 0 }).format(taxAmount)}
@@ -516,7 +517,7 @@ export function ProposalBuilder({
                     </div>
                   </div>
                 </CardContent>
-                <CardFooter className="bg-zinc-50/50 dark:bg-zinc-900/50 p-4 border-t border-zinc-150 dark:border-zinc-800 flex flex-col gap-2">
+                <CardFooter className="bg-zinc-50/50 dark:bg-zinc-900/50 p-4 border-t border-gray-100 dark:border-zinc-800 flex flex-col gap-2">
                   <Button type="submit" disabled={isLoading} className="w-full flex items-center justify-center gap-1.5 cursor-pointer text-xs h-9 font-semibold">
                     <Save className="h-4 w-4" />
                     <span>{isLoading ? 'Saving...' : isEditMode ? 'Save Changes' : 'Save Draft'}</span>

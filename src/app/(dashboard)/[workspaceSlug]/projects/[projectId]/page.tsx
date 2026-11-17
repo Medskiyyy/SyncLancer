@@ -1,3 +1,4 @@
+import { serialize } from '@/lib/serialize';
 import { auth } from '@/auth';
 import { redirect, notFound } from 'next/navigation';
 import { WorkspaceService } from '@/features/workspace/services/workspace-service';
@@ -29,7 +30,7 @@ export default async function ProjectDetailPage({ params }: PageProps) {
   try {
     // Validate workspace membership
     await workspaceService.validateWorkspaceAccess(workspace.id, session.user.id);
-  } catch (error) {
+  } catch {
     redirect('/');
   }
 
@@ -40,7 +41,7 @@ export default async function ProjectDetailPage({ params }: PageProps) {
 
   return (
     <ProjectDetail
-      project={project}
+      project={serialize(project)}
       workspaceSlug={workspaceSlug}
     />
   );

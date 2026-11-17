@@ -1,5 +1,7 @@
 'use client';
 
+import { getErrorMessage } from '@/lib/errors';
+
 import React, { useState, useEffect, useRef } from 'react';
 import { TimeEntry, Task } from '@prisma/client';
 import { 
@@ -71,13 +73,9 @@ interface ActiveTimer {
   billable: boolean;
 }
 
-const getErrorMessage = (error: unknown, fallback = 'An error occurred') => {
-  return error instanceof Error ? error.message : fallback;
-};
-
 export function TimeTracker({ project, initialTimeEntries }: TimeTrackerProps) {
   const router = useRouter();
-  const [timeEntries] = useState<ExtendedTimeEntry[]>(initialTimeEntries);
+  const timeEntries = initialTimeEntries;
   const [activeTimer, setActiveTimer] = useState<ActiveTimer | null>(null);
   const [otherTimerRunning, setOtherTimerRunning] = useState<{ projectName: string; projectId: string } | null>(null);
   
@@ -466,7 +464,7 @@ export function TimeTracker({ project, initialTimeEntries }: TimeTrackerProps) {
 
       {/* Other Timer Running Alert */}
       {otherTimerRunning && (
-        <div className="flex items-center gap-3 p-4 rounded-lg bg-blue-50 border border-blue-200 dark:bg-blue-950/30 dark:border-blue-900/50 text-blue-850 dark:text-blue-300 text-xs">
+        <div className="flex items-center gap-3 p-4 rounded-lg bg-blue-50 border border-blue-200 dark:bg-blue-950/30 dark:border-blue-900/50 text-blue-900 dark:text-blue-300 text-xs">
           <AlertCircle className="h-5 w-5 text-blue-600 shrink-0" />
           <div>
             <span className="font-bold">Timer Running Elsewhere:</span> A timer is currently running in this workspace for project <span className="font-semibold underline">&ldquo;{otherTimerRunning.projectName}&rdquo;</span>.
@@ -502,12 +500,12 @@ export function TimeTracker({ project, initialTimeEntries }: TimeTrackerProps) {
                     </div>
                   )}
                   {activeTimer.notes && (
-                    <p className="text-sm text-slate-600 dark:text-slate-350 italic">
+                    <p className="text-sm text-slate-600 dark:text-slate-400 italic">
                       &ldquo;{activeTimer.notes}&rdquo;
                     </p>
                   )}
                   <div className="flex items-center gap-1.5 pt-1">
-                    <Badge variant="outline" className={`text-[10px] font-semibold tracking-wide uppercase ${activeTimer.billable ? 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/20 dark:text-emerald-300 dark:border-emerald-900/30' : 'bg-slate-50 text-slate-650 border-slate-200 dark:bg-slate-950/20 dark:text-slate-300 dark:border-slate-800'}`}>
+                    <Badge variant="outline" className={`text-[10px] font-semibold tracking-wide uppercase ${activeTimer.billable ? 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/20 dark:text-emerald-300 dark:border-emerald-900/30' : 'bg-slate-50 text-slate-600 border-slate-200 dark:bg-slate-950/20 dark:text-slate-300 dark:border-slate-800'}`}>
                       {activeTimer.billable ? 'Billable' : 'Non-Billable'}
                     </Badge>
                   </div>
@@ -525,7 +523,7 @@ export function TimeTracker({ project, initialTimeEntries }: TimeTrackerProps) {
                 <Button 
                   variant="outline"
                   onClick={handleDiscardTimer}
-                  className="border-slate-250 dark:border-slate-800 text-slate-650 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 py-5"
+                  className="border-zinc-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 py-5"
                 >
                   Discard
                 </Button>
@@ -559,7 +557,7 @@ export function TimeTracker({ project, initialTimeEntries }: TimeTrackerProps) {
                         {timerTaskId && timerTaskId !== 'none' ? (project.tasks?.find(t => t.id === timerTaskId)?.title || timerTaskId) : undefined}
                       </SelectValue>
                     </SelectTrigger>
-                    <SelectContent className="bg-white dark:bg-slate-950 border-slate-250 dark:border-slate-800">
+                    <SelectContent className="bg-white dark:bg-slate-950 border-zinc-200 dark:border-slate-800">
                       <SelectItem value="none">No Task Linked</SelectItem>
                       {project.tasks?.map((task) => (
                         <SelectItem key={task.id} value={task.id}>
@@ -608,14 +606,14 @@ export function TimeTracker({ project, initialTimeEntries }: TimeTrackerProps) {
 
       {/* Log History */}
       <Card className="border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 rounded-xl shadow-sm overflow-hidden">
-        <CardHeader className="border-b border-slate-100 dark:border-slate-850 pb-4">
+        <CardHeader className="border-b border-slate-100 dark:border-gray-800 pb-4">
           <CardTitle className="text-base font-bold text-slate-900 dark:text-slate-50 flex items-center gap-2">
             <Calendar className="h-5 w-5 text-indigo-500" /> Log History
           </CardTitle>
         </CardHeader>
         <CardContent className="p-0">
           {timeEntries.length === 0 ? (
-            <div className="text-center py-12 text-slate-550 dark:text-slate-400 space-y-2">
+            <div className="text-center py-12 text-gray-500 dark:text-slate-400 space-y-2">
               <Clock className="h-10 w-10 mx-auto text-slate-300 dark:text-slate-700" />
               <p className="text-sm font-semibold">No time entries logged yet</p>
               <p className="text-xs text-slate-400">Start the timer or add a manual entry to track project hours.</p>
@@ -624,7 +622,7 @@ export function TimeTracker({ project, initialTimeEntries }: TimeTrackerProps) {
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse">
                 <thead>
-                  <tr className="border-b border-slate-100 dark:border-slate-805 bg-slate-50/50 dark:bg-slate-950/20 text-xs font-bold text-slate-500 dark:text-slate-400">
+                  <tr className="border-b border-slate-100 dark:border-gray-800 bg-slate-50/50 dark:bg-slate-950/20 text-xs font-bold text-slate-500 dark:text-slate-400">
                     <th className="py-3 px-4 font-bold">Date & Time Range</th>
                     <th className="py-3 px-4 font-bold">Linked Task</th>
                     <th className="py-3 px-4 font-bold">Description</th>
@@ -633,18 +631,18 @@ export function TimeTracker({ project, initialTimeEntries }: TimeTrackerProps) {
                     <th className="py-3 px-4 font-bold text-right">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100 dark:divide-slate-850 text-xs">
+                <tbody className="divide-y divide-slate-100 dark:divide-gray-800 text-xs">
                   {timeEntries.map((entry) => (
                     <tr key={entry.id} className="hover:bg-slate-50/40 dark:hover:bg-slate-950/10 transition-colors">
                       <td className="py-3.5 px-4 font-medium text-slate-800 dark:text-slate-300">
                         <div>{formatDate(entry.startTime)}</div>
-                        <div className="text-[10px] text-slate-450 dark:text-slate-500 mt-0.5">
+                        <div className="text-[10px] text-slate-500 dark:text-slate-500 mt-0.5">
                           {formatTimeRange(entry.startTime, entry.endTime)}
                         </div>
                       </td>
                       <td className="py-3.5 px-4 max-w-[150px] truncate">
                         {entry.task ? (
-                          <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-indigo-650 dark:text-indigo-400 bg-indigo-50/50 dark:bg-indigo-950/25 px-2 py-0.5 rounded border border-indigo-100 dark:border-indigo-900/30">
+                          <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-indigo-600 dark:text-indigo-400 bg-indigo-50/50 dark:bg-indigo-950/25 px-2 py-0.5 rounded border border-indigo-100 dark:border-indigo-900/30">
                             <Tag className="h-3 w-3 shrink-0" />
                             <span className="truncate">{entry.task.title}</span>
                           </span>
@@ -659,7 +657,7 @@ export function TimeTracker({ project, initialTimeEntries }: TimeTrackerProps) {
                         {formatDuration(entry.durationMinutes)}
                       </td>
                       <td className="py-3.5 px-4 text-center">
-                        <Badge variant="outline" className={`text-[9px] font-semibold uppercase px-1.5 py-0 ${entry.billable ? 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/20 dark:text-emerald-300 dark:border-emerald-900/30' : 'bg-slate-50 text-slate-650 border-slate-200 dark:bg-slate-950/20 dark:text-slate-300 dark:border-slate-800'}`}>
+                        <Badge variant="outline" className={`text-[9px] font-semibold uppercase px-1.5 py-0 ${entry.billable ? 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/20 dark:text-emerald-300 dark:border-emerald-900/30' : 'bg-slate-50 text-slate-600 border-slate-200 dark:bg-slate-950/20 dark:text-slate-300 dark:border-slate-800'}`}>
                           {entry.billable ? 'Billable' : 'Non-Bill'}
                         </Badge>
                       </td>
@@ -668,7 +666,7 @@ export function TimeTracker({ project, initialTimeEntries }: TimeTrackerProps) {
                           <Button
                             variant="ghost"
                             size="icon"
-                            className="h-7 w-7 text-slate-400 hover:text-slate-650 dark:hover:text-slate-200"
+                            className="h-7 w-7 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
                             onClick={() => handleOpenEditModal(entry)}
                           >
                             <Edit className="h-3.5 w-3.5" />
@@ -676,7 +674,7 @@ export function TimeTracker({ project, initialTimeEntries }: TimeTrackerProps) {
                           <Button
                             variant="ghost"
                             size="icon"
-                            className="h-7 w-7 text-red-400 hover:text-red-650 dark:hover:text-red-400"
+                            className="h-7 w-7 text-red-400 hover:text-red-700 dark:hover:text-red-400"
                             onClick={() => {
                               setEntryToDelete(entry);
                               setIsDeleteOpen(true);
@@ -702,7 +700,7 @@ export function TimeTracker({ project, initialTimeEntries }: TimeTrackerProps) {
             <DialogTitle className="text-slate-900 dark:text-slate-100 flex items-center gap-2">
               <Clock className="h-5 w-5 text-indigo-500" /> Log Time Manually
             </DialogTitle>
-            <DialogDescription className="text-slate-550 dark:text-slate-400 text-xs">
+            <DialogDescription className="text-gray-500 dark:text-slate-400 text-xs">
               Log project progress by manually specifying date, hours, and notes.
             </DialogDescription>
           </DialogHeader>
@@ -749,7 +747,7 @@ export function TimeTracker({ project, initialTimeEntries }: TimeTrackerProps) {
                     {manualTaskId && manualTaskId !== 'none' ? (project.tasks?.find(t => t.id === manualTaskId)?.title || manualTaskId) : undefined}
                   </SelectValue>
                 </SelectTrigger>
-                <SelectContent className="bg-white dark:bg-slate-950 border-slate-250 dark:border-slate-800">
+                <SelectContent className="bg-white dark:bg-slate-950 border-zinc-200 dark:border-slate-800">
                   <SelectItem value="none">No Task Linked</SelectItem>
                   {project.tasks?.map((task) => (
                     <SelectItem key={task.id} value={task.id}>
@@ -779,7 +777,7 @@ export function TimeTracker({ project, initialTimeEntries }: TimeTrackerProps) {
                 checked={manualBillable}
                 onChange={(e) => setManualBillable(e.target.checked)}
               />
-              <label htmlFor="manualBillable" className="text-xs font-bold text-slate-700 dark:text-slate-350 cursor-pointer select-none">
+              <label htmlFor="manualBillable" className="text-xs font-bold text-slate-700 dark:text-slate-400 cursor-pointer select-none">
                 This time entry is billable
               </label>
             </div>
@@ -812,7 +810,7 @@ export function TimeTracker({ project, initialTimeEntries }: TimeTrackerProps) {
             <DialogTitle className="text-slate-900 dark:text-slate-100 flex items-center gap-2">
               <Edit className="h-5 w-5 text-indigo-500" /> Edit Time Entry
             </DialogTitle>
-            <DialogDescription className="text-slate-550 dark:text-slate-400 text-xs">
+            <DialogDescription className="text-gray-500 dark:text-slate-400 text-xs">
               Modify the start/end logs, note details, or status of this entry.
             </DialogDescription>
           </DialogHeader>
@@ -859,7 +857,7 @@ export function TimeTracker({ project, initialTimeEntries }: TimeTrackerProps) {
                     {editTaskId && editTaskId !== 'none' ? (project.tasks?.find(t => t.id === editTaskId)?.title || editTaskId) : undefined}
                   </SelectValue>
                 </SelectTrigger>
-                <SelectContent className="bg-white dark:bg-slate-950 border-slate-250 dark:border-slate-800">
+                <SelectContent className="bg-white dark:bg-slate-950 border-zinc-200 dark:border-slate-800">
                   <SelectItem value="none">No Task Linked</SelectItem>
                   {project.tasks?.map((task) => (
                     <SelectItem key={task.id} value={task.id}>
@@ -889,7 +887,7 @@ export function TimeTracker({ project, initialTimeEntries }: TimeTrackerProps) {
                 checked={editBillable}
                 onChange={(e) => setEditBillable(e.target.checked)}
               />
-              <label htmlFor="editBillable" className="text-xs font-bold text-slate-700 dark:text-slate-350 cursor-pointer select-none">
+              <label htmlFor="editBillable" className="text-xs font-bold text-slate-700 dark:text-slate-400 cursor-pointer select-none">
                 This time entry is billable
               </label>
             </div>
@@ -923,7 +921,7 @@ export function TimeTracker({ project, initialTimeEntries }: TimeTrackerProps) {
         <DialogContent className="border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 sm:max-w-md">
           <DialogHeader>
             <DialogTitle className="text-slate-900 dark:text-slate-100">Delete Time Entry</DialogTitle>
-            <DialogDescription className="text-slate-550 dark:text-slate-400 text-xs">
+            <DialogDescription className="text-gray-500 dark:text-slate-400 text-xs">
               Are you sure you want to delete this time entry? This action is permanent and cannot be undone.
             </DialogDescription>
           </DialogHeader>
@@ -939,7 +937,7 @@ export function TimeTracker({ project, initialTimeEntries }: TimeTrackerProps) {
               </div>
               <div className="flex justify-between text-slate-500 dark:text-slate-400">
                 <span>Notes:</span>
-                <span className="font-semibold text-slate-705 dark:text-slate-300 max-w-[200px] truncate">{entryToDelete.notes}</span>
+                <span className="font-semibold text-slate-700 dark:text-slate-300 max-w-[200px] truncate">{entryToDelete.notes}</span>
               </div>
             </div>
           )}
@@ -951,7 +949,7 @@ export function TimeTracker({ project, initialTimeEntries }: TimeTrackerProps) {
                 setIsDeleteOpen(false);
                 setEntryToDelete(null);
               }}
-              className="border-slate-200 dark:border-slate-800 text-slate-750 dark:text-slate-305"
+              className="border-slate-200 dark:border-slate-800 text-gray-700 dark:text-slate-300"
             >
               Cancel
             </Button>
@@ -959,7 +957,7 @@ export function TimeTracker({ project, initialTimeEntries }: TimeTrackerProps) {
               variant="destructive"
               disabled={isLoading}
               onClick={handleDeleteEntry}
-              className="bg-red-650 hover:bg-red-700 text-white font-medium"
+              className="bg-red-700 hover:bg-red-700 text-white font-medium"
             >
               {isLoading ? 'Deleting...' : 'Delete'}
             </Button>

@@ -1,5 +1,7 @@
 'use server';
+import { serialize } from '@/lib/serialize';
 
+import { getErrorMessage, getErrorCode } from '@/lib/errors';
 import { auth } from '@/auth';
 import { ProposalService } from '../services/proposal-service';
 import { CreateProposalInput, UpdateProposalInput } from '../schemas/proposal';
@@ -17,9 +19,9 @@ export async function createProposalAction(workspaceId: string, input: CreatePro
     const proposal = await proposalService.createProposal(workspaceId, session.user.id, input);
     revalidatePath(`/[workspaceSlug]/proposals`);
     revalidatePath(`/[workspaceSlug]/clients/${input.clientId}`);
-    return { success: true, data: proposal };
-  } catch (error: any) {
-    return { success: false, error: error.message || 'Failed to create proposal' };
+    return { success: true, data: serialize(proposal) };
+  } catch (error: unknown) {
+    return { success: false, error: getErrorMessage(error, 'Failed to create proposal') };
   }
 }
 
@@ -37,9 +39,9 @@ export async function updateProposalAction(
     const proposal = await proposalService.updateProposal(proposalId, workspaceId, session.user.id, input);
     revalidatePath(`/[workspaceSlug]/proposals`);
     revalidatePath(`/[workspaceSlug]/proposals/${proposalId}`);
-    return { success: true, data: proposal };
-  } catch (error: any) {
-    return { success: false, error: error.message || 'Failed to update proposal' };
+    return { success: true, data: serialize(proposal) };
+  } catch (error: unknown) {
+    return { success: false, error: getErrorMessage(error, 'Failed to update proposal') };
   }
 }
 
@@ -54,8 +56,8 @@ export async function deleteProposalAction(proposalId: string, workspaceId: stri
     revalidatePath(`/[workspaceSlug]/proposals`);
     revalidatePath(`/[workspaceSlug]/clients/${proposal.clientId}`);
     return { success: true };
-  } catch (error: any) {
-    return { success: false, error: error.message || 'Failed to delete proposal' };
+  } catch (error: unknown) {
+    return { success: false, error: getErrorMessage(error, 'Failed to delete proposal') };
   }
 }
 
@@ -69,9 +71,9 @@ export async function sendProposalAction(proposalId: string, workspaceId: string
     const proposal = await proposalService.sendProposal(proposalId, workspaceId, session.user.id);
     revalidatePath(`/[workspaceSlug]/proposals`);
     revalidatePath(`/[workspaceSlug]/proposals/${proposalId}`);
-    return { success: true, data: proposal };
-  } catch (error: any) {
-    return { success: false, error: error.message || 'Failed to send proposal' };
+    return { success: true, data: serialize(proposal) };
+  } catch (error: unknown) {
+    return { success: false, error: getErrorMessage(error, 'Failed to send proposal') };
   }
 }
 
@@ -85,9 +87,9 @@ export async function rejectProposalAction(proposalId: string, workspaceId: stri
     const proposal = await proposalService.rejectProposal(proposalId, workspaceId, session.user.id);
     revalidatePath(`/[workspaceSlug]/proposals`);
     revalidatePath(`/[workspaceSlug]/proposals/${proposalId}`);
-    return { success: true, data: proposal };
-  } catch (error: any) {
-    return { success: false, error: error.message || 'Failed to reject proposal' };
+    return { success: true, data: serialize(proposal) };
+  } catch (error: unknown) {
+    return { success: false, error: getErrorMessage(error, 'Failed to reject proposal') };
   }
 }
 
@@ -103,13 +105,13 @@ export async function approveProposalAction(proposalId: string, workspaceId: str
     revalidatePath(`/[workspaceSlug]/proposals/${proposalId}`);
     revalidatePath(`/[workspaceSlug]/projects`);
     revalidatePath(`/[workspaceSlug]/clients/${result.proposal.clientId}`);
-    return { success: true, data: result };
-  } catch (error: any) {
+    return { success: true, data: serialize(result) };
+  } catch (error: unknown) {
     // If the error code is LIMIT_EXCEEDED, pass it to UI
-    const errorCode = (error as any).code || 'APPROVE_ERROR';
+    const errorCode = getErrorCode(error, 'APPROVE_ERROR');
     return { 
       success: false, 
-      error: error.message || 'Failed to approve proposal',
+      error: getErrorMessage(error, 'Failed to approve proposal'),
       code: errorCode
     };
   }

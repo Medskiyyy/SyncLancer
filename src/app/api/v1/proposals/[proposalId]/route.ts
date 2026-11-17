@@ -1,3 +1,4 @@
+import { getErrorMessage } from '@/lib/errors';
 import { NextResponse } from 'next/server';
 import { auth } from '@/auth';
 import { ProposalService } from '@/features/proposals/services/proposal-service';
@@ -41,10 +42,10 @@ export async function GET(
       success: true,
       data: proposal,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Get proposal detail API error:', error);
     return NextResponse.json(
-      { success: false, error: { code: 'API_ERROR', message: error.message || 'An error occurred' } },
+      { success: false, error: { code: 'API_ERROR', message: getErrorMessage(error, 'An error occurred') } },
       { status: 500 }
     );
   }
@@ -96,10 +97,10 @@ export async function PATCH(
       success: true,
       data: proposal,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Update proposal API error:', error);
     return NextResponse.json(
-      { success: false, error: { code: 'API_ERROR', message: error.message || 'An error occurred' } },
+      { success: false, error: { code: 'API_ERROR', message: getErrorMessage(error, 'An error occurred') } },
       { status: 500 }
     );
   }
@@ -135,10 +136,10 @@ export async function DELETE(
       success: true,
       message: 'Proposal soft-deleted successfully',
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Delete proposal API error:', error);
     return NextResponse.json(
-      { success: false, error: { code: 'API_ERROR', message: error.message || 'An error occurred' } },
+      { success: false, error: { code: 'API_ERROR', message: getErrorMessage(error, 'An error occurred') } },
       { status: 500 }
     );
   }

@@ -28,7 +28,7 @@ export default async function ClientInvoicesPage({ params }: PageProps) {
   // Validate workspace membership
   try {
     await workspaceService.validateWorkspaceAccess(workspace.id, session.user.id);
-  } catch (error) {
+  } catch {
     redirect('/');
   }
 
@@ -43,7 +43,7 @@ export default async function ClientInvoicesPage({ params }: PageProps) {
       <div className="flex flex-col items-center justify-center py-16 text-center space-y-4">
         <AlertCircle className="h-12 w-12 text-red-500" />
         <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-50">Access Denied</h2>
-        <p className="text-sm text-zinc-550 dark:text-zinc-400">
+        <p className="text-sm text-gray-500 dark:text-zinc-400">
           You do not have a client profile linked in this workspace.
         </p>
       </div>
@@ -89,10 +89,10 @@ export default async function ClientInvoicesPage({ params }: PageProps) {
 
   const STATUS_COLORS: Record<string, string> = {
     DRAFT: 'bg-zinc-100 text-zinc-800 dark:bg-zinc-800 dark:text-zinc-200 border-zinc-200',
-    SENT: 'bg-blue-100 text-blue-800 dark:bg-blue-955 dark:text-blue-300 border-blue-200',
-    PAID: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-955 dark:text-emerald-300 border-emerald-250',
-    OVERDUE: 'bg-rose-100 text-rose-800 dark:bg-rose-955 dark:text-rose-300 border-rose-200',
-    CANCELLED: 'bg-amber-100 text-amber-800 dark:bg-amber-955 dark:text-amber-300 border-amber-200',
+    SENT: 'bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300 border-blue-200',
+    PAID: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 border-emerald-200',
+    OVERDUE: 'bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300 border-rose-200',
+    CANCELLED: 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300 border-amber-200',
   };
 
   return (
@@ -107,7 +107,7 @@ export default async function ClientInvoicesPage({ params }: PageProps) {
         </div>
         <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg p-3 px-4 flex items-center gap-3">
           <div>
-            <span className="text-[10px] text-zinc-450 dark:text-zinc-500 uppercase font-semibold">Total Outstanding</span>
+            <span className="text-[10px] text-zinc-400 dark:text-zinc-500 uppercase font-semibold">Total Outstanding</span>
             <div className="text-lg font-black text-zinc-900 dark:text-zinc-50">
               {formatCurrency(outstandingBalance)}
             </div>
@@ -117,7 +117,7 @@ export default async function ClientInvoicesPage({ params }: PageProps) {
 
       {/* Invoices List Table */}
       <Card className="border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 rounded-xl shadow-sm overflow-hidden">
-        <CardHeader className="border-b border-zinc-100 dark:border-zinc-850 pb-4">
+        <CardHeader className="border-b border-zinc-100 dark:border-gray-800 pb-4">
           <CardTitle className="text-base font-bold text-zinc-900 dark:text-zinc-50 flex items-center gap-2">
             <FileText className="h-5 w-5 text-indigo-500" /> Billing History
           </CardTitle>
@@ -127,16 +127,16 @@ export default async function ClientInvoicesPage({ params }: PageProps) {
         </CardHeader>
         <CardContent className="p-0">
           {invoices.length === 0 ? (
-            <div className="text-center py-12 text-zinc-550 dark:text-zinc-400 space-y-2">
+            <div className="text-center py-12 text-gray-500 dark:text-zinc-400 space-y-2">
               <FileText className="h-10 w-10 mx-auto text-zinc-300 dark:text-zinc-700" />
               <p className="text-sm font-semibold">No invoices found</p>
-              <p className="text-xs text-zinc-450">You have no invoices generated for your account.</p>
+              <p className="text-xs text-zinc-400">You have no invoices generated for your account.</p>
             </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse">
                 <thead>
-                  <tr className="border-b border-zinc-150 dark:border-zinc-805 bg-zinc-50/50 dark:bg-zinc-950/20 text-xs font-bold text-zinc-500 dark:text-zinc-400">
+                  <tr className="border-b border-gray-100 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-950/20 text-xs font-bold text-zinc-500 dark:text-zinc-400">
                     <th className="py-3 px-4 font-bold">Invoice Number</th>
                     <th className="py-3 px-4 font-bold">Project</th>
                     <th className="py-3 px-4 font-bold">Due Date</th>
@@ -145,16 +145,16 @@ export default async function ClientInvoicesPage({ params }: PageProps) {
                     <th className="py-3 px-4 font-bold text-right">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-zinc-150 dark:divide-zinc-850 text-xs">
+                <tbody className="divide-y divide-gray-100 dark:divide-gray-800 text-xs">
                   {invoices.map((invoice) => (
                     <tr key={invoice.id} className="hover:bg-zinc-50/40 dark:hover:bg-zinc-950/10 transition-colors">
                       <td className="py-3.5 px-4 font-bold text-zinc-900 dark:text-zinc-50">
                         {invoice.invoiceNumber}
                       </td>
-                      <td className="py-3.5 px-4 text-zinc-650 dark:text-zinc-400 font-medium">
+                      <td className="py-3.5 px-4 text-slate-600 dark:text-zinc-400 font-medium">
                         {invoice.project?.name || 'General Billing'}
                       </td>
-                      <td className="py-3.5 px-4 text-zinc-655 dark:text-zinc-450 font-medium">
+                      <td className="py-3.5 px-4 text-slate-600 dark:text-zinc-400 font-medium">
                         {formatDate(invoice.dueDate)}
                       </td>
                       <td className="py-3.5 px-4">
@@ -174,7 +174,7 @@ export default async function ClientInvoicesPage({ params }: PageProps) {
                           <Button
                             variant="ghost"
                             size="icon"
-                            className="h-7 w-7 text-zinc-450 hover:text-zinc-650 dark:hover:text-zinc-200"
+                            className="h-7 w-7 text-zinc-400 hover:text-slate-600 dark:hover:text-zinc-200"
                             title="Download PDF"
                           >
                             <Download className="h-3.5 w-3.5" />

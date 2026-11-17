@@ -43,7 +43,7 @@ export function RevenueChart({ data }: RevenueChartProps) {
 
   if (isEmpty) {
     return (
-      <div className="flex min-h-[360px] h-[360px] flex-col items-center justify-center rounded-lg border border-dashed border-border bg-muted/30 p-6 text-center">
+      <div className="flex min-h-[260px] h-[260px] sm:min-h-[360px] sm:h-[360px] flex-col items-center justify-center rounded-lg border border-dashed border-border bg-muted/30 p-6 text-center">
         <Receipt className="h-10 w-10 text-zinc-400 dark:text-zinc-600 mb-3 shrink-0" />
         <h4 className="text-sm font-bold text-zinc-900 dark:text-zinc-100 mb-1">No revenue data yet</h4>
         <p className="text-xs text-zinc-500 dark:text-zinc-400 max-w-[240px] mb-4">
@@ -59,7 +59,7 @@ export function RevenueChart({ data }: RevenueChartProps) {
   }
 
   return (
-    <div className="h-[360px] w-full">
+    <div className="h-[260px] w-full sm:h-[360px]">
       <ResponsiveContainer width="100%" height="100%">
         <AreaChart
           data={data}

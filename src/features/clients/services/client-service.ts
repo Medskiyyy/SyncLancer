@@ -1,3 +1,4 @@
+import { safeUserSelect } from '@/lib/safe-user-select';
 import { ClientRepository } from '../repositories/client-repository';
 import { WorkspaceService } from '@/features/workspace/services/workspace-service';
 import { NotificationService } from '@/features/notifications/services/notification-service';
@@ -23,13 +24,24 @@ export class ClientService {
     return this.clientRepository.listByWorkspaceId(workspaceId);
   }
 
-  async getClientById(clientId: string, workspaceId: string, userId: string): Promise<Client | null> {
+  // No explicit return type: it would erase the repository include (projects,
+  // proposals, invoices, portalUsers) that ClientProfile depends on.
+  async getClientById(clientId: string, workspaceId: string, userId: string) {
     await this.workspaceService.validateWorkspaceAccess(workspaceId, userId);
     const client = await this.clientRepository.findById(clientId);
     if (!client || client.workspaceId !== workspaceId) {
       return null;
     }
-    return client;
+
+    // The portal "Active vs Pending" badge only needs to know whether the rep has
+    // set a password — resolve that here so the hash itself never leaves the server.
+    return {
+      ...client,
+      portalUsers: client.portalUsers.map(({ user, ...portalUser }) => {
+        const { passwordHash, ...safeUser } = user;
+        return { ...portalUser, user: { ...safeUser, hasPassword: passwordHash !== null } };
+      }),
+    };
   }
 
   async createClient(workspaceId: string, userId: string, input: CreateClientInput): Promise<Client> {
@@ -183,7 +195,8 @@ export class ClientService {
     return clientUser;
   }
 
-  async getClientFiles(workspaceId: string, clientId: string, userId: string): Promise<any[]> {
+  // No explicit return type: it would erase the include that ClientProfile reads.
+  async getClientFiles(workspaceId: string, clientId: string, userId: string) {
     await this.workspaceService.validateWorkspaceAccess(workspaceId, userId);
     
     // Find client with projects to get their IDs
@@ -192,9 +205,7 @@ export class ClientService {
       throw new Error('Client not found or does not belong to this workspace.');
     }
 
-    // Cast client to any because findById now includes projects relation
-    const projects = (client as any).projects || [];
-    const projectIds = projects.map((p: any) => p.id);
+    const projectIds = (client.projects ?? []).map((p) => p.id);
     if (projectIds.length === 0) return [];
 
     return prisma.file.findMany({
@@ -203,7 +214,7 @@ export class ClientService {
         deletedAt: null,
       },
       include: {
-        uploader: true,
+        uploader: { select: safeUserSelect },
       },
       orderBy: { createdAt: 'desc' },
     });

@@ -6,20 +6,20 @@ import { usePathname } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { Workspace } from '@prisma/client';
 import {
-  SquaresFour,
+  LayoutGrid,
   Users,
   FileText,
-  Kanban,
+  FolderKanban,
   Receipt,
   FolderOpen,
-  ChartBar,
-  Gear,
-  MagnifyingGlass,
-  List,
+  BarChart3,
+  Settings,
+  Search,
+  Menu,
   X,
-  User as UserIcon,
+  GitBranch,
   Square,
-} from '@phosphor-icons/react';
+} from 'lucide-react';
 import { WorkspaceSwitcher } from './workspace-switcher';
 import { CommandPalette } from './command-palette';
 import { cn } from '@/lib/utils';
@@ -161,7 +161,7 @@ export function SidebarNav({
   }, []);
 
   const clientNavItems = [
-    { name: 'Dashboard', href: `/${workspaceSlug}/portal`, icon: SquaresFour },
+    { name: 'Dashboard', href: `/${workspaceSlug}/portal`, icon: LayoutGrid },
     { name: 'Invoices', href: `/${workspaceSlug}/portal/invoices`, icon: Receipt },
     { name: 'Files', href: `/${workspaceSlug}/portal/files`, icon: FolderOpen },
   ];
@@ -170,10 +170,11 @@ export function SidebarNav({
     {
       title: 'Workspace',
       items: [
-        { name: 'Dashboard', href: `/${workspaceSlug}`, icon: SquaresFour },
+        { name: 'Dashboard', href: `/${workspaceSlug}`, icon: LayoutGrid },
+        { name: 'CRM Pipeline', href: `/${workspaceSlug}/crm`, icon: GitBranch },
         { name: 'Clients', href: `/${workspaceSlug}/clients`, icon: Users },
         { name: 'Proposals', href: `/${workspaceSlug}/proposals`, icon: FileText },
-        { name: 'Projects', href: `/${workspaceSlug}/projects`, icon: Kanban },
+        { name: 'Projects', href: `/${workspaceSlug}/projects`, icon: FolderKanban },
       ],
     },
     {
@@ -181,13 +182,13 @@ export function SidebarNav({
       items: [
         { name: 'Invoices', href: `/${workspaceSlug}/invoices`, icon: Receipt },
         { name: 'Files', href: `/${workspaceSlug}/files`, icon: FolderOpen },
-        { name: 'Analytics', href: `/${workspaceSlug}/analytics`, icon: ChartBar },
+        { name: 'Analytics', href: `/${workspaceSlug}/analytics`, icon: BarChart3 },
       ],
     },
     {
       title: 'Management',
       items: [
-        { name: 'Settings', href: `/${workspaceSlug}/settings`, icon: Gear },
+        { name: 'Settings', href: `/${workspaceSlug}/settings`, icon: Settings },
       ],
     },
   ];
@@ -203,7 +204,7 @@ export function SidebarNav({
     if (isClient) {
       return (
         <div className="space-y-1.5 px-3 py-4">
-          <div className="px-3 mb-2 text-[10px] font-semibold tracking-wider text-zinc-400 dark:text-zinc-550 uppercase">
+          <div className="px-3 mb-2 text-[10px] font-semibold tracking-wider text-zinc-400 dark:text-gray-500 uppercase">
             Client Portal
           </div>
           {clientNavItems.map((item) => {
@@ -227,7 +228,7 @@ export function SidebarNav({
                     transition={{ type: "spring", stiffness: 380, damping: 30 }}
                   />
                 )}
-                <Icon weight={active ? "fill" : "regular"} className={cn("h-5 w-5 shrink-0 transition-transform duration-200 relative z-10", active ? "text-primary" : "text-zinc-400 dark:text-zinc-500")} />
+                <Icon className={cn("h-5 w-5 shrink-0 transition-transform duration-200 relative z-10", active ? "text-primary" : "text-zinc-400 dark:text-zinc-500")} />
                 <span className="relative z-10">{item.name}</span>
               </Link>
             );
@@ -240,7 +241,7 @@ export function SidebarNav({
       <div className="space-y-5 px-3 py-4">
         {adminGroups.map((group) => (
           <div key={group.title} className="space-y-1">
-            <div className="px-3 mb-2 text-[10px] font-semibold tracking-wider text-zinc-400 dark:text-zinc-550 uppercase">
+            <div className="px-3 mb-2 text-[10px] font-semibold tracking-wider text-zinc-400 dark:text-gray-500 uppercase">
               {group.title}
             </div>
             <div className="space-y-1">
@@ -265,7 +266,7 @@ export function SidebarNav({
                         transition={{ type: "spring", stiffness: 380, damping: 30 }}
                       />
                     )}
-                    <Icon weight={active ? "fill" : "regular"} className={cn("h-5 w-5 shrink-0 relative z-10", active ? "text-primary" : "text-muted-foreground")} />
+                    <Icon className={cn("h-5 w-5 shrink-0 relative z-10", active ? "text-primary" : "text-muted-foreground")} />
                     <span className="relative z-10">{item.name}</span>
                   </Link>
                 );
@@ -344,34 +345,40 @@ export function SidebarNav({
         </div>
       )}
 
-      {/* Main Content Area Wrapper */}
-      <div className="flex flex-1 flex-col md:pl-60 min-h-screen">
+      {/* Main Content Area Wrapper.
+          min-w-0 is required: as a flex child its default min-width:auto lets it
+          grow past the viewport whenever a page holds wide content (kanban board,
+          data tables), which also stops inner overflow-x-auto scrollers from ever
+          engaging. */}
+      <div className="flex min-w-0 flex-1 flex-col md:pl-60 min-h-screen">
         {/* Top Header - exactly 64px height (h-16) */}
-        <header className="sticky top-0 z-10 flex h-16 border-b border-border bg-card px-6 items-center justify-between w-full">
-          <div className="flex flex-1 items-center justify-between">
+        <header className="sticky top-0 z-10 flex h-16 border-b border-border bg-card px-4 md:px-6 items-center justify-between w-full">
+          <div className="flex min-w-0 flex-1 items-center justify-between gap-2">
             {/* Left section: Hamburger (mobile) + Page Title */}
-            <div className="flex items-center gap-3">
+            <div className="flex min-w-0 items-center gap-2 sm:gap-3">
               <button
                 onClick={() => setIsMobileMenuOpen(true)}
-                className="rounded-md p-1.5 text-muted-foreground hover:bg-muted md:hidden cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                className="shrink-0 rounded-md p-1.5 text-muted-foreground hover:bg-muted md:hidden cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-ring"
               >
-                <List className="h-5 w-5" />
+                <Menu className="h-5 w-5" />
               </button>
-              
-              <div className="flex items-center gap-1.5 text-sm font-semibold">
-                  <span className="text-muted-foreground font-normal">SyncLancer</span>
-                <span className="text-zinc-300 dark:text-zinc-700">/</span>
-                <span className="font-bold text-zinc-900 dark:text-zinc-50 truncate max-w-[120px] md:max-w-none">
+
+              <div className="flex min-w-0 items-center gap-1.5 text-sm font-semibold">
+                {/* The "SyncLancer /" prefix is dropped on narrow screens so the
+                    workspace name keeps room instead of pushing the header wide. */}
+                <span className="hidden text-muted-foreground font-normal sm:inline">SyncLancer</span>
+                <span className="hidden text-zinc-300 dark:text-zinc-700 sm:inline">/</span>
+                <span className="truncate font-bold text-zinc-900 dark:text-zinc-50 md:max-w-none">
                   {isClient ? 'Client Portal' : currentWorkspace.name}
                 </span>
               </div>
             </div>
 
             {/* Right section: Global search (320px), Notification Center, User Avatar */}
-            <div className="flex items-center gap-4">
+            <div className="flex shrink-0 items-center gap-2 sm:gap-4">
               {/* Desktop header search bar trigger - exactly 320px width */}
               <div className="relative hidden md:block w-[320px]">
-                <MagnifyingGlass className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                 <button
                   onClick={() => setIsSearchOpen(true)}
                   className="flex h-9 w-full items-center justify-between rounded-md border border-border bg-muted/50 pl-8 pr-3 text-left text-xs text-muted-foreground transition-colors hover:bg-muted cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-ring font-medium"
@@ -386,21 +393,27 @@ export function SidebarNav({
                 onClick={() => setIsSearchOpen(true)}
                 className="rounded-lg p-1.5 text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-800 cursor-pointer outline-none md:hidden"
               >
-                <MagnifyingGlass className="h-4 w-4" />
+                <Search className="h-4 w-4" />
               </button>
 
               {/* Notification Center */}
               {notificationCenter}
 
-              <div className="flex h-8 w-8 items-center justify-center rounded-full border border-border bg-muted text-muted-foreground">
-                <UserIcon className="h-4 w-4" />
-              </div>
+              {!isClient && (
+                <Link
+                  href={`/${workspaceSlug}/settings`}
+                  title="Workspace settings"
+                  className="flex h-8 w-8 items-center justify-center rounded-md border border-border bg-muted/50 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                >
+                  <Settings className="h-4 w-4" />
+                </Link>
+              )}
             </div>
           </div>
         </header>
 
-        {/* Page Content - exactly 24px (p-6) outer padding, max 1440px width */}
-        <main className="flex-1 p-6 max-w-[1440px] w-full mx-auto">
+        {/* Page Content - 16px padding on mobile, 24px from md up, max 1440px width */}
+        <main className="flex-1 p-4 md:p-6 max-w-[1440px] w-full mx-auto min-w-0">
           {children}
         </main>
       </div>
@@ -415,7 +428,7 @@ export function SidebarNav({
 
       {/* Floating Active Timer Panel */}
       {activeTimer && (
-        <div className="fixed bottom-6 right-6 z-50 flex max-w-sm items-center gap-4 rounded-lg border border-primary/30 bg-slate-950 text-white p-4 shadow-lg animate-in slide-in-from-bottom duration-200">
+        <div className="fixed bottom-4 right-4 left-4 z-50 flex items-center gap-4 rounded-lg border border-primary/30 bg-slate-950 text-white p-4 shadow-lg animate-in slide-in-from-bottom duration-200 sm:left-auto sm:bottom-6 sm:right-6 sm:max-w-sm">
           <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary/10 border border-primary/20 shrink-0">
             <span className="h-3.5 w-3.5 rounded-full bg-primary" />
           </div>
@@ -431,7 +444,7 @@ export function SidebarNav({
               className="flex h-8 w-8 items-center justify-center rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 cursor-pointer transition-colors"
               title="Stop Timer"
             >
-              <Square weight="fill" className="h-3.5 w-3.5" />
+              <Square className="h-3.5 w-3.5 fill-current" />
             </button>
           </div>
         </div>

@@ -1,3 +1,4 @@
+import { getErrorMessage } from '@/lib/errors';
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/auth';
 import { FileService } from '@/features/files/services/file-service';
@@ -50,10 +51,10 @@ export async function POST(request: NextRequest) {
       success: true,
       data: uploaded,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('File upload API error:', error);
     return NextResponse.json(
-      { success: false, error: { code: 'API_ERROR', message: error.message || 'An error occurred' } },
+      { success: false, error: { code: 'API_ERROR', message: getErrorMessage(error, 'An error occurred') } },
       { status: 500 }
     );
   }

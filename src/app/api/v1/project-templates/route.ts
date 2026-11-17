@@ -1,3 +1,4 @@
+import { getErrorMessage } from '@/lib/errors';
 import { NextResponse } from 'next/server';
 import { auth } from '@/auth';
 import { ProjectService } from '@/features/projects/services/project-service';
@@ -30,10 +31,10 @@ export async function GET(request: Request) {
       success: true,
       data: templates,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Get project templates API error:', error);
     return NextResponse.json(
-      { success: false, error: { code: 'API_ERROR', message: error.message || 'An error occurred' } },
+      { success: false, error: { code: 'API_ERROR', message: getErrorMessage(error, 'An error occurred') } },
       { status: 500 }
     );
   }

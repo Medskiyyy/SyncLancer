@@ -1,3 +1,4 @@
+import { getErrorMessage } from '@/lib/errors';
 import { NextResponse } from 'next/server';
 import { auth } from '@/auth';
 import { WorkspaceService } from '@/features/workspace/services/workspace-service';
@@ -45,10 +46,10 @@ export async function PATCH(
       success: true,
       data: workspace,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Update workspace API error:', error);
     return NextResponse.json(
-      { success: false, error: { code: 'API_ERROR', message: error.message || 'An error occurred' } },
+      { success: false, error: { code: 'API_ERROR', message: getErrorMessage(error, 'An error occurred') } },
       { status: 500 }
     );
   }
@@ -74,10 +75,10 @@ export async function DELETE(
       success: true,
       message: 'Workspace deleted successfully',
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Delete workspace API error:', error);
     return NextResponse.json(
-      { success: false, error: { code: 'API_ERROR', message: error.message || 'An error occurred' } },
+      { success: false, error: { code: 'API_ERROR', message: getErrorMessage(error, 'An error occurred') } },
       { status: 500 }
     );
   }

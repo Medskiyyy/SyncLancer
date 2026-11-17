@@ -1,5 +1,5 @@
 import prisma from '@/lib/prisma';
-import { RecurringInvoice } from '@prisma/client';
+
 import { CreateRecurringInvoiceInput, UpdateRecurringInvoiceInput } from '../schemas/recurring-invoice';
 
 export class RecurringInvoiceRepository {

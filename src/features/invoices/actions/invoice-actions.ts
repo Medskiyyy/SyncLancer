@@ -1,5 +1,6 @@
 'use server';
 
+import { getErrorMessage } from '@/lib/errors';
 import { auth } from '@/auth';
 import { InvoiceService } from '../services/invoice-service';
 import { CreateInvoiceInput, UpdateInvoiceInput } from '../schemas/invoice';
@@ -20,8 +21,8 @@ export async function createInvoiceAction(workspaceId: string, input: CreateInvo
     }
     revalidatePath(`/[workspaceSlug]/invoices`);
     return { success: true, data: invoice };
-  } catch (error: any) {
-    return { success: false, error: error.message || 'Failed to create invoice' };
+  } catch (error: unknown) {
+    return { success: false, error: getErrorMessage(error, 'Failed to create invoice') };
   }
 }
 
@@ -38,8 +39,8 @@ export async function updateInvoiceAction(id: string, workspaceId: string, proje
     }
     revalidatePath(`/[workspaceSlug]/invoices`);
     return { success: true, data: invoice };
-  } catch (error: any) {
-    return { success: false, error: error.message || 'Failed to update invoice' };
+  } catch (error: unknown) {
+    return { success: false, error: getErrorMessage(error, 'Failed to update invoice') };
   }
 }
 
@@ -56,8 +57,8 @@ export async function deleteInvoiceAction(id: string, workspaceId: string, proje
     }
     revalidatePath(`/[workspaceSlug]/invoices`);
     return { success: true };
-  } catch (error: any) {
-    return { success: false, error: error.message || 'Failed to delete invoice' };
+  } catch (error: unknown) {
+    return { success: false, error: getErrorMessage(error, 'Failed to delete invoice') };
   }
 }
 
@@ -74,8 +75,8 @@ export async function sendInvoiceAction(id: string, workspaceId: string, project
     }
     revalidatePath(`/[workspaceSlug]/invoices`);
     return { success: true, data: invoice };
-  } catch (error: any) {
-    return { success: false, error: error.message || 'Failed to send invoice' };
+  } catch (error: unknown) {
+    return { success: false, error: getErrorMessage(error, 'Failed to send invoice') };
   }
 }
 
@@ -92,7 +93,7 @@ export async function markAsPaidAction(id: string, workspaceId: string, projectI
     }
     revalidatePath(`/[workspaceSlug]/invoices`);
     return { success: true, data: invoice };
-  } catch (error: any) {
-    return { success: false, error: error.message || 'Failed to mark invoice as paid' };
+  } catch (error: unknown) {
+    return { success: false, error: getErrorMessage(error, 'Failed to mark invoice as paid') };
   }
 }

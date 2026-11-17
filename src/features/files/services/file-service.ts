@@ -1,6 +1,6 @@
 import { FileRepository } from '../repositories/file-repository';
 import { WorkspaceService } from '@/features/workspace/services/workspace-service';
-import { validateFile, MAX_FILE_SIZE } from '../schemas/file';
+import { validateFile } from '../schemas/file';
 import { Role } from '@prisma/client';
 import prisma from '@/lib/prisma';
 import { supabase } from '@/lib/supabase';
@@ -124,12 +124,17 @@ export class FileService {
     const storagePath = `${workspaceId}/${projectId || 'global'}/${fileId}-${cleanFileName}`;
 
     // 7. Upload to Supabase Storage
+    // "duplex" is required by undici when the body is a stream, but it is absent
+    // from supabase-js FileOptions — hence the narrow cast to the real option type
+    // instead of an "any" on the whole call.
+    type UploadOptions = Parameters<ReturnType<typeof supabase.storage.from>['upload']>[2];
+
     const { error: uploadError } = await supabase.storage
       .from(this.bucketName)
       .upload(storagePath, fileBuffer, {
         contentType: fileType,
         duplex: 'half',
-      } as any);
+      } as UploadOptions);
 
     if (uploadError) {
       throw new Error(`Failed to upload file to storage: ${uploadError.message}`);

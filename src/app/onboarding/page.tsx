@@ -1,5 +1,6 @@
 'use client';
 
+import { getErrorMessage } from '@/lib/errors';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
@@ -8,7 +9,7 @@ import { createWorkspaceSchema, CreateWorkspaceInput } from '@/features/workspac
 import { createWorkspaceAction } from '@/features/workspace/actions/workspace-actions';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 
 export default function OnboardingPage() {
@@ -36,8 +37,8 @@ export default function OnboardingPage() {
 
       // Redirect to the newly created workspace dashboard
       router.push(`/${result.data.slug}`);
-    } catch (err: any) {
-      setError(err.message || 'An unexpected error occurred');
+    } catch (err: unknown) {
+      setError(getErrorMessage(err, 'An unexpected error occurred'));
     } finally {
       setIsLoading(false);
     }

@@ -1,5 +1,6 @@
 'use client';
 
+import { getErrorMessage } from '@/lib/errors';
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
@@ -66,7 +67,7 @@ export function WorkspaceSettings({ workspace, usage }: WorkspaceSettingsProps) 
         toast.error(result.error || 'Failed to update workspace.');
       }
     } catch (err: unknown) {
-      toast.error(err instanceof Error ? err.message : 'An error occurred.');
+      toast.error(err instanceof Error ? getErrorMessage(err) : 'An error occurred.');
     } finally {
       setUpdatingGeneral(false);
     }
@@ -83,7 +84,7 @@ export function WorkspaceSettings({ workspace, usage }: WorkspaceSettingsProps) 
         toast.error(result.error || 'Failed to change plan.');
       }
     } catch (err: unknown) {
-      toast.error(err instanceof Error ? err.message : 'An error occurred.');
+      toast.error(err instanceof Error ? getErrorMessage(err) : 'An error occurred.');
     } finally {
       setUpdatingPlan(false);
     }
@@ -118,7 +119,7 @@ export function WorkspaceSettings({ workspace, usage }: WorkspaceSettingsProps) 
                 "flex items-center gap-3 px-4 py-2.5 text-sm font-semibold rounded-lg transition-colors whitespace-nowrap cursor-pointer",
                 isActive
                   ? "bg-primary/10 text-primary border-l-2 border-primary rounded-l-none"
-                  : "text-zinc-550 hover:text-zinc-900 hover:bg-zinc-100/50 dark:text-zinc-400 dark:hover:text-zinc-100 dark:hover:bg-zinc-900/50"
+                  : "text-gray-500 hover:text-zinc-900 hover:bg-zinc-100/50 dark:text-zinc-400 dark:hover:text-zinc-100 dark:hover:bg-zinc-900/50"
               )}
             >
               <TabIcon className="h-4 w-4 shrink-0" />
@@ -176,7 +177,7 @@ export function WorkspaceSettings({ workspace, usage }: WorkspaceSettingsProps) 
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                   <div className="space-y-1">
                     <h3 className="text-lg font-bold text-zinc-900 dark:text-zinc-50 font-heading">Subscription Plan</h3>
-                    <p className="text-xs text-zinc-550 dark:text-zinc-400">Manage plan levels and monitor resource utilization limits.</p>
+                    <p className="text-xs text-gray-500 dark:text-zinc-400">Manage plan levels and monitor resource utilization limits.</p>
                   </div>
                   {workspace.plan === 'PRO' ? (
                     <Badge className="px-3 py-1 bg-primary text-primary-foreground font-bold shadow-sm border-0 uppercase tracking-wider text-[10px] rounded-full">

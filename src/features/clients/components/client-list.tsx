@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { Client, Project, Invoice } from '@prisma/client';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -54,18 +55,32 @@ interface ClientListProps {
 }
 
 export function ClientList({ initialClients, workspaceId, workspaceSlug }: ClientListProps) {
+  const searchParams = useSearchParams();
+  const shouldAutoOpenAdd = searchParams.get('add') === 'true';
+  const [prevAddParam, setPrevAddParam] = useState(shouldAutoOpenAdd);
   const [clients, setClients] = useState<ExtendedClient[]>(initialClients);
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState<'active' | 'archived'>('active');
   
-  const [isAddOpen, setIsAddOpen] = useState(false);
+  const [isAddOpen, setIsAddOpen] = useState(shouldAutoOpenAdd);
   const [editingClient, setEditingClient] = useState<ExtendedClient | null>(null);
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  useEffect(() => {
+  if (shouldAutoOpenAdd !== prevAddParam) {
+    setPrevAddParam(shouldAutoOpenAdd);
+    if (shouldAutoOpenAdd) {
+      setIsAddOpen(true);
+    }
+  }
+
+  // Re-sync when the server sends a fresh list (router.refresh()). Done during
+  // render rather than in an effect so there is no extra commit with stale rows.
+  const [syncedClients, setSyncedClients] = useState(initialClients);
+  if (initialClients !== syncedClients) {
+    setSyncedClients(initialClients);
     setClients(initialClients);
-  }, [initialClients]);
+  }
 
   const addForm = useForm<CreateClientInput>({
     resolver: zodResolver(createClientSchema),
@@ -109,7 +124,7 @@ export function ClientList({ initialClients, workspaceId, workspaceSlug }: Clien
       } else {
         toast.error(result.error || 'Failed to create client');
       }
-    } catch (error) {
+    } catch {
       toast.error('An unexpected error occurred');
     } finally {
       setIsLoading(false);
@@ -128,7 +143,7 @@ export function ClientList({ initialClients, workspaceId, workspaceSlug }: Clien
       } else {
         toast.error(result.error || 'Failed to update client');
       }
-    } catch (error) {
+    } catch {
       toast.error('An unexpected error occurred');
     } finally {
       setIsLoading(false);
@@ -146,7 +161,7 @@ export function ClientList({ initialClients, workspaceId, workspaceSlug }: Clien
       } else {
         toast.error(result.error || `Failed to ${actionText} client`);
       }
-    } catch (error) {
+    } catch {
       toast.error('An unexpected error occurred');
     }
   };
@@ -161,7 +176,7 @@ export function ClientList({ initialClients, workspaceId, workspaceSlug }: Clien
       } else {
         toast.error(result.error || 'Failed to delete client');
       }
-    } catch (error) {
+    } catch {
       toast.error('An unexpected error occurred');
     }
   };
@@ -308,19 +323,19 @@ export function ClientList({ initialClients, workspaceId, workspaceSlug }: Clien
                             {client.companyName.substring(0, 2).toUpperCase()}
                           </div>
                           <div className="flex flex-col min-w-0">
-                            <Link href={`/${workspaceSlug}/clients/${client.id}`} className="font-semibold text-zinc-900 dark:text-zinc-50 hover:text-primary hover:underline truncate">
+                            <Link href={`/${workspaceSlug}/clients/${client.id}`} className="inline-flex min-h-6 items-center font-semibold text-zinc-900 dark:text-zinc-50 hover:text-primary hover:underline truncate">
                               {client.companyName}
                             </Link>
                           </div>
                         </div>
                       </td>
-                      <td className="px-6 align-middle text-zinc-650 dark:text-zinc-400">
-                        <a href={`mailto:${client.primaryEmail}`} className="hover:underline hover:text-primary">
+                      <td className="px-6 align-middle text-slate-600 dark:text-zinc-400">
+                        <a href={`mailto:${client.primaryEmail}`} className="inline-flex min-h-6 items-center hover:underline hover:text-primary">
                           {client.primaryEmail}
                         </a>
                       </td>
                       <td className="px-6 align-middle">
-                        <span className="font-medium text-zinc-700 dark:text-zinc-350">
+                        <span className="font-medium text-zinc-700 dark:text-zinc-300">
                           {projectCount} {projectCount === 1 ? 'project' : 'projects'}
                         </span>
                       </td>
@@ -333,20 +348,20 @@ export function ClientList({ initialClients, workspaceId, workspaceSlug }: Clien
                             "text-[10px] font-medium px-2 py-0.5 rounded-full border shadow-none",
                             client.archived 
                               ? "bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400 border-border/80"
-                              : "bg-emerald-50 text-emerald-700 border-emerald-150 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20"
+                              : "bg-emerald-50 text-emerald-700 border-emerald-100 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20"
                           )}
                           variant="secondary"
                         >
                           {client.archived ? 'Archived' : 'Active'}
                         </Badge>
                       </td>
-                      <td className="px-6 align-middle text-zinc-500 dark:text-zinc-450 text-xs">
+                      <td className="px-6 align-middle text-zinc-500 dark:text-zinc-400 text-xs">
                         {lastActivity}
                       </td>
                       <td className="px-6 align-middle text-right">
                         <div className="flex items-center justify-end gap-1">
                           <Link href={`/${workspaceSlug}/clients/${client.id}`}>
-                            <Button variant="ghost" size="icon" title="View Profile" className="h-8 w-8 text-zinc-450 hover:text-zinc-900 dark:hover:text-zinc-50 rounded-md cursor-pointer">
+                            <Button variant="ghost" size="icon" title="View Profile" className="h-8 w-8 text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-50 rounded-md cursor-pointer">
                               <Eye className="h-4 w-4" />
                             </Button>
                           </Link>
@@ -358,7 +373,7 @@ export function ClientList({ initialClients, workspaceId, workspaceSlug }: Clien
                               setEditingClient(client);
                               setIsEditOpen(true);
                             }}
-                            className="h-8 w-8 text-zinc-450 hover:text-zinc-900 dark:hover:text-zinc-50 rounded-md cursor-pointer"
+                            className="h-8 w-8 text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-50 rounded-md cursor-pointer"
                           >
                             <Edit className="h-4 w-4" />
                           </Button>
@@ -367,7 +382,7 @@ export function ClientList({ initialClients, workspaceId, workspaceSlug }: Clien
                             size="icon" 
                             title={client.archived ? 'Restore Client' : 'Archive Client'} 
                             onClick={() => handleArchiveClient(client)}
-                            className="h-8 w-8 text-zinc-450 hover:text-zinc-900 dark:hover:text-zinc-50 rounded-md cursor-pointer"
+                            className="h-8 w-8 text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-50 rounded-md cursor-pointer"
                           >
                             {client.archived ? <RotateCcw className="h-4 w-4 text-amber-500" /> : <Archive className="h-4 w-4" />}
                           </Button>
@@ -376,7 +391,7 @@ export function ClientList({ initialClients, workspaceId, workspaceSlug }: Clien
                             size="icon" 
                             title="Delete Client" 
                             onClick={() => handleDeleteClient(client.id)}
-                            className="h-8 w-8 text-zinc-450 hover:bg-red-500/10 hover:text-red-500 rounded-md cursor-pointer"
+                            className="h-8 w-8 text-zinc-400 hover:bg-red-500/10 hover:text-red-500 rounded-md cursor-pointer"
                           >
                             <Trash2 className="h-4 w-4" />
                           </Button>
@@ -393,7 +408,7 @@ export function ClientList({ initialClients, workspaceId, workspaceSlug }: Clien
 
       {/* Add Client Dialog */}
       <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
-        <DialogContent className="max-w-md p-6 bg-white dark:bg-zinc-900 border border-zinc-250 dark:border-zinc-800 rounded-xl">
+        <DialogContent className="sm:max-w-md p-6 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl">
           <DialogHeader>
             <DialogTitle className="text-base font-bold text-zinc-900 dark:text-zinc-50 flex items-center gap-2">
               <Building className="h-4 w-4 text-primary" />
@@ -410,7 +425,7 @@ export function ClientList({ initialClients, workspaceId, workspaceSlug }: Clien
                 name="companyName"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-xs font-semibold text-zinc-700 dark:text-zinc-350">Company Name</FormLabel>
+                    <FormLabel className="text-xs font-semibold text-zinc-700 dark:text-zinc-300">Company Name</FormLabel>
                     <FormControl>
                       <Input placeholder="Acme Inc" disabled={isLoading} className="text-xs h-9 rounded-lg" {...field} />
                     </FormControl>
@@ -423,7 +438,7 @@ export function ClientList({ initialClients, workspaceId, workspaceSlug }: Clien
                 name="primaryEmail"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-xs font-semibold text-zinc-700 dark:text-zinc-350">Primary Contact Email</FormLabel>
+                    <FormLabel className="text-xs font-semibold text-zinc-700 dark:text-zinc-300">Primary Contact Email</FormLabel>
                     <FormControl>
                       <Input type="email" placeholder="billing@acme.com" disabled={isLoading} className="text-xs h-9 rounded-lg" {...field} />
                     </FormControl>
@@ -436,7 +451,7 @@ export function ClientList({ initialClients, workspaceId, workspaceSlug }: Clien
                 name="phone"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-xs font-semibold text-zinc-700 dark:text-zinc-350">Phone Number</FormLabel>
+                    <FormLabel className="text-xs font-semibold text-zinc-700 dark:text-zinc-300">Phone Number</FormLabel>
                     <FormControl>
                       <Input placeholder="+62xxxxxxxx" disabled={isLoading} className="text-xs h-9 rounded-lg" {...field} />
                     </FormControl>
@@ -449,7 +464,7 @@ export function ClientList({ initialClients, workspaceId, workspaceSlug }: Clien
                 name="notes"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-xs font-semibold text-zinc-700 dark:text-zinc-350">Internal Notes</FormLabel>
+                    <FormLabel className="text-xs font-semibold text-zinc-700 dark:text-zinc-300">Internal Notes</FormLabel>
                     <FormControl>
                       <Textarea placeholder="Describe the client sector, core business..." disabled={isLoading} className="text-xs min-h-[80px] rounded-lg resize-none" {...field} />
                     </FormControl>
@@ -469,7 +484,7 @@ export function ClientList({ initialClients, workspaceId, workspaceSlug }: Clien
 
       {/* Edit Client Dialog */}
       <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
-        <DialogContent className="max-w-md p-6 bg-white dark:bg-zinc-900 border border-zinc-250 dark:border-zinc-800 rounded-xl">
+        <DialogContent className="sm:max-w-md p-6 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl">
           <DialogHeader>
             <DialogTitle className="text-base font-bold text-zinc-900 dark:text-zinc-50 flex items-center gap-2">
               <Building className="h-4 w-4 text-primary" />
@@ -486,7 +501,7 @@ export function ClientList({ initialClients, workspaceId, workspaceSlug }: Clien
                 name="companyName"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-xs font-semibold text-zinc-700 dark:text-zinc-350">Company Name</FormLabel>
+                    <FormLabel className="text-xs font-semibold text-zinc-700 dark:text-zinc-300">Company Name</FormLabel>
                     <FormControl>
                       <Input placeholder="Acme Inc" disabled={isLoading} className="text-xs h-9 rounded-lg" {...field} />
                     </FormControl>
@@ -499,7 +514,7 @@ export function ClientList({ initialClients, workspaceId, workspaceSlug }: Clien
                 name="primaryEmail"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-xs font-semibold text-zinc-700 dark:text-zinc-350">Primary Contact Email</FormLabel>
+                    <FormLabel className="text-xs font-semibold text-zinc-700 dark:text-zinc-300">Primary Contact Email</FormLabel>
                     <FormControl>
                       <Input type="email" placeholder="billing@acme.com" disabled={isLoading} className="text-xs h-9 rounded-lg" {...field} />
                     </FormControl>
@@ -512,7 +527,7 @@ export function ClientList({ initialClients, workspaceId, workspaceSlug }: Clien
                 name="phone"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-xs font-semibold text-zinc-700 dark:text-zinc-350">Phone Number</FormLabel>
+                    <FormLabel className="text-xs font-semibold text-zinc-700 dark:text-zinc-300">Phone Number</FormLabel>
                     <FormControl>
                       <Input placeholder="+62xxxxxxxx" disabled={isLoading} className="text-xs h-9 rounded-lg" {...field} />
                     </FormControl>
@@ -525,7 +540,7 @@ export function ClientList({ initialClients, workspaceId, workspaceSlug }: Clien
                 name="notes"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-xs font-semibold text-zinc-700 dark:text-zinc-350">Internal Notes</FormLabel>
+                    <FormLabel className="text-xs font-semibold text-zinc-700 dark:text-zinc-300">Internal Notes</FormLabel>
                     <FormControl>
                       <Textarea placeholder="Describe the client sector, core business..." disabled={isLoading} className="text-xs min-h-[80px] rounded-lg resize-none" {...field} />
                     </FormControl>

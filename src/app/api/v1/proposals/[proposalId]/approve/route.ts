@@ -1,3 +1,4 @@
+import { getErrorMessage, getErrorCode } from '@/lib/errors';
 import { NextResponse } from 'next/server';
 import { auth } from '@/auth';
 import { ProposalService } from '@/features/proposals/services/proposal-service';
@@ -34,17 +35,17 @@ export async function POST(
       success: true,
       data: result,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Approve proposal API error:', error);
-    const errorCode = error.code || 'API_ERROR';
-    const status = error.code === 'LIMIT_EXCEEDED' ? 400 : 500;
+    const errorCode = getErrorCode(error, 'API_ERROR');
+    const status = errorCode === 'LIMIT_EXCEEDED' ? 400 : 500;
     
     return NextResponse.json(
       {
         success: false,
         error: {
           code: errorCode,
-          message: error.message || 'An error occurred',
+          message: getErrorMessage(error, 'An error occurred'),
         },
       },
       { status }

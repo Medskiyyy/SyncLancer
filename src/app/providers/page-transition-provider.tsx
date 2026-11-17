@@ -2,19 +2,17 @@
 
 import * as React from 'react';
 import { usePathname } from 'next/navigation';
-import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 
 interface PageTransitionProviderProps {
   children: React.ReactNode;
 }
 
+// Reduced motion is handled globally by <MotionConfig reducedMotion="user"> in
+// app/providers/motion-provider.tsx — branching on useReducedMotion() here would
+// produce an unpatchable SSR hydration mismatch.
 export function PageTransitionProvider({ children }: PageTransitionProviderProps) {
   const pathname = usePathname();
-  const shouldReduceMotion = useReducedMotion();
-
-  if (shouldReduceMotion) {
-    return <div className="flex flex-1 flex-col w-full">{children}</div>;
-  }
 
   return (
     <AnimatePresence mode="wait">

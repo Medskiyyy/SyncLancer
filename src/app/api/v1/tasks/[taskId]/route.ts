@@ -1,3 +1,4 @@
+import { getErrorMessage } from '@/lib/errors';
 import { NextResponse } from 'next/server';
 import { auth } from '@/auth';
 import { TaskService } from '@/features/tasks/services/task-service';
@@ -38,7 +39,7 @@ export async function GET(
     }
 
     const tasks = await taskService.getTasksByProjectId(projectId, workspaceId, session.user.id);
-    const task = tasks.find((t: any) => t.id === taskId);
+    const task = tasks.find((t) => t.id === taskId);
 
     if (!task) {
       return NextResponse.json(
@@ -51,10 +52,10 @@ export async function GET(
       success: true,
       data: task,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Get task detail API error:', error);
     return NextResponse.json(
-      { success: false, error: { code: 'API_ERROR', message: error.message || 'An error occurred' } },
+      { success: false, error: { code: 'API_ERROR', message: getErrorMessage(error, 'An error occurred') } },
       { status: 500 }
     );
   }
@@ -106,10 +107,10 @@ export async function PATCH(
       success: true,
       data: task,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Update task API error:', error);
     return NextResponse.json(
-      { success: false, error: { code: 'API_ERROR', message: error.message || 'An error occurred' } },
+      { success: false, error: { code: 'API_ERROR', message: getErrorMessage(error, 'An error occurred') } },
       { status: 500 }
     );
   }
@@ -145,10 +146,10 @@ export async function DELETE(
       success: true,
       message: 'Task deleted successfully',
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Delete task API error:', error);
     return NextResponse.json(
-      { success: false, error: { code: 'API_ERROR', message: error.message || 'An error occurred' } },
+      { success: false, error: { code: 'API_ERROR', message: getErrorMessage(error, 'An error occurred') } },
       { status: 500 }
     );
   }

@@ -1,9 +1,12 @@
+import { safeUserSelect } from '@/lib/safe-user-select';
 import prisma from '@/lib/prisma';
 import { Client, ClientUser, Role } from '@prisma/client';
 import { CreateClientInput, UpdateClientInput } from '../schemas/client';
 
 export class ClientRepository {
-  async findById(id: string): Promise<Client | null> {
+  // No explicit return type: annotating Promise<Client | null> erased the include
+  // types, which is what forced the "as any" casts at every call site.
+  async findById(id: string) {
     return prisma.client.findFirst({
       where: {
         id,
@@ -12,7 +15,9 @@ export class ClientRepository {
       include: {
         portalUsers: {
           include: {
-            user: true,
+            // passwordHash is selected only so ClientService can derive hasPassword;
+            // it is stripped there and never reaches a Client Component.
+            user: { select: { ...safeUserSelect, passwordHash: true } },
           },
         },
         projects: {
@@ -31,7 +36,7 @@ export class ClientRepository {
     });
   }
 
-  async listByWorkspaceId(workspaceId: string): Promise<Client[]> {
+  async listByWorkspaceId(workspaceId: string) {
     return prisma.client.findMany({
       where: {
         workspaceId,

@@ -1,3 +1,4 @@
+import { safeUserSelect } from '@/lib/safe-user-select';
 import prisma from '@/lib/prisma';
 
 export interface CreateFileRepoInput {
@@ -11,12 +12,11 @@ export interface CreateFileRepoInput {
 }
 
 export class FileRepository {
-  private mapFile(file: any) {
+  // File.fileSize is BigInt in Prisma; Client Components cannot receive BigInt,
+  // so every read path narrows it to number here.
+  private mapFile<T extends { fileSize: bigint }>(file: T | null) {
     if (!file) return null;
-    return {
-      ...file,
-      fileSize: Number(file.fileSize),
-    };
+    return { ...file, fileSize: Number(file.fileSize) };
   }
 
   async findById(id: string) {
@@ -25,7 +25,7 @@ export class FileRepository {
       include: {
         workspace: true,
         project: true,
-        uploader: true,
+        uploader: { select: safeUserSelect },
       },
     });
     return this.mapFile(file);
@@ -39,7 +39,7 @@ export class FileRepository {
       },
       orderBy: { createdAt: 'desc' },
       include: {
-        uploader: true,
+        uploader: { select: safeUserSelect },
       },
     });
     return files.map(f => this.mapFile(f));
@@ -53,7 +53,7 @@ export class FileRepository {
       },
       orderBy: { createdAt: 'desc' },
       include: {
-        uploader: true,
+        uploader: { select: safeUserSelect },
       },
     });
     return files.map(f => this.mapFile(f));
@@ -71,7 +71,7 @@ export class FileRepository {
         storagePath: data.storagePath,
       },
       include: {
-        uploader: true,
+        uploader: { select: safeUserSelect },
       },
     });
     return this.mapFile(file);

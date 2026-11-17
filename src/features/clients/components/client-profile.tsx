@@ -1,7 +1,8 @@
 'use client';
+import type { Serialized } from '@/lib/serialize';
 
 import React, { useState } from 'react';
-import { Client, Project, Proposal, Invoice, ClientUser, User } from '@prisma/client';
+import { Client, Project, Proposal, Invoice, ClientUser, User, File as PrismaFile } from '@prisma/client';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -14,8 +15,6 @@ import {
   FileText, 
   Receipt, 
   FolderOpen, 
-  Send, 
-  Plus, 
   UserPlus, 
   ShieldCheck, 
   Clock, 
@@ -40,18 +39,31 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { inviteClientPortalAction } from '../actions/client-actions';
 import { cn } from '@/lib/utils';
 
-interface ExtendedClientUser extends ClientUser {
-  user: User;
-}
+// `user` is the safe projection (no passwordHash) — see lib/safe-user-select.
+type ExtendedClientUser = ClientUser & {
+  user: Pick<User, 'id' | 'email' | 'fullName' | 'avatarUrl' | 'emailVerified' | 'createdAt'> & { hasPassword: boolean };
+};
 
-interface ClientProfileProps {
-  client: Client & {
+// Serialized<>: the page converts Prisma Decimal money columns to numbers before
+// this crosses the Server -> Client Component boundary.
+type ClientWithRelations = Serialized<
+  Client & {
     projects: Project[];
     proposals: Proposal[];
     invoices: Invoice[];
     portalUsers: ExtendedClientUser[];
-  };
-  files: any[];
+  }
+>;
+
+// Matches ClientService.getClientFiles(); Serialized<> turns File.fileSize from
+// bigint into number, which is what lets it cross into a Client Component at all.
+type ClientFile = Serialized<
+  PrismaFile & { uploader: Pick<User, 'id' | 'email' | 'fullName' | 'avatarUrl'> }
+>;
+
+interface ClientProfileProps {
+  client: ClientWithRelations;
+  files: ClientFile[];
   workspaceId: string;
   workspaceSlug: string;
 }
@@ -98,7 +110,7 @@ export function ClientProfile({ client, files, workspaceId, workspaceSlug }: Cli
       } else {
         toast.error(result.error || 'Failed to send invitation');
       }
-    } catch (err) {
+    } catch {
       toast.error('An error occurred');
     } finally {
       setIsLoading(false);
@@ -115,7 +127,7 @@ export function ClientProfile({ client, files, workspaceId, workspaceSlug }: Cli
             <Card className="shadow-xs border border-zinc-200/60 dark:border-zinc-800/80 rounded-xl overflow-hidden bg-white dark:bg-zinc-900">
               <CardHeader className="pb-3 border-b border-zinc-100 dark:border-zinc-800/60 flex flex-row items-center justify-between space-y-0">
                 <div>
-                  <CardTitle className="text-sm font-bold text-zinc-900 dark:text-zinc-55">Projects Scopes</CardTitle>
+                  <CardTitle className="text-sm font-bold text-zinc-900 dark:text-zinc-50">Projects Scopes</CardTitle>
                   <CardDescription className="text-xs text-zinc-500 dark:text-zinc-400">Active and completed scopes of work under this client account</CardDescription>
                 </div>
                 <Badge variant="secondary" className="rounded-full font-mono text-[10px] px-2 py-0.5 border border-zinc-200/40 dark:border-zinc-800/40">{client.projects.length} Total</Badge>
@@ -126,7 +138,7 @@ export function ClientProfile({ client, files, workspaceId, workspaceSlug }: Cli
                     No projects found for this client. Create a project from Settings or Proposals.
                   </div>
                 ) : (
-                  <div className="divide-y divide-zinc-150 dark:divide-zinc-800/80">
+                  <div className="divide-y divide-gray-100 dark:divide-zinc-800/80">
                     {client.projects.map((project) => (
                       <div key={project.id} className="py-4 flex items-center justify-between first:pt-0 last:pb-0">
                         <div>
@@ -142,13 +154,13 @@ export function ClientProfile({ client, files, workspaceId, workspaceSlug }: Cli
                             <div className="h-1.5 w-16 bg-zinc-100 dark:bg-zinc-800 rounded-full overflow-hidden">
                               <div className="h-full bg-gradient-to-r from-amber-500 to-amber-600" style={{ width: `${project.progress}%` }} />
                             </div>
-                            <span className="text-[10px] font-mono font-bold text-zinc-650 dark:text-zinc-400">{project.progress}%</span>
+                            <span className="text-[10px] font-mono font-bold text-slate-600 dark:text-zinc-400">{project.progress}%</span>
                           </div>
                           <Badge 
                             className={cn(
                               "text-[9px] font-bold px-1.5 py-0.5",
                               project.status === 'ACTIVE' 
-                                ? "bg-green-500/10 text-green-600 dark:text-green-400 border border-green-550/15"
+                                ? "bg-green-500/10 text-green-600 dark:text-green-400 border border-green-600/15"
                                 : "bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 border border-zinc-200/30"
                             )}
                             variant="secondary"
@@ -166,10 +178,10 @@ export function ClientProfile({ client, files, workspaceId, workspaceSlug }: Cli
             {/* Notes & Description */}
             <Card className="shadow-xs border border-zinc-200/60 dark:border-zinc-800/80 rounded-xl overflow-hidden bg-white dark:bg-zinc-900">
               <CardHeader className="pb-3 border-b border-zinc-100 dark:border-zinc-800/60">
-                <CardTitle className="text-sm font-bold text-zinc-900 dark:text-zinc-55">Internal Notes</CardTitle>
+                <CardTitle className="text-sm font-bold text-zinc-900 dark:text-zinc-50">Internal Notes</CardTitle>
                 <CardDescription className="text-xs text-zinc-500 dark:text-zinc-400">Important business context, preferences, and background information</CardDescription>
               </CardHeader>
-              <CardContent className="text-xs text-zinc-700 dark:text-zinc-355 whitespace-pre-wrap pt-4 leading-relaxed font-medium">
+              <CardContent className="text-xs text-zinc-700 dark:text-zinc-300 whitespace-pre-wrap pt-4 leading-relaxed font-medium">
                 {client.notes || 'No internal notes recorded for this client.'}
               </CardContent>
             </Card>
@@ -181,7 +193,7 @@ export function ClientProfile({ client, files, workspaceId, workspaceSlug }: Cli
           <Card className="shadow-xs border border-zinc-200/60 dark:border-zinc-800/80 rounded-xl overflow-hidden bg-white dark:bg-zinc-900">
             <CardHeader className="pb-3 border-b border-zinc-100 dark:border-zinc-800/60 flex flex-row items-center justify-between space-y-0">
               <div>
-                <CardTitle className="text-sm font-bold text-zinc-900 dark:text-zinc-55">Submitted Proposals</CardTitle>
+                <CardTitle className="text-sm font-bold text-zinc-900 dark:text-zinc-50">Submitted Proposals</CardTitle>
                 <CardDescription className="text-xs text-zinc-500 dark:text-zinc-400">Submitted estimates, bids, and scopes agreements</CardDescription>
               </div>
               <Badge variant="secondary" className="rounded-full font-mono text-[10px] px-2 py-0.5 border border-zinc-200/40 dark:border-zinc-800/40">{client.proposals.length} Total</Badge>
@@ -195,7 +207,7 @@ export function ClientProfile({ client, files, workspaceId, workspaceSlug }: Cli
                 <div className="overflow-x-auto">
                   <table className="w-full text-left border-collapse text-xs">
                     <thead>
-                      <tr className="border-b border-zinc-150 dark:border-zinc-800 text-[9px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider bg-zinc-50/50 dark:bg-zinc-900/30">
+                      <tr className="border-b border-gray-100 dark:border-zinc-800 text-[9px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider bg-zinc-50/50 dark:bg-zinc-900/30">
                         <th className="px-5 py-3">Number</th>
                         <th className="px-5 py-3">Proposal Title</th>
                         <th className="px-5 py-3">Total Cost</th>
@@ -220,11 +232,11 @@ export function ClientProfile({ client, files, workspaceId, workspaceSlug }: Cli
                               className={cn(
                                 "text-[9px] font-bold px-1.5 py-0.5",
                                 proposal.status === 'APPROVED' 
-                                  ? "bg-green-500/10 text-green-600 dark:text-green-400 border border-green-550/15"
+                                  ? "bg-green-500/10 text-green-600 dark:text-green-400 border border-green-600/15"
                                   : proposal.status === 'SENT'
-                                    ? "bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-550/15"
+                                    ? "bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-600/15"
                                     : proposal.status === 'REJECTED'
-                                      ? "bg-red-500/10 text-red-650 dark:text-red-400 border border-red-550/15"
+                                      ? "bg-red-500/10 text-red-700 dark:text-red-400 border border-red-600/15"
                                       : "bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 border border-zinc-200/30"
                               )}
                               variant="secondary"
@@ -250,7 +262,7 @@ export function ClientProfile({ client, files, workspaceId, workspaceSlug }: Cli
           <Card className="shadow-xs border border-zinc-200/60 dark:border-zinc-800/80 rounded-xl overflow-hidden bg-white dark:bg-zinc-900">
             <CardHeader className="pb-3 border-b border-zinc-100 dark:border-zinc-800/60 flex flex-row items-center justify-between space-y-0">
               <div>
-                <CardTitle className="text-sm font-bold text-zinc-900 dark:text-zinc-55">Billing & Invoices</CardTitle>
+                <CardTitle className="text-sm font-bold text-zinc-900 dark:text-zinc-50">Billing & Invoices</CardTitle>
                 <CardDescription className="text-xs text-zinc-500 dark:text-zinc-400">Billing history, balances, and payment records</CardDescription>
               </div>
               <Badge variant="secondary" className="rounded-full font-mono text-[10px] px-2 py-0.5 border border-zinc-200/40 dark:border-zinc-800/40">{client.invoices.length} Total</Badge>
@@ -264,7 +276,7 @@ export function ClientProfile({ client, files, workspaceId, workspaceSlug }: Cli
                 <div className="overflow-x-auto">
                   <table className="w-full text-left border-collapse text-xs">
                     <thead>
-                      <tr className="border-b border-zinc-150 dark:border-zinc-800 text-[9px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider bg-zinc-50/50 dark:bg-zinc-900/30">
+                      <tr className="border-b border-gray-100 dark:border-zinc-800 text-[9px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider bg-zinc-50/50 dark:bg-zinc-900/30">
                         <th className="px-5 py-3">Invoice Number</th>
                         <th className="px-5 py-3">Total Amount</th>
                         <th className="px-5 py-3">Payment Status</th>
@@ -274,7 +286,7 @@ export function ClientProfile({ client, files, workspaceId, workspaceSlug }: Cli
                     <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800/60 bg-white dark:bg-zinc-900">
                       {client.invoices.map((invoice) => (
                         <tr key={invoice.id} className="hover:bg-zinc-50/40 dark:hover:bg-zinc-900/40 transition-colors">
-                          <td className="px-5 py-3 font-mono font-bold text-zinc-650 dark:text-zinc-400 text-[10px]">
+                          <td className="px-5 py-3 font-mono font-bold text-slate-600 dark:text-zinc-400 text-[10px]">
                             {invoice.invoiceNumber}
                           </td>
                           <td className="px-5 py-3 font-bold font-mono text-zinc-900 dark:text-zinc-100">
@@ -285,11 +297,11 @@ export function ClientProfile({ client, files, workspaceId, workspaceSlug }: Cli
                               className={cn(
                                 "text-[9px] font-bold px-1.5 py-0.5",
                                 invoice.status === 'PAID' 
-                                  ? "bg-green-500/10 text-green-600 dark:text-green-400 border border-green-550/15"
+                                  ? "bg-green-500/10 text-green-600 dark:text-green-400 border border-green-600/15"
                                   : invoice.status === 'OVERDUE'
-                                    ? "bg-red-500/10 text-red-650 dark:text-red-400 border border-red-550/15"
+                                    ? "bg-red-500/10 text-red-700 dark:text-red-400 border border-red-600/15"
                                     : invoice.status === 'SENT'
-                                      ? "bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-550/15"
+                                      ? "bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-600/15"
                                       : "bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 border border-zinc-200/30"
                               )}
                               variant="secondary"
@@ -315,7 +327,7 @@ export function ClientProfile({ client, files, workspaceId, workspaceSlug }: Cli
           <Card className="shadow-xs border border-zinc-200/60 dark:border-zinc-800/80 rounded-xl overflow-hidden bg-white dark:bg-zinc-900">
             <CardHeader className="pb-3 border-b border-zinc-100 dark:border-zinc-800/60 flex flex-row items-center justify-between space-y-0">
               <div>
-                <CardTitle className="text-sm font-bold text-zinc-900 dark:text-zinc-55">Workspace Materials</CardTitle>
+                <CardTitle className="text-sm font-bold text-zinc-900 dark:text-zinc-50">Workspace Materials</CardTitle>
                 <CardDescription className="text-xs text-zinc-500 dark:text-zinc-400">Aggregated scope files, assets, and design sheets uploaded under this client</CardDescription>
               </div>
               <Badge variant="secondary" className="rounded-full font-mono text-[10px] px-2 py-0.5 border border-zinc-200/40 dark:border-zinc-800/40">{files.length} Files</Badge>
@@ -326,7 +338,7 @@ export function ClientProfile({ client, files, workspaceId, workspaceSlug }: Cli
                   No files uploaded for this client&apos;s projects.
                 </div>
               ) : (
-                <div className="divide-y divide-zinc-150 dark:divide-zinc-800/80">
+                <div className="divide-y divide-gray-100 dark:divide-zinc-800/80">
                   {files.map((file) => (
                     <div key={file.id} className="py-3 flex items-center justify-between first:pt-0 last:pb-0">
                       <div className="flex items-center gap-3">
@@ -338,7 +350,7 @@ export function ClientProfile({ client, files, workspaceId, workspaceSlug }: Cli
                           </div>
                         </div>
                       </div>
-                      <div className="text-[10px] text-zinc-400 dark:text-zinc-550 font-medium">
+                      <div className="text-[10px] text-zinc-400 dark:text-gray-500 font-medium">
                         Uploaded: {new Date(file.createdAt).toLocaleDateString()}
                       </div>
                     </div>
@@ -354,8 +366,8 @@ export function ClientProfile({ client, files, workspaceId, workspaceSlug }: Cli
   return (
     <div className="space-y-6 animate-in fade-in-50 duration-300">
       {/* Breadcrumbs & Back Button */}
-      <div className="flex items-center gap-2 text-xs text-zinc-500 font-semibold uppercase tracking-wider">
-        <Link href={`/${workspaceSlug}/clients`} className="hover:text-zinc-900 dark:hover:text-zinc-50 transition-colors">
+      <div className="flex min-w-0 items-center gap-2 text-xs text-zinc-500 font-semibold uppercase tracking-wider">
+        <Link href={`/${workspaceSlug}/clients`} className="inline-flex min-h-6 shrink-0 items-center hover:text-zinc-900 dark:hover:text-zinc-50 transition-colors">
           Clients
         </Link>
         <ChevronRight className="h-3 w-3 shrink-0" />
@@ -365,14 +377,14 @@ export function ClientProfile({ client, files, workspaceId, workspaceSlug }: Cli
       {/* Main Profile Layout Grid */}
       <div className="grid gap-6 lg:grid-cols-3">
         {/* Left Side: Client Info Card & Portal Members */}
-        <div className="space-y-6 lg:col-span-1">
+        <div className="min-w-0 space-y-6 lg:col-span-1">
           {/* Main Info Card */}
           <Card className="shadow-xs border border-zinc-200/60 dark:border-zinc-800/80 rounded-xl overflow-hidden bg-white dark:bg-zinc-900">
-            <CardHeader className="pb-4 border-b border-zinc-150 dark:border-zinc-800">
+            <CardHeader className="pb-4 border-b border-gray-100 dark:border-zinc-800">
               <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/15 shadow-xs mb-3">
                 <Building className="h-5 w-5" />
               </div>
-              <CardTitle className="text-base font-bold text-zinc-950 dark:text-zinc-50">{client.companyName}</CardTitle>
+              <CardTitle className="text-base font-bold text-zinc-950 dark:text-zinc-50 break-words">{client.companyName}</CardTitle>
               <CardDescription className="text-[10px] text-zinc-400 dark:text-zinc-500 font-medium">
                 Client directory entry since {new Date(client.createdAt).toLocaleDateString()}
               </CardDescription>
@@ -380,12 +392,12 @@ export function ClientProfile({ client, files, workspaceId, workspaceSlug }: Cli
             <CardContent className="space-y-4 pt-4 text-xs font-medium">
               <div className="flex items-center gap-3">
                 <Mail className="h-4 w-4 text-zinc-400 shrink-0" />
-                <span className="text-zinc-700 dark:text-zinc-305 truncate">{client.primaryEmail}</span>
+                <span className="text-zinc-700 dark:text-zinc-300 truncate">{client.primaryEmail}</span>
               </div>
               {client.phone && (
                 <div className="flex items-center gap-3">
                   <Phone className="h-4 w-4 text-zinc-400 shrink-0" />
-                  <span className="text-zinc-700 dark:text-zinc-305">{client.phone}</span>
+                  <span className="text-zinc-700 dark:text-zinc-300">{client.phone}</span>
                 </div>
               )}
               <div className="pt-1">
@@ -394,7 +406,7 @@ export function ClientProfile({ client, files, workspaceId, workspaceSlug }: Cli
                     "text-[9px] font-bold px-1.5 py-0.5",
                     client.archived 
                       ? "bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 border border-zinc-200/30"
-                      : "bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-550/15"
+                      : "bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-600/15"
                   )}
                   variant="secondary"
                 >
@@ -406,7 +418,7 @@ export function ClientProfile({ client, files, workspaceId, workspaceSlug }: Cli
 
           {/* Portal User Invitation / List */}
           <Card className="shadow-xs border border-zinc-200/60 dark:border-zinc-800/80 rounded-xl overflow-hidden bg-white dark:bg-zinc-900">
-            <CardHeader className="pb-3 border-b border-zinc-150 dark:border-zinc-800 flex flex-row items-center justify-between space-y-0">
+            <CardHeader className="pb-3 border-b border-gray-100 dark:border-zinc-800 flex flex-row items-center justify-between space-y-0">
               <div>
                 <CardTitle className="text-xs font-bold text-zinc-900 dark:text-zinc-50 uppercase tracking-wider">Client Portal keys</CardTitle>
                 <CardDescription className="text-[10px] text-zinc-400 dark:text-zinc-500">Security tokens for client representatives</CardDescription>
@@ -438,16 +450,16 @@ export function ClientProfile({ client, files, workspaceId, workspaceSlug }: Cli
               ) : (
                 <div className="space-y-3">
                   {portalUsers.map((portalUser) => {
-                    const isActive = !!portalUser.user.passwordHash;
+                    const isActive = portalUser.user.hasPassword;
                     return (
                       <div key={portalUser.id} className="flex items-center justify-between text-xs p-2.5 rounded-lg bg-zinc-50/50 dark:bg-zinc-950/20 border border-zinc-200/60 dark:border-zinc-800">
                         <div className="min-w-0 pr-2">
-                          <div className="font-semibold text-zinc-850 dark:text-zinc-200 truncate">{portalUser.user.email}</div>
+                          <div className="font-semibold text-gray-800 dark:text-zinc-200 truncate">{portalUser.user.email}</div>
                           <div className="text-[9px] text-zinc-400 dark:text-zinc-500 mt-0.5 font-medium">{portalUser.title}</div>
                         </div>
                         <div className="flex items-center gap-1 shrink-0">
                           {isActive ? (
-                            <Badge variant="default" className="text-[8px] font-extrabold px-1.5 py-0.5 bg-green-550/10 text-green-600 dark:text-green-400 border border-green-550/15 flex items-center gap-0.5">
+                            <Badge variant="default" className="text-[8px] font-extrabold px-1.5 py-0.5 bg-green-600/10 text-green-600 dark:text-green-400 border border-green-600/15 flex items-center gap-0.5">
                               <ShieldCheck className="h-2.5 w-2.5" />
                               <span>Active</span>
                             </Badge>
@@ -468,15 +480,15 @@ export function ClientProfile({ client, files, workspaceId, workspaceSlug }: Cli
         </div>
 
         {/* Right Side: Navigation Tabs & Tab Content */}
-        <div className="lg:col-span-2 space-y-6">
+        <div className="min-w-0 lg:col-span-2 space-y-6">
           {/* Tab Navigation Menu */}
-          <div className="flex border-b border-zinc-200 dark:border-zinc-850 bg-white/50 dark:bg-zinc-900/50 p-1 rounded-t-xl gap-1">
+          <div className="flex overflow-x-auto border-b border-zinc-200 dark:border-gray-800 bg-white/50 dark:bg-zinc-900/50 p-1 rounded-t-xl gap-1">
             <button
               onClick={() => setActiveTab('overview')}
               className={cn(
                 "flex items-center gap-2 px-4 py-2 text-xs font-bold rounded-lg border border-transparent transition-all cursor-pointer",
                 activeTab === 'overview'
-                  ? "bg-zinc-100 dark:bg-zinc-850 text-zinc-950 dark:text-zinc-50 border-zinc-200/40 dark:border-zinc-800"
+                  ? "bg-zinc-100 dark:bg-gray-800 text-zinc-950 dark:text-zinc-50 border-zinc-200/40 dark:border-zinc-800"
                   : "text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-200"
               )}
             >
@@ -488,7 +500,7 @@ export function ClientProfile({ client, files, workspaceId, workspaceSlug }: Cli
               className={cn(
                 "flex items-center gap-2 px-4 py-2 text-xs font-bold rounded-lg border border-transparent transition-all cursor-pointer",
                 activeTab === 'proposals'
-                  ? "bg-zinc-100 dark:bg-zinc-850 text-zinc-950 dark:text-zinc-50 border-zinc-200/40 dark:border-zinc-800"
+                  ? "bg-zinc-100 dark:bg-gray-800 text-zinc-950 dark:text-zinc-50 border-zinc-200/40 dark:border-zinc-800"
                   : "text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-200"
               )}
             >
@@ -500,7 +512,7 @@ export function ClientProfile({ client, files, workspaceId, workspaceSlug }: Cli
               className={cn(
                 "flex items-center gap-2 px-4 py-2 text-xs font-bold rounded-lg border border-transparent transition-all cursor-pointer",
                 activeTab === 'invoices'
-                  ? "bg-zinc-100 dark:bg-zinc-850 text-zinc-950 dark:text-zinc-50 border-zinc-200/40 dark:border-zinc-800"
+                  ? "bg-zinc-100 dark:bg-gray-800 text-zinc-950 dark:text-zinc-50 border-zinc-200/40 dark:border-zinc-800"
                   : "text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-200"
               )}
             >
@@ -512,7 +524,7 @@ export function ClientProfile({ client, files, workspaceId, workspaceSlug }: Cli
               className={cn(
                 "flex items-center gap-2 px-4 py-2 text-xs font-bold rounded-lg border border-transparent transition-all cursor-pointer",
                 activeTab === 'files'
-                  ? "bg-zinc-100 dark:bg-zinc-850 text-zinc-950 dark:text-zinc-50 border-zinc-200/40 dark:border-zinc-800"
+                  ? "bg-zinc-100 dark:bg-gray-800 text-zinc-950 dark:text-zinc-50 border-zinc-200/40 dark:border-zinc-800"
                   : "text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-200"
               )}
             >
@@ -528,7 +540,7 @@ export function ClientProfile({ client, files, workspaceId, workspaceSlug }: Cli
 
       {/* Invite Client User Dialog */}
       <Dialog open={isInviteOpen} onOpenChange={setIsInviteOpen}>
-        <DialogContent className="max-w-md p-6 bg-white dark:bg-zinc-900 border border-zinc-250 dark:border-zinc-800 rounded-xl">
+        <DialogContent className="sm:max-w-md p-6 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl">
           <DialogHeader>
             <DialogTitle className="text-base font-bold text-zinc-900 dark:text-zinc-50 flex items-center gap-2">
               <UserPlus className="h-4 w-4 text-primary" />
@@ -546,7 +558,7 @@ export function ClientProfile({ client, files, workspaceId, workspaceSlug }: Cli
                 name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-xs font-semibold text-zinc-700 dark:text-zinc-350">Representative Email</FormLabel>
+                    <FormLabel className="text-xs font-semibold text-zinc-700 dark:text-zinc-300">Representative Email</FormLabel>
                     <FormControl>
                       <Input type="email" placeholder="representative@acme.com" className="text-xs h-9 rounded-lg" {...field} />
                     </FormControl>
@@ -560,7 +572,7 @@ export function ClientProfile({ client, files, workspaceId, workspaceSlug }: Cli
                 name="title"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-xs font-semibold text-zinc-700 dark:text-zinc-350">Job Title / Role</FormLabel>
+                    <FormLabel className="text-xs font-semibold text-zinc-700 dark:text-zinc-300">Job Title / Role</FormLabel>
                     <FormControl>
                       <Input placeholder="e.g. Project Manager, CEO, Tech Lead" className="text-xs h-9 rounded-lg" {...field} />
                     </FormControl>

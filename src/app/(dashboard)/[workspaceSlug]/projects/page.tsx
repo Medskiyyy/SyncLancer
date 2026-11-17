@@ -1,4 +1,5 @@
 import { auth } from '@/auth';
+import { serialize } from '@/lib/serialize';
 import { redirect, notFound } from 'next/navigation';
 import { WorkspaceService } from '@/features/workspace/services/workspace-service';
 import { ProjectService } from '@/features/projects/services/project-service';
@@ -26,7 +27,7 @@ export default async function ProjectsPage({ params }: PageProps) {
   try {
     // Validate workspace membership
     await workspaceService.validateWorkspaceAccess(workspace.id, session.user.id);
-  } catch (error) {
+  } catch {
     redirect('/');
   }
 
@@ -34,7 +35,7 @@ export default async function ProjectsPage({ params }: PageProps) {
 
   return (
     <ProjectList
-      initialProjects={projects}
+      initialProjects={serialize(projects)}
       workspaceId={workspace.id}
       workspaceSlug={workspaceSlug}
     />

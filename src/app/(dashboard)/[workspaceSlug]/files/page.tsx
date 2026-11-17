@@ -50,7 +50,7 @@ export default async function WorkspaceFilesPage({ params }: PageProps) {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-550">Files</h1>
+        <h1 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-gray-500">Files</h1>
         <p className="text-sm text-zinc-500 dark:text-zinc-400">
           Manage all files uploaded across projects in this workspace.
         </p>

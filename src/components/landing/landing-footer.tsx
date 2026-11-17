@@ -41,7 +41,7 @@ export const LandingFooter: React.FC<LandingFooterProps> = ({ lang }) => {
               <li>
                 <a
                   href="#features"
-                  className="hover:text-slate-900 transition-colors duration-200"
+                  className="inline-flex min-h-6 items-center hover:text-slate-900 transition-colors duration-200"
                 >
                   {translations[lang].nav.features}
                 </a>
@@ -49,7 +49,7 @@ export const LandingFooter: React.FC<LandingFooterProps> = ({ lang }) => {
               <li>
                 <a
                   href="#workflow"
-                  className="hover:text-slate-900 transition-colors duration-200"
+                  className="inline-flex min-h-6 items-center hover:text-slate-900 transition-colors duration-200"
                 >
                   {translations[lang].nav.workflow}
                 </a>
@@ -57,7 +57,7 @@ export const LandingFooter: React.FC<LandingFooterProps> = ({ lang }) => {
               <li>
                 <a
                   href="#portal"
-                  className="hover:text-slate-900 transition-colors duration-200"
+                  className="inline-flex min-h-6 items-center hover:text-slate-900 transition-colors duration-200"
                 >
                   {translations[lang].nav.portal}
                 </a>
@@ -74,7 +74,7 @@ export const LandingFooter: React.FC<LandingFooterProps> = ({ lang }) => {
               <li>
                 <Link
                   href="/login"
-                  className="hover:text-slate-900 transition-colors duration-200"
+                  className="inline-flex min-h-6 items-center hover:text-slate-900 transition-colors duration-200"
                 >
                   {translations[lang].nav.login}
                 </Link>
@@ -82,7 +82,7 @@ export const LandingFooter: React.FC<LandingFooterProps> = ({ lang }) => {
               <li>
                 <Link
                   href="/register"
-                  className="hover:text-slate-900 transition-colors duration-200"
+                  className="inline-flex min-h-6 items-center hover:text-slate-900 transition-colors duration-200"
                 >
                   {translations[lang].nav.register}
                 </Link>

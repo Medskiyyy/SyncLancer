@@ -48,7 +48,7 @@ export function AnimatedAnalyticsGrid({ metrics }: AnimatedAnalyticsGridProps) {
                 <CardTitle className="text-xs font-semibold tracking-wider text-zinc-500 dark:text-zinc-400 uppercase">
                   {kpi.title}
                 </CardTitle>
-                <div className="p-1.5 rounded-lg bg-zinc-50 text-zinc-450 dark:bg-zinc-950/60 dark:text-zinc-500 border border-zinc-200/50 dark:border-zinc-800/60">
+                <div className="p-1.5 rounded-lg bg-zinc-50 text-zinc-400 dark:bg-zinc-950/60 dark:text-zinc-500 border border-zinc-200/50 dark:border-zinc-800/60">
                   <Icon className="h-4 w-4" />
                 </div>
               </CardHeader>
@@ -60,7 +60,7 @@ export function AnimatedAnalyticsGrid({ metrics }: AnimatedAnalyticsGridProps) {
                     delay={0.1 + idx * 0.05}
                   />
                 </div>
-                <p className="text-[10px] text-zinc-450 dark:text-zinc-550 mt-1.5 font-medium">
+                <p className="text-[10px] text-zinc-400 dark:text-gray-500 mt-1.5 font-medium">
                   {kpi.description}
                 </p>
               </CardContent>

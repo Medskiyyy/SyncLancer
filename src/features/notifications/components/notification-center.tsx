@@ -22,11 +22,12 @@ export function NotificationCenter() {
   const [isOpen, setIsOpen] = useState(false);
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
-  const [loading, setLoading] = useState(false);
+  // Starts true: the mount effect always fetches. Flipping it on inside the effect
+  // body instead would be a synchronous setState and an extra render pass.
+  const [loading, setLoading] = useState(true);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const fetchNotifications = async (showLoading = false) => {
-    if (showLoading) setLoading(true);
+  const fetchNotifications = async () => {
     try {
       const countRes = await getUnreadCountAction();
       if (countRes.success && typeof countRes.data === 'number') {
@@ -39,17 +40,22 @@ export function NotificationCenter() {
     } catch (err) {
       console.error('Failed to fetch notifications:', err);
     } finally {
-      if (showLoading) setLoading(false);
+      setLoading(false);
     }
   };
 
   useEffect(() => {
-    // Initial fetch on mount
-    fetchNotifications(true);
+    // Initial fetch on mount.
+    // The lint rule flags any setState reachable from an effect body, but every
+    // setState in fetchNotifications runs after an `await`, so none of them are
+    // synchronous and no cascading render happens. Proper fix is to move this
+    // onto the react-query client already in the dependency list.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    fetchNotifications();
 
     // Poll every 30 seconds for background notifications
     const interval = setInterval(() => {
-      fetchNotifications(false);
+      fetchNotifications();
     }, 30000);
 
     // Click outside handler
@@ -71,7 +77,7 @@ export function NotificationCenter() {
     setIsOpen(!isOpen);
     if (!isOpen) {
       // Refresh list when opening dropdown
-      fetchNotifications(false);
+      fetchNotifications();
     }
   };
 
@@ -118,9 +124,9 @@ export function NotificationCenter() {
         className="relative hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
         onClick={handleToggle}
       >
-        <Bell className="h-4 w-4 text-zinc-650 dark:text-zinc-400" />
+        <Bell className="h-4 w-4 text-slate-600 dark:text-zinc-400" />
         {unreadCount > 0 && (
-          <span className="absolute top-1.5 right-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-indigo-650 text-[10px] font-bold text-white shadow-sm ring-2 ring-white dark:ring-zinc-900">
+          <span className="absolute top-1.5 right-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-indigo-600 text-[10px] font-bold text-white shadow-sm ring-2 ring-white dark:ring-zinc-900">
             {unreadCount > 9 ? '9+' : unreadCount}
           </span>
         )}
@@ -135,7 +141,7 @@ export function NotificationCenter() {
             {unreadCount > 0 && (
               <button 
                 onClick={handleMarkAllAsRead}
-                className="text-xs font-semibold text-indigo-650 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300 transition-colors"
+                className="text-xs font-semibold text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300 transition-colors"
               >
                 Mark all as read
               </button>
@@ -143,7 +149,7 @@ export function NotificationCenter() {
           </div>
 
           {/* List Area */}
-          <div className="max-h-80 overflow-y-auto divide-y divide-zinc-100 dark:divide-zinc-805">
+          <div className="max-h-80 overflow-y-auto divide-y divide-zinc-100 dark:divide-zinc-800">
             {loading ? (
               <div className="flex flex-col items-center justify-center py-10 text-zinc-400">
                 <Loader2 className="h-6 w-6 animate-spin text-indigo-500" />
@@ -153,7 +159,7 @@ export function NotificationCenter() {
               <div className="flex flex-col items-center justify-center py-12 text-zinc-400 dark:text-zinc-600 px-4 text-center space-y-2">
                 <BellOff className="h-8 w-8 text-zinc-300 dark:text-zinc-800" />
                 <p className="text-sm font-semibold">All caught up!</p>
-                <p className="text-xs text-zinc-500 dark:text-zinc-400 max-w-xs">No notifications yet. We'll alert you when something happens.</p>
+                <p className="text-xs text-zinc-500 dark:text-zinc-400 max-w-xs">No notifications yet. We&rsquo;ll alert you when something happens.</p>
               </div>
             ) : (
               notifications.map((notif) => (
@@ -168,16 +174,16 @@ export function NotificationCenter() {
                   {/* Status Indicator Dot */}
                   <div className="mt-1.5 flex h-2 w-2 shrink-0 rounded-full">
                     {!notif.isRead && (
-                      <span className="h-2 w-2 rounded-full bg-indigo-650 dark:bg-indigo-400" />
+                      <span className="h-2 w-2 rounded-full bg-indigo-600 dark:bg-indigo-400" />
                     )}
                   </div>
 
                   {/* Body Content */}
                   <div className="flex-1 min-w-0">
-                    <p className={`text-sm ${notif.isRead ? 'text-zinc-850 dark:text-zinc-300' : 'font-bold text-zinc-900 dark:text-zinc-50'}`}>
+                    <p className={`text-sm ${notif.isRead ? 'text-gray-800 dark:text-zinc-300' : 'font-bold text-zinc-900 dark:text-zinc-50'}`}>
                       {notif.title}
                     </p>
-                    <p className="text-xs text-zinc-500 dark:text-zinc-450 mt-0.5 leading-relaxed break-words">
+                    <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5 leading-relaxed break-words">
                       {notif.message}
                     </p>
                     <span className="text-[10px] text-zinc-400 dark:text-zinc-500 mt-1 block">

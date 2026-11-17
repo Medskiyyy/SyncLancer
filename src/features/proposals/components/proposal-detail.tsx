@@ -1,4 +1,5 @@
 'use client';
+import type { Serialized } from '@/lib/serialize';
 
 import React, { useState } from 'react';
 import { Proposal, ProposalItem, Client, Project } from '@prisma/client';
@@ -37,11 +38,11 @@ import {
   approveProposalAction 
 } from '../actions/proposal-actions';
 
-interface ExtendedProposal extends Proposal {
-  items: ProposalItem[];
-  client: Client;
-  projects?: Project[];
-}
+// Serialized<>: the page converts Prisma Decimal money columns to numbers before
+// this crosses the Server -> Client Component boundary.
+type ExtendedProposal = Serialized<
+  Proposal & { items: ProposalItem[]; client: Client; projects?: Project[] }
+>;
 
 interface ProposalDetailProps {
   proposal: ExtendedProposal;
@@ -52,6 +53,11 @@ interface ProposalDetailProps {
 export function ProposalDetail({ proposal: initialProposal, workspaceId, workspaceSlug }: ProposalDetailProps) {
   const router = useRouter();
   const [proposal, setProposal] = useState<ExtendedProposal>(initialProposal);
+  const [syncedProposal, setSyncedProposal] = useState(initialProposal);
+  if (initialProposal !== syncedProposal) {
+    setSyncedProposal(initialProposal);
+    setProposal(initialProposal);
+  }
   const [isLoading, setIsLoading] = useState(false);
   const [isLimitDialogOpen, setIsLimitDialogOpen] = useState(false);
 
@@ -70,12 +76,12 @@ export function ProposalDetail({ proposal: initialProposal, workspaceId, workspa
       const result = await sendProposalAction(proposal.id, workspaceId);
       if (result.success && result.data) {
         toast.success('Proposal sent to client successfully');
-        setProposal(result.data as ExtendedProposal);
+        setProposal(result.data);
         router.refresh();
       } else {
         toast.error(result.error || 'Failed to send proposal');
       }
-    } catch (err) {
+    } catch {
       toast.error('An error occurred');
     } finally {
       setIsLoading(false);
@@ -89,12 +95,12 @@ export function ProposalDetail({ proposal: initialProposal, workspaceId, workspa
       const result = await rejectProposalAction(proposal.id, workspaceId);
       if (result.success && result.data) {
         toast.success('Proposal marked as rejected');
-        setProposal(result.data as ExtendedProposal);
+        setProposal(result.data);
         router.refresh();
       } else {
         toast.error(result.error || 'Failed to reject proposal');
       }
-    } catch (err) {
+    } catch {
       toast.error('An error occurred');
     } finally {
       setIsLoading(false);
@@ -107,14 +113,14 @@ export function ProposalDetail({ proposal: initialProposal, workspaceId, workspa
       const result = await approveProposalAction(proposal.id, workspaceId);
       if (result.success && result.data) {
         toast.success('Proposal approved! Project auto-spawned successfully.');
-        setProposal(result.data.proposal as ExtendedProposal);
+        setProposal(result.data.proposal);
         router.refresh();
       } else if (result.code === 'LIMIT_EXCEEDED') {
         setIsLimitDialogOpen(true);
       } else {
         toast.error(result.error || 'Failed to approve proposal');
       }
-    } catch (err) {
+    } catch {
       toast.error('An error occurred');
     } finally {
       setIsLoading(false);
@@ -130,19 +136,19 @@ export function ProposalDetail({ proposal: initialProposal, workspaceId, workspa
     switch (status) {
       case 'APPROVED':
         return (
-          <Badge className="text-[9px] font-bold px-1.5 py-0.5 bg-green-500/10 text-green-600 dark:text-green-400 border border-green-550/15" variant="secondary">
+          <Badge className="text-[9px] font-bold px-1.5 py-0.5 bg-green-500/10 text-green-600 dark:text-green-400 border border-green-600/15" variant="secondary">
             Approved
           </Badge>
         );
       case 'SENT':
         return (
-          <Badge className="text-[9px] font-bold px-1.5 py-0.5 bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-550/15" variant="secondary">
+          <Badge className="text-[9px] font-bold px-1.5 py-0.5 bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-600/15" variant="secondary">
             Sent
           </Badge>
         );
       case 'REJECTED':
         return (
-          <Badge className="text-[9px] font-bold px-1.5 py-0.5 bg-red-500/10 text-red-655 dark:text-red-400 border border-red-550/15" variant="secondary">
+          <Badge className="text-[9px] font-bold px-1.5 py-0.5 bg-red-500/10 text-red-700 dark:text-red-400 border border-red-600/15" variant="secondary">
             Rejected
           </Badge>
         );
@@ -154,7 +160,7 @@ export function ProposalDetail({ proposal: initialProposal, workspaceId, workspa
         );
       default:
         return (
-          <Badge className="text-[9px] font-bold px-1.5 py-0.5 bg-zinc-50 dark:bg-zinc-950 text-zinc-400 dark:text-zinc-505 border border-zinc-200/60 dark:border-zinc-850" variant="secondary">
+          <Badge className="text-[9px] font-bold px-1.5 py-0.5 bg-zinc-50 dark:bg-zinc-950 text-zinc-400 dark:text-slate-500 border border-zinc-200/60 dark:border-gray-800" variant="secondary">
             Draft
           </Badge>
         );
@@ -177,7 +183,7 @@ export function ProposalDetail({ proposal: initialProposal, workspaceId, workspa
           {proposal.status === 'DRAFT' && (
             <Link href={`/${workspaceSlug}/proposals/${proposal.id}/edit`}>
               <Button variant="outline" size="sm" className="flex items-center gap-1.5 cursor-pointer text-xs h-9 font-semibold bg-white dark:bg-zinc-900">
-                <Edit className="h-4 w-4 text-zinc-450" />
+                <Edit className="h-4 w-4 text-zinc-400" />
                 <span>Edit Draft</span>
               </Button>
             </Link>
@@ -188,7 +194,7 @@ export function ProposalDetail({ proposal: initialProposal, workspaceId, workspa
             rel="noopener noreferrer"
           >
             <Button variant="outline" size="sm" className="flex items-center gap-1.5 cursor-pointer text-xs h-9 font-semibold bg-white dark:bg-zinc-900">
-              <Download className="h-4 w-4 text-zinc-450" />
+              <Download className="h-4 w-4 text-zinc-400" />
               <span>Download PDF</span>
             </Button>
           </a>
@@ -227,9 +233,9 @@ export function ProposalDetail({ proposal: initialProposal, workspaceId, workspa
         <Card className="md:col-span-2 shadow-xs border border-zinc-200/60 dark:border-zinc-800/80 rounded-xl overflow-hidden bg-white dark:bg-zinc-900 relative">
           {/* Subtle gold decoration dot */}
           <div className="absolute top-0 left-0 w-full h-[3px] bg-gradient-to-r from-amber-500 to-amber-600" />
-          <CardHeader className="border-b border-zinc-150 dark:border-zinc-800 pb-6 pt-7">
+          <CardHeader className="border-b border-gray-100 dark:border-zinc-800 pb-6 pt-7">
             <div className="flex items-center justify-between">
-              <span className="text-[9px] font-mono tracking-wider font-bold text-zinc-450 uppercase">
+              <span className="text-[9px] font-mono tracking-wider font-bold text-zinc-400 uppercase">
                 {proposal.proposalNumber}
               </span>
               {getStatusBadge(proposal.status)}
@@ -247,7 +253,7 @@ export function ProposalDetail({ proposal: initialProposal, workspaceId, workspa
             {proposal.description && (
               <div className="space-y-2">
                 <h3 className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Scope Overview</h3>
-                <p className="text-xs text-zinc-650 dark:text-zinc-300 whitespace-pre-wrap leading-relaxed font-medium">
+                <p className="text-xs text-slate-600 dark:text-zinc-300 whitespace-pre-wrap leading-relaxed font-medium">
                   {proposal.description}
                 </p>
               </div>
@@ -257,31 +263,33 @@ export function ProposalDetail({ proposal: initialProposal, workspaceId, workspa
             <div className="space-y-3">
               <h3 className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Pricing Items</h3>
               <div className="border border-zinc-200/60 dark:border-zinc-800/80 rounded-xl overflow-hidden">
+                <div className="overflow-x-auto">
                 <table className="w-full text-left border-collapse text-xs">
                   <thead>
-                    <tr className="bg-zinc-50/50 dark:bg-zinc-900/30 text-[9px] font-bold text-zinc-400 dark:text-zinc-505 border-b border-zinc-200/60 dark:border-zinc-800 uppercase tracking-wider">
+                    <tr className="bg-zinc-50/50 dark:bg-zinc-900/30 text-[9px] font-bold text-zinc-400 dark:text-slate-500 border-b border-zinc-200/60 dark:border-zinc-800 uppercase tracking-wider">
                       <th className="px-4 py-2.5">Scope Description</th>
                       <th className="px-4 py-2.5 text-center">Qty</th>
                       <th className="px-4 py-2.5 text-right">Unit Rate</th>
                       <th className="px-4 py-2.5 text-right">Total</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-zinc-150 dark:divide-zinc-800/80 bg-white dark:bg-zinc-900 font-medium">
+                  <tbody className="divide-y divide-gray-100 dark:divide-zinc-800/80 bg-white dark:bg-zinc-900 font-medium">
                     {proposal.items.map((item) => (
                       <tr key={item.id} className="align-top">
                         <td className="px-4 py-3">
                           <div className="font-bold text-zinc-900 dark:text-zinc-100 text-xs">{item.name}</div>
                           {item.description && (
-                            <div className="text-[10px] text-zinc-450 dark:text-zinc-500 mt-1 max-w-sm leading-relaxed">{item.description}</div>
+                            <div className="text-[10px] text-zinc-400 dark:text-zinc-500 mt-1 max-w-sm leading-relaxed">{item.description}</div>
                           )}
                         </td>
-                        <td className="px-4 py-3 text-center text-zinc-650 dark:text-zinc-400">{item.quantity}</td>
-                        <td className="px-4 py-3 text-right font-mono text-zinc-650 dark:text-zinc-400">{currencyFormatter(Number(item.unitPrice))}</td>
+                        <td className="px-4 py-3 text-center text-slate-600 dark:text-zinc-400">{item.quantity}</td>
+                        <td className="px-4 py-3 text-right font-mono text-slate-600 dark:text-zinc-400">{currencyFormatter(Number(item.unitPrice))}</td>
                         <td className="px-4 py-3 text-right font-bold font-mono text-zinc-900 dark:text-zinc-50">{currencyFormatter(Number(item.totalPrice))}</td>
                       </tr>
                     ))}
                   </tbody>
                 </table>
+                </div>
               </div>
             </div>
           </CardContent>
@@ -291,7 +299,7 @@ export function ProposalDetail({ proposal: initialProposal, workspaceId, workspa
         <div className="space-y-6 md:col-span-1">
           {/* Client Details Box */}
           <Card className="shadow-xs border border-zinc-200/60 dark:border-zinc-800/80 rounded-xl overflow-hidden bg-white dark:bg-zinc-900">
-            <CardHeader className="pb-3 border-b border-zinc-150 dark:border-zinc-800">
+            <CardHeader className="pb-3 border-b border-gray-100 dark:border-zinc-800">
               <CardTitle className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Prepared For</CardTitle>
             </CardHeader>
             <CardContent className="pt-4 space-y-3 text-xs font-semibold">
@@ -314,7 +322,7 @@ export function ProposalDetail({ proposal: initialProposal, workspaceId, workspa
 
           {/* Pricing Totals Box */}
           <Card className="shadow-xs border border-border rounded-xl overflow-hidden bg-white dark:bg-zinc-900">
-            <CardHeader className="bg-zinc-50/50 dark:bg-zinc-900/30 pb-3 border-b border-zinc-150 dark:border-zinc-800">
+            <CardHeader className="bg-zinc-50/50 dark:bg-zinc-900/30 pb-3 border-b border-gray-100 dark:border-zinc-800">
               <CardTitle className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Pricing Summary</CardTitle>
             </CardHeader>
             <CardContent className="pt-4 space-y-2.5 text-xs font-semibold">
@@ -340,7 +348,7 @@ export function ProposalDetail({ proposal: initialProposal, workspaceId, workspa
           {/* Proposal Status Actions */}
           {proposal.status !== 'APPROVED' && proposal.status !== 'REJECTED' && !hasExpired && (
             <Card className="shadow-xs border border-zinc-200/60 dark:border-zinc-800/80 rounded-xl overflow-hidden bg-white dark:bg-zinc-900">
-              <CardHeader className="pb-3 border-b border-zinc-150 dark:border-zinc-800">
+              <CardHeader className="pb-3 border-b border-gray-100 dark:border-zinc-800">
                 <CardTitle className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Status Actions</CardTitle>
               </CardHeader>
               <CardContent className="pt-4 space-y-2">
@@ -384,9 +392,9 @@ export function ProposalDetail({ proposal: initialProposal, workspaceId, workspa
 
       {/* Project Limit Reached warning dialog (Free plan limit exceeded) */}
       <Dialog open={isLimitDialogOpen} onOpenChange={setIsLimitDialogOpen}>
-        <DialogContent className="max-w-md p-6 bg-white dark:bg-zinc-900 border border-zinc-250 dark:border-zinc-800 rounded-xl">
+        <DialogContent className="sm:max-w-md p-6 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl">
           <DialogHeader className="flex flex-col items-center text-center">
-            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-red-500/10 text-red-650 border border-red-500/15 mb-3">
+            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-red-500/10 text-red-700 border border-red-500/15 mb-3">
               <AlertTriangle className="h-6 w-6" />
             </div>
             <DialogTitle className="text-base font-bold text-zinc-900 dark:text-zinc-50">Project Limit Reached</DialogTitle>

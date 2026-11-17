@@ -1,7 +1,7 @@
 import { MilestoneRepository } from '../repositories/milestone-repository';
 import { WorkspaceService } from '@/features/workspace/services/workspace-service';
 import { CreateMilestoneInput, UpdateMilestoneInput } from '../schemas/milestone';
-import { Milestone, Role, MilestoneStatus } from '@prisma/client';
+import { Role, MilestoneStatus , Prisma } from '@prisma/client';
 import prisma from '@/lib/prisma';
 
 export class MilestoneService {
@@ -81,7 +81,7 @@ export class MilestoneService {
     }
 
     return prisma.$transaction(async (tx) => {
-      const updateData: any = {};
+      const updateData: Prisma.MilestoneUpdateInput = {};
       if (input.title !== undefined) updateData.title = input.title;
       if (input.description !== undefined) updateData.description = input.description;
       if (input.dueDate !== undefined) updateData.dueDate = input.dueDate;
@@ -117,13 +117,13 @@ export class MilestoneService {
     });
   }
 
-  private async updateProjectProgress(tx: any, projectId: string) {
+  private async updateProjectProgress(tx: Prisma.TransactionClient, projectId: string) {
     const milestones = await tx.milestone.findMany({
       where: { projectId },
     });
 
     const total = milestones.length;
-    const completed = milestones.filter((m: any) => m.status === MilestoneStatus.COMPLETED).length;
+    const completed = milestones.filter((m) => m.status === MilestoneStatus.COMPLETED).length;
     const progress = total > 0 ? Math.floor((completed / total) * 100) : 0;
 
     await tx.project.update({

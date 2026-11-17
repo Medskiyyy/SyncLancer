@@ -1,3 +1,4 @@
+import { getErrorMessage, getErrorCode } from '@/lib/errors';
 import { NextResponse } from 'next/server';
 import { auth } from '@/auth';
 import { ProjectService } from '@/features/projects/services/project-service';
@@ -41,10 +42,10 @@ export async function GET(
       success: true,
       data: project,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Get project detail API error:', error);
     return NextResponse.json(
-      { success: false, error: { code: 'API_ERROR', message: error.message || 'An error occurred' } },
+      { success: false, error: { code: 'API_ERROR', message: getErrorMessage(error, 'An error occurred') } },
       { status: 500 }
     );
   }
@@ -96,15 +97,15 @@ export async function PATCH(
       success: true,
       data: project,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Update project API error:', error);
-    const isLimitExceeded = (error as any).code === 'LIMIT_EXCEEDED';
+    const isLimitExceeded = getErrorCode(error) === 'LIMIT_EXCEEDED';
     return NextResponse.json(
       {
         success: false,
         error: {
           code: isLimitExceeded ? 'LIMIT_EXCEEDED' : 'API_ERROR',
-          message: error.message || 'An error occurred',
+          message: getErrorMessage(error, 'An error occurred'),
         },
       },
       { status: isLimitExceeded ? 403 : 500 }
@@ -142,10 +143,10 @@ export async function DELETE(
       success: true,
       message: 'Project soft-deleted successfully',
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Delete project API error:', error);
     return NextResponse.json(
-      { success: false, error: { code: 'API_ERROR', message: error.message || 'An error occurred' } },
+      { success: false, error: { code: 'API_ERROR', message: getErrorMessage(error, 'An error occurred') } },
       { status: 500 }
     );
   }

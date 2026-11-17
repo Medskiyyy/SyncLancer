@@ -97,7 +97,7 @@ describe('WorkspaceService', () => {
     });
 
     it('throws when member role is not in allowed roles', async () => {
-      repo().findMembership.mockResolvedValue({ role: Role.MEMBER });
+      repo().findMembership.mockResolvedValue({ role: Role.CLIENT });
       await expect(
         service.validateWorkspaceAccess(WORKSPACE_ID, USER_ID, [Role.OWNER])
       ).rejects.toThrow('required permissions');
@@ -110,9 +110,9 @@ describe('WorkspaceService', () => {
     });
 
     it('returns membership when no roles are required', async () => {
-      repo().findMembership.mockResolvedValue({ role: Role.MEMBER });
+      repo().findMembership.mockResolvedValue({ role: Role.CLIENT });
       const membership = await service.validateWorkspaceAccess(WORKSPACE_ID, USER_ID);
-      expect(membership.role).toBe(Role.MEMBER);
+      expect(membership.role).toBe(Role.CLIENT);
     });
   });
 

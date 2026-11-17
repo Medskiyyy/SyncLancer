@@ -1,5 +1,7 @@
 'use client';
 
+import { getErrorMessage } from '@/lib/errors';
+
 import React, { useState } from 'react';
 import { 
   Plus, 
@@ -15,7 +17,7 @@ import {
   Search,
   Filter
 } from 'lucide-react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { toast } from 'sonner';
 
 import { Card, CardContent, CardDescription, CardTitle } from '@/components/ui/card';
@@ -95,16 +97,12 @@ const toDateInputValue = (offsetDays: number) => {
   return date.toISOString().split('T')[0];
 };
 
-const getErrorMessage = (error: unknown, fallback = 'An error occurred') => {
-  return error instanceof Error ? error.message : fallback;
-};
-
 const STATUS_COLORS: Record<string, string> = {
-  DRAFT: 'bg-zinc-100/80 text-zinc-650 border-zinc-200/50 dark:bg-zinc-800/40 dark:text-zinc-400 dark:border-zinc-800 shadow-none',
-  SENT: 'bg-blue-500/10 text-blue-600 dark:text-blue-450 border-blue-500/20 shadow-none',
-  PAID: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-450 border-emerald-500/20 shadow-none',
-  OVERDUE: 'bg-red-500/10 text-red-600 dark:text-red-450 border-red-500/20 shadow-none',
-  CANCELLED: 'bg-zinc-200/50 text-zinc-500 border-zinc-200 shadow-none dark:bg-zinc-800/20 dark:text-zinc-550 dark:border-zinc-800',
+  DRAFT: 'bg-zinc-100/80 text-slate-600 border-zinc-200/50 dark:bg-zinc-800/40 dark:text-zinc-400 dark:border-zinc-800 shadow-none',
+  SENT: 'bg-blue-500/10 text-blue-600 dark:text-blue-500 border-blue-500/20 shadow-none',
+  PAID: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-500 border-emerald-500/20 shadow-none',
+  OVERDUE: 'bg-red-500/10 text-red-600 dark:text-red-500 border-red-500/20 shadow-none',
+  CANCELLED: 'bg-zinc-200/50 text-zinc-500 border-zinc-200 shadow-none dark:bg-zinc-800/20 dark:text-gray-500 dark:border-zinc-800',
 };
 
 export function WorkspaceInvoiceManager({ 
@@ -114,9 +112,19 @@ export function WorkspaceInvoiceManager({
   projects 
 }: WorkspaceInvoiceManagerProps) {
   const router = useRouter();
-  const [invoices] = useState<MappedInvoice[]>(initialInvoices);
-  const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const searchParams = useSearchParams();
+  const shouldAutoOpenCreate = searchParams.get('create') === 'true';
+  const [prevCreateParam, setPrevCreateParam] = useState(shouldAutoOpenCreate);
+  const invoices = initialInvoices;
+  const [isCreateOpen, setIsCreateOpen] = useState(shouldAutoOpenCreate);
   const [isLoading, setIsLoading] = useState(false);
+
+  if (shouldAutoOpenCreate !== prevCreateParam) {
+    setPrevCreateParam(shouldAutoOpenCreate);
+    if (shouldAutoOpenCreate) {
+      setIsCreateOpen(true);
+    }
+  }
 
   // Filter states
   const [searchTerm, setSearchTerm] = useState('');
@@ -300,7 +308,7 @@ export function WorkspaceInvoiceManager({
         <Card variant="elevated" className="border-l-[3px] border-l-zinc-500/70 p-5 h-[120px] flex flex-col justify-between">
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Total Invoiced</span>
-            <div className="p-1.5 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/50 dark:border-zinc-850 rounded-lg">
+            <div className="p-1.5 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/50 dark:border-gray-800 rounded-lg">
               <Receipt className="h-4 w-4 text-zinc-500" />
             </div>
           </div>
@@ -308,7 +316,7 @@ export function WorkspaceInvoiceManager({
             <span className="text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50 font-mono">
               {formatCurrency(totalInvoiced, 'USD')}
             </span>
-            <span className="text-[10px] text-zinc-450 dark:text-zinc-500 mt-0.5">Cumulative billing volume</span>
+            <span className="text-[10px] text-zinc-400 dark:text-zinc-500 mt-0.5">Cumulative billing volume</span>
           </div>
         </Card>
 
@@ -330,7 +338,7 @@ export function WorkspaceInvoiceManager({
         <Card variant="elevated" className="border-l-[3px] border-l-amber-500/70 p-5 h-[120px] flex flex-col justify-between">
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Outstanding</span>
-            <div className="p-1.5 bg-amber-50 dark:bg-amber-955/20 border border-amber-100 dark:border-amber-900/20 rounded-lg">
+            <div className="p-1.5 bg-amber-50 dark:bg-amber-950/20 border border-amber-100 dark:border-amber-900/20 rounded-lg">
               <AlertCircle className="h-4 w-4 text-amber-500" />
             </div>
           </div>
@@ -345,7 +353,7 @@ export function WorkspaceInvoiceManager({
         <Card variant="elevated" className="border-l-[3px] border-l-blue-500/70 p-5 h-[120px] flex flex-col justify-between">
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Drafts</span>
-            <div className="p-1.5 bg-blue-50 dark:bg-blue-955/20 border border-blue-100 dark:border-blue-900/20 rounded-lg">
+            <div className="p-1.5 bg-blue-50 dark:bg-blue-950/20 border border-blue-100 dark:border-blue-900/20 rounded-lg">
               <FileText className="h-4 w-4 text-blue-500" />
             </div>
           </div>
@@ -369,7 +377,7 @@ export function WorkspaceInvoiceManager({
               placeholder="Search invoices..." 
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-9 h-10 text-sm border-border/60 bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-150"
+              className="pl-9 h-10 text-sm border-border/60 bg-white dark:bg-zinc-900 text-zinc-900 dark:text-gray-100"
             />
           </div>
           
@@ -405,8 +413,8 @@ export function WorkspaceInvoiceManager({
       <Card variant="elevated" className="overflow-hidden">
         <CardContent className="p-0">
           {filteredInvoices.length === 0 ? (
-            <div className="text-center py-16 text-zinc-450 dark:text-zinc-500 text-sm flex flex-col items-center justify-center">
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-zinc-50 dark:bg-zinc-900 text-zinc-450 mb-4 border border-border/60">
+            <div className="text-center py-16 text-zinc-400 dark:text-zinc-500 text-sm flex flex-col items-center justify-center">
+              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-zinc-50 dark:bg-zinc-900 text-zinc-400 mb-4 border border-border/60">
                 <Receipt className="h-6 w-6 text-primary" />
               </div>
               <CardTitle className="text-base font-bold text-zinc-900 dark:text-zinc-50 font-heading">No invoices found</CardTitle>
@@ -433,16 +441,16 @@ export function WorkspaceInvoiceManager({
                 <tbody className="divide-y divide-border/40 bg-transparent">
                   {filteredInvoices.map((invoice) => (
                     <tr key={invoice.id} className="hover:bg-zinc-50/50 dark:hover:bg-zinc-900/20 transition-colors h-[60px]">
-                      <td className="px-6 align-middle font-semibold text-zinc-900 dark:text-zinc-550">
+                      <td className="px-6 align-middle font-semibold text-zinc-900 dark:text-gray-500">
                         {invoice.invoiceNumber}
                       </td>
-                      <td className="px-6 align-middle font-semibold text-zinc-800 dark:text-zinc-350">
+                      <td className="px-6 align-middle font-semibold text-zinc-800 dark:text-zinc-300">
                         {invoice.client.companyName}
                       </td>
-                      <td className="px-6 align-middle text-zinc-650 dark:text-zinc-400 font-medium">
-                        {invoice.project?.name || <span className="text-xs text-zinc-500 dark:text-zinc-550">General Billing</span>}
+                      <td className="px-6 align-middle text-slate-600 dark:text-zinc-400 font-medium">
+                        {invoice.project?.name || <span className="text-xs text-zinc-500 dark:text-gray-500">General Billing</span>}
                       </td>
-                      <td className="px-6 align-middle text-zinc-500 dark:text-zinc-450 text-xs">
+                      <td className="px-6 align-middle text-zinc-500 dark:text-zinc-400 text-xs">
                         {new Date(invoice.dueDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                       </td>
                       <td className="px-6 align-middle">
@@ -504,7 +512,7 @@ export function WorkspaceInvoiceManager({
                               setInvoiceToDelete(invoice);
                               setIsDeleteOpen(true);
                             }}
-                            className="cursor-pointer h-8 w-8 text-slate-400 hover:bg-red-50 hover:text-red-650 rounded-md"
+                            className="cursor-pointer h-8 w-8 text-slate-400 hover:bg-red-50 hover:text-red-700 rounded-md"
                             title="Delete"
                           >
                             <Trash2 className="h-4 w-4" />
@@ -673,7 +681,7 @@ export function WorkspaceInvoiceManager({
 
               <div className="space-y-3">
                 {items.map((item, idx) => (
-                  <div key={idx} className="p-3 border border-zinc-150 dark:border-zinc-800 rounded-lg space-y-3 bg-zinc-50/30">
+                  <div key={idx} className="p-3 border border-gray-100 dark:border-zinc-800 rounded-lg space-y-3 bg-zinc-50/30">
                     <div className="grid grid-cols-1 sm:grid-cols-12 gap-3">
                       {/* Name */}
                       <div className="sm:col-span-6 space-y-1">
@@ -740,7 +748,7 @@ export function WorkspaceInvoiceManager({
             </div>
 
             {/* Summary block */}
-            <div className="border-t border-zinc-150 dark:border-zinc-800 pt-4 flex flex-col items-end gap-1.5 text-zinc-650 dark:text-zinc-400">
+            <div className="border-t border-gray-100 dark:border-zinc-800 pt-4 flex flex-col items-end gap-1.5 text-slate-600 dark:text-zinc-400">
               <div className="flex gap-4">
                 <span>Subtotal:</span>
                 <span className="font-bold text-zinc-900 dark:text-zinc-100">{formatCurrency(subtotal, currency)}</span>
@@ -749,14 +757,14 @@ export function WorkspaceInvoiceManager({
                 <span>Tax ({taxRate}%):</span>
                 <span className="font-bold text-zinc-900 dark:text-zinc-100">{formatCurrency(taxAmount, currency)}</span>
               </div>
-              <div className="flex gap-4 text-sm font-black border-t border-zinc-150 dark:border-zinc-805 pt-1.5 text-zinc-900 dark:text-zinc-50">
+              <div className="flex gap-4 text-sm font-black border-t border-gray-100 dark:border-zinc-800 pt-1.5 text-zinc-900 dark:text-zinc-50">
                 <span>Total Due:</span>
                 <span>{formatCurrency(totalAmount, currency)}</span>
               </div>
             </div>
 
             {/* Actions */}
-            <DialogFooter className="pt-4 border-t border-zinc-150 dark:border-zinc-800">
+            <DialogFooter className="pt-4 border-t border-gray-100 dark:border-zinc-800">
               <Button
                 type="button"
                 variant="ghost"

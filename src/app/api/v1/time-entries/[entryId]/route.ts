@@ -1,3 +1,4 @@
+import { getErrorMessage } from '@/lib/errors';
 import { NextResponse } from 'next/server';
 import { auth } from '@/auth';
 import { TimeEntryService } from '@/features/time-tracking/services/time-entry-service';
@@ -38,7 +39,7 @@ export async function GET(
     }
 
     const entries = await timeEntryService.getTimeEntriesByProjectId(projectId, workspaceId, session.user.id);
-    const entry = entries.find((e: any) => e.id === entryId);
+    const entry = entries.find((e) => e.id === entryId);
 
     if (!entry) {
       return NextResponse.json(
@@ -51,10 +52,10 @@ export async function GET(
       success: true,
       data: entry,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Get time entry detail API error:', error);
     return NextResponse.json(
-      { success: false, error: { code: 'API_ERROR', message: error.message || 'An error occurred' } },
+      { success: false, error: { code: 'API_ERROR', message: getErrorMessage(error, 'An error occurred') } },
       { status: 500 }
     );
   }
@@ -106,10 +107,10 @@ export async function PATCH(
       success: true,
       data: entry,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Update time entry API error:', error);
     return NextResponse.json(
-      { success: false, error: { code: 'API_ERROR', message: error.message || 'An error occurred' } },
+      { success: false, error: { code: 'API_ERROR', message: getErrorMessage(error, 'An error occurred') } },
       { status: 500 }
     );
   }
@@ -145,10 +146,10 @@ export async function DELETE(
       success: true,
       message: 'Time entry deleted successfully',
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Delete time entry API error:', error);
     return NextResponse.json(
-      { success: false, error: { code: 'API_ERROR', message: error.message || 'An error occurred' } },
+      { success: false, error: { code: 'API_ERROR', message: getErrorMessage(error, 'An error occurred') } },
       { status: 500 }
     );
   }

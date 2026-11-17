@@ -1,4 +1,7 @@
 'use client';
+import type { Serialized } from '@/lib/serialize';
+
+import { getErrorMessage } from '@/lib/errors';
 
 import React, { useState, useEffect } from 'react';
 import { Project, Client, Milestone, Task, MilestoneStatus, File as PrismaFile, Invoice, InvoiceItem } from '@prisma/client';
@@ -59,20 +62,20 @@ interface ExtendedMilestone extends Milestone {
   tasks?: Task[];
 }
 
-interface ExtendedProject extends Project {
-  client?: Client;
-  milestones?: ExtendedMilestone[];
-  tasks?: Task[];
-  timeEntries?: (TimeEntry & { task?: Task | null })[];
-  files?: (Omit<PrismaFile, 'fileSize'> & { fileSize: number; uploader?: { fullName: string } | null })[];
-  invoices?: (Invoice & { items: InvoiceItem[]; client: Client })[];
-}
+// Serialized<>: the page converts Prisma Decimal (budget, invoice money columns)
+// and File.fileSize BigInt before this crosses the Server -> Client boundary.
+type ExtendedProject = Serialized<
+  Project & {
+    client?: Client;
+    milestones?: ExtendedMilestone[];
+    tasks?: Task[];
+    timeEntries?: (TimeEntry & { task?: Task | null })[];
+    files?: (PrismaFile & { uploader?: { fullName: string } | null })[];
+    invoices?: (Invoice & { items: InvoiceItem[]; client: Client })[];
+  }
+>;
 
 type CurrencyAmount = number | string | { toString(): string };
-
-const getErrorMessage = (error: unknown, fallback = 'An error occurred') => {
-  return error instanceof Error ? error.message : fallback;
-};
 
 interface ProjectDetailProps {
   project: ExtendedProject;
@@ -80,22 +83,22 @@ interface ProjectDetailProps {
 }
 
 const STATUS_COLORS: Record<string, string> = {
-  DRAFT: 'bg-zinc-50 dark:bg-zinc-950 text-zinc-400 dark:text-zinc-505 border border-zinc-200/60 dark:border-zinc-850',
-  ACTIVE: 'bg-green-500/10 text-green-600 dark:text-green-400 border border-green-550/15',
+  DRAFT: 'bg-zinc-50 dark:bg-zinc-950 text-zinc-400 dark:text-slate-500 border border-zinc-200/60 dark:border-gray-800',
+  ACTIVE: 'bg-green-500/10 text-green-600 dark:text-green-400 border border-green-600/15',
   ON_HOLD: 'bg-amber-500/10 text-amber-700 dark:text-amber-300 border border-amber-500/20',
-  REVIEW: 'bg-stone-500/10 text-stone-650 dark:text-stone-400 border border-stone-550/15',
+  REVIEW: 'bg-slate-500/10 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-700',
   COMPLETED: 'bg-primary/10 text-primary border border-primary/20',
-  CANCELLED: 'bg-red-500/10 text-red-655 dark:text-red-400 border border-red-550/15',
+  CANCELLED: 'bg-red-500/10 text-red-700 dark:text-red-400 border border-red-600/15',
 };
 
 const MILESTONE_STATUS_COLORS: Record<string, string> = {
-  NOT_STARTED: 'bg-zinc-50 dark:bg-zinc-950 text-zinc-400 dark:text-zinc-505 border border-zinc-200/60 dark:border-zinc-850',
+  NOT_STARTED: 'bg-zinc-50 dark:bg-zinc-950 text-zinc-400 dark:text-slate-500 border border-zinc-200/60 dark:border-gray-800',
   IN_PROGRESS: 'bg-blue-500/10 text-blue-700 dark:text-blue-300 border border-blue-500/20',
-  COMPLETED: 'bg-green-500/10 text-green-600 dark:text-green-400 border border-green-550/15',
+  COMPLETED: 'bg-green-500/10 text-green-600 dark:text-green-400 border border-green-600/15',
 };
 
 const TASK_PRIORITY_COLORS: Record<string, string> = {
-  LOW: 'text-zinc-500 bg-zinc-50/50 border-zinc-200/60 dark:bg-zinc-950/20 dark:border-zinc-850',
+  LOW: 'text-zinc-500 bg-zinc-50/50 border-zinc-200/60 dark:bg-zinc-950/20 dark:border-gray-800',
   MEDIUM: 'text-blue-500 bg-blue-500/10 border-blue-500/15 dark:bg-blue-950/20 dark:border-blue-900/30',
   HIGH: 'text-amber-700 bg-amber-500/10 border-amber-500/20 dark:text-amber-300 dark:bg-amber-950/20 dark:border-amber-900/30',
   URGENT: 'text-red-600 bg-red-500/10 border-red-500/15 dark:bg-red-950/20 dark:border-red-900/30',
@@ -259,7 +262,7 @@ export function ProjectDetail({ project, workspaceSlug }: ProjectDetailProps) {
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-4">
           <Link href={`/${workspaceSlug}/projects`}>
-            <Button variant="ghost" size="icon" className="cursor-pointer h-9 w-9 border-zinc-200/60 dark:border-zinc-800/80 text-zinc-650 dark:text-zinc-400">
+            <Button variant="ghost" size="icon" className="cursor-pointer h-9 w-9 border-zinc-200/60 dark:border-zinc-800/80 text-slate-600 dark:text-zinc-400">
               <ArrowLeft className="h-4.5 w-4.5" />
             </Button>
           </Link>
@@ -283,7 +286,7 @@ export function ProjectDetail({ project, workspaceSlug }: ProjectDetailProps) {
       </div>
 
       {/* Tabs Menu */}
-      <div className="flex border-b border-zinc-200 dark:border-zinc-850 bg-white/50 dark:bg-zinc-900/50 p-1 rounded-t-xl gap-1 overflow-x-auto scrollbar-none">
+      <div className="flex border-b border-zinc-200 dark:border-gray-800 bg-white/50 dark:bg-zinc-900/50 p-1 rounded-t-xl gap-1 overflow-x-auto scrollbar-none">
         {tabs.map((tab) => (
           <button
             key={tab}
@@ -291,7 +294,7 @@ export function ProjectDetail({ project, workspaceSlug }: ProjectDetailProps) {
             className={cn(
               "flex items-center gap-2 px-4 py-2 text-xs font-bold rounded-lg border border-transparent transition-all cursor-pointer whitespace-nowrap",
               activeTab === tab
-                ? "bg-zinc-150 dark:bg-zinc-850 text-zinc-950 dark:text-zinc-50 border-zinc-200/45 dark:border-zinc-800"
+                ? "bg-gray-100 dark:bg-gray-800 text-zinc-950 dark:text-zinc-50 border-zinc-200/45 dark:border-zinc-800"
                 : "text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-200"
             )}
           >
@@ -306,13 +309,13 @@ export function ProjectDetail({ project, workspaceSlug }: ProjectDetailProps) {
           {/* Main info card */}
           <div className="md:col-span-2 space-y-6">
             <Card className="border-zinc-200/60 dark:border-zinc-800/80 bg-white dark:bg-slate-900 rounded-xl shadow-sm">
-              <CardHeader className="border-b border-zinc-150 dark:border-zinc-800/50 pb-4">
+              <CardHeader className="border-b border-gray-100 dark:border-zinc-800/50 pb-4">
                 <CardTitle className="text-base font-bold text-zinc-950 dark:text-zinc-50 flex items-center gap-2">
                   <Briefcase className="h-5 w-5 text-primary" /> Description & Scope
                 </CardTitle>
               </CardHeader>
               <CardContent className="pt-6">
-                <p className="text-sm text-zinc-650 dark:text-zinc-300 whitespace-pre-line leading-relaxed">
+                <p className="text-sm text-slate-600 dark:text-zinc-300 whitespace-pre-line leading-relaxed">
                   {project.description || 'No description provided for this project.'}
                 </p>
               </CardContent>
@@ -320,7 +323,7 @@ export function ProjectDetail({ project, workspaceSlug }: ProjectDetailProps) {
 
             <div className="grid gap-6 sm:grid-cols-2">
               <Card className="border-zinc-200/60 dark:border-zinc-800/80 bg-white dark:bg-slate-900 rounded-xl shadow-sm">
-                <CardHeader className="border-b border-zinc-150 dark:border-zinc-800/50 pb-4">
+                <CardHeader className="border-b border-gray-100 dark:border-zinc-800/50 pb-4">
                   <CardTitle className="text-base font-bold text-zinc-950 dark:text-zinc-50 flex items-center gap-2">
                     <DollarSign className="h-5 w-5 text-primary" /> Budget Details
                   </CardTitle>
@@ -342,7 +345,7 @@ export function ProjectDetail({ project, workspaceSlug }: ProjectDetailProps) {
               </Card>
 
               <Card className="border-zinc-200/60 dark:border-zinc-800/80 bg-white dark:bg-slate-900 rounded-xl shadow-sm">
-                <CardHeader className="border-b border-zinc-150 dark:border-zinc-800/50 pb-4">
+                <CardHeader className="border-b border-gray-100 dark:border-zinc-800/50 pb-4">
                   <CardTitle className="text-base font-bold text-zinc-950 dark:text-zinc-50 flex items-center gap-2">
                     <Calendar className="h-5 w-5 text-primary" /> Key Dates
                   </CardTitle>
@@ -368,7 +371,7 @@ export function ProjectDetail({ project, workspaceSlug }: ProjectDetailProps) {
           {/* Sidebar */}
           <div className="space-y-6">
             <Card className="border-zinc-200/60 dark:border-zinc-800/80 bg-white dark:bg-slate-900 rounded-xl shadow-sm">
-              <CardHeader className="border-b border-zinc-150 dark:border-zinc-800/50 pb-4">
+              <CardHeader className="border-b border-gray-100 dark:border-zinc-800/50 pb-4">
                 <CardTitle className="text-base font-bold text-zinc-950 dark:text-zinc-50 flex items-center gap-2">
                   <User className="h-5 w-5 text-primary" /> Client Contact
                 </CardTitle>
@@ -378,13 +381,13 @@ export function ProjectDetail({ project, workspaceSlug }: ProjectDetailProps) {
                   <p className="text-sm font-bold text-zinc-950 dark:text-zinc-50">{project.client?.companyName}</p>
                   <p className="text-xs text-zinc-500 dark:text-zinc-400">Primary Account Partner</p>
                 </div>
-                <div className="space-y-3 pt-3 border-t border-zinc-150 dark:border-zinc-800/80 text-xs">
-                  <div className="flex items-center gap-2.5 text-zinc-650 dark:text-zinc-400">
+                <div className="space-y-3 pt-3 border-t border-gray-100 dark:border-zinc-800/80 text-xs">
+                  <div className="flex items-center gap-2.5 text-slate-600 dark:text-zinc-400">
                     <Mail className="h-4 w-4 text-slate-400" />
                     <span>{project.client?.primaryEmail}</span>
                   </div>
                   {project.client?.phone && (
-                    <div className="flex items-center gap-2.5 text-zinc-650 dark:text-zinc-400">
+                    <div className="flex items-center gap-2.5 text-slate-600 dark:text-zinc-400">
                       <Phone className="h-4 w-4 text-slate-400" />
                       <span>{project.client?.phone}</span>
                     </div>
@@ -394,14 +397,14 @@ export function ProjectDetail({ project, workspaceSlug }: ProjectDetailProps) {
             </Card>
 
             <Card className="border-zinc-200/60 dark:border-zinc-800/80 bg-white dark:bg-slate-900 rounded-xl shadow-sm">
-              <CardHeader className="border-b border-zinc-150 dark:border-zinc-800/50 pb-4">
+              <CardHeader className="border-b border-gray-100 dark:border-zinc-800/50 pb-4">
                 <CardTitle className="text-base font-bold text-zinc-950 dark:text-zinc-50 flex items-center gap-2">
                   <TrendingUp className="h-5 w-5 text-primary" /> Project Health
                 </CardTitle>
               </CardHeader>
               <CardContent className="pt-6 space-y-4">
                 <div className="space-y-2">
-                  <div className="flex items-center justify-between text-xs font-semibold text-zinc-650 dark:text-zinc-400">
+                  <div className="flex items-center justify-between text-xs font-semibold text-slate-600 dark:text-zinc-400">
                     <span>Overall Progress</span>
                     <span>{project.progress}%</span>
                   </div>
@@ -431,7 +434,7 @@ export function ProjectDetail({ project, workspaceSlug }: ProjectDetailProps) {
 
       {activeTab === 'Milestones' && (
         <Card className="border-zinc-200/60 dark:border-zinc-800/80 bg-white dark:bg-slate-900 rounded-xl shadow-sm">
-          <CardHeader className="border-b border-zinc-150 dark:border-zinc-800/50 pb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <CardHeader className="border-b border-gray-100 dark:border-zinc-800/50 pb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
               <CardTitle className="text-base font-bold text-zinc-950 dark:text-zinc-50 flex items-center gap-2">
                 <Layers className="h-5 w-5 text-primary" /> Milestones Timeline
@@ -458,7 +461,7 @@ export function ProjectDetail({ project, workspaceSlug }: ProjectDetailProps) {
                 {project.milestones.map((milestone) => (
                   <div key={milestone.id} className="relative">
                     {/* Circle bullet on line */}
-                    <span className="absolute -left-[31px] top-1 flex h-4.5 w-4.5 items-center justify-center rounded-full border border-slate-250 bg-white dark:border-slate-700 dark:bg-slate-900">
+                    <span className="absolute -left-[31px] top-1 flex h-4.5 w-4.5 items-center justify-center rounded-full border border-zinc-200 bg-white dark:border-slate-700 dark:bg-slate-900">
                       <span className="h-2 w-2 rounded-full bg-primary"></span>
                     </span>
 
@@ -483,7 +486,7 @@ export function ProjectDetail({ project, workspaceSlug }: ProjectDetailProps) {
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="cursor-pointer h-7 w-7 text-slate-400 hover:text-slate-650 dark:hover:text-slate-200"
+                          className="cursor-pointer h-7 w-7 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
                           onClick={() => {
                             setSelectedMilestone(milestone);
                             setIsEditMilestoneOpen(true);
@@ -494,7 +497,7 @@ export function ProjectDetail({ project, workspaceSlug }: ProjectDetailProps) {
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="cursor-pointer h-7 w-7 text-red-400 hover:text-red-650 dark:hover:text-red-400"
+                          className="cursor-pointer h-7 w-7 text-red-400 hover:text-red-700 dark:hover:text-red-400"
                           onClick={() => {
                             setSelectedMilestone(milestone);
                             setIsDeleteMilestoneOpen(true);
@@ -507,7 +510,7 @@ export function ProjectDetail({ project, workspaceSlug }: ProjectDetailProps) {
 
                     {/* Simple task items list under milestone */}
                     {milestone.tasks && milestone.tasks.length > 0 && (
-                      <div className="mt-4 rounded-lg bg-zinc-50/50 dark:bg-zinc-950/20/40 p-3 space-y-2.5 border border-zinc-150 dark:border-slate-900/60 max-w-xl">
+                      <div className="mt-4 rounded-lg bg-zinc-50/50 dark:bg-zinc-950/20 p-3 space-y-2.5 border border-gray-100 dark:border-slate-900/60 max-w-xl">
                         {milestone.tasks.map((task) => (
                           <div key={task.id} className="flex items-center justify-between text-xs py-0.5">
                             <span className="flex items-center gap-2 font-medium text-zinc-700 dark:text-zinc-300">
@@ -603,7 +606,7 @@ export function ProjectDetail({ project, workspaceSlug }: ProjectDetailProps) {
                   </FormItem>
                 )}
               />
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <FormField
                   control={addMilestoneForm.control}
                   name="dueDate"
@@ -643,7 +646,7 @@ export function ProjectDetail({ project, workspaceSlug }: ProjectDetailProps) {
                           <SelectValue placeholder="Select Status" />
                         </SelectTrigger>
                       </FormControl>
-                      <SelectContent className="bg-white dark:bg-slate-905 border-zinc-200/60 dark:border-zinc-800/80">
+                      <SelectContent className="bg-white dark:bg-slate-900 border-zinc-200/60 dark:border-zinc-800/80">
                         {Object.values(MilestoneStatus).map((status) => (
                           <SelectItem key={status} value={status}>
                             {status.replace('_', ' ')}
@@ -705,7 +708,7 @@ export function ProjectDetail({ project, workspaceSlug }: ProjectDetailProps) {
                   </FormItem>
                 )}
               />
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <FormField
                   control={editMilestoneForm.control}
                   name="dueDate"
@@ -745,7 +748,7 @@ export function ProjectDetail({ project, workspaceSlug }: ProjectDetailProps) {
                           <SelectValue placeholder="Select Status" />
                         </SelectTrigger>
                       </FormControl>
-                      <SelectContent className="bg-white dark:bg-slate-905 border-zinc-200/60 dark:border-zinc-800/80">
+                      <SelectContent className="bg-white dark:bg-slate-900 border-zinc-200/60 dark:border-zinc-800/80">
                         {Object.values(MilestoneStatus).map((status) => (
                           <SelectItem key={status} value={status}>
                             {status.replace('_', ' ')}

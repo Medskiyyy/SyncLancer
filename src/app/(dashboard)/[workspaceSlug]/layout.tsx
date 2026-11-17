@@ -6,7 +6,7 @@ import { ClientPortalRedirect } from '@/components/client-portal-redirect';
 import { NotificationCenter } from '@/features/notifications/components/notification-center';
 import { PageTransitionProvider } from '@/app/providers/page-transition-provider';
 import { Button } from '@/components/ui/button';
-import { SignOut } from '@phosphor-icons/react/dist/ssr';
+import { LogOut } from 'lucide-react';
 
 const workspaceService = new WorkspaceService();
 
@@ -31,7 +31,7 @@ export default async function DashboardLayout({
   let membership;
   try {
     membership = await workspaceService.validateWorkspaceAccess(currentWorkspace.id, session.user.id);
-  } catch (error) {
+  } catch {
     redirect('/');
   }
 
@@ -51,7 +51,7 @@ export default async function DashboardLayout({
         size="sm"
         className="flex w-full items-center justify-start gap-3 text-destructive hover:bg-destructive/10 hover:text-destructive cursor-pointer font-semibold"
       >
-        <SignOut className="h-4 w-4" />
+        <LogOut className="h-4 w-4" />
         <span>Log Out</span>
       </Button>
     </form>

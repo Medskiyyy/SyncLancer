@@ -1,4 +1,7 @@
 'use client';
+import type { Serialized } from '@/lib/serialize';
+
+import { getErrorMessage } from '@/lib/errors';
 
 import React, { useState, useEffect } from 'react';
 import { Invoice, InvoiceItem, Client, Frequency } from '@prisma/client';
@@ -50,10 +53,9 @@ import {
   saveRecurringInvoiceAction
 } from '../actions/recurring-invoice-actions';
 
-interface ExtendedInvoice extends Invoice {
-  items: InvoiceItem[];
-  client: Client;
-}
+// Serialized<>: money columns arrive as numbers, not Prisma Decimal, because the
+// repository converts them before crossing the Server -> Client boundary.
+type ExtendedInvoice = Serialized<Invoice & { items: InvoiceItem[]; client: Client }>;
 
 interface InvoiceManagerProps {
   projectId: string;
@@ -76,21 +78,17 @@ const toDateInputValue = (offsetDays: number) => {
   return date.toISOString().split('T')[0];
 };
 
-const getErrorMessage = (error: unknown, fallback = 'An error occurred') => {
-  return error instanceof Error ? error.message : fallback;
-};
-
 const STATUS_COLORS: Record<string, string> = {
-  DRAFT: 'bg-zinc-50 dark:bg-zinc-950 text-zinc-400 dark:text-zinc-55 border border-zinc-200/60 dark:border-zinc-850',
+  DRAFT: 'bg-zinc-50 dark:bg-zinc-950 text-zinc-400 dark:text-zinc-50 border border-zinc-200/60 dark:border-gray-800',
   SENT: 'bg-blue-500/10 text-blue-700 dark:text-blue-300 border border-blue-500/20',
-  PAID: 'bg-green-500/10 text-green-600 dark:text-green-400 border border-green-550/15',
-  OVERDUE: 'bg-red-500/10 text-red-655 dark:text-red-400 border border-red-550/15',
+  PAID: 'bg-green-500/10 text-green-600 dark:text-green-400 border border-green-600/15',
+  OVERDUE: 'bg-red-500/10 text-red-700 dark:text-red-400 border border-red-600/15',
   CANCELLED: 'bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 border border-zinc-200/30',
 };
 
 export function InvoiceManager({ projectId, workspaceId, clientId, initialInvoices }: InvoiceManagerProps) {
   const router = useRouter();
-  const [invoices] = useState<ExtendedInvoice[]>(initialInvoices);
+  const invoices = initialInvoices;
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -354,7 +352,7 @@ export function InvoiceManager({ projectId, workspaceId, clientId, initialInvoic
             <CheckCircle className="h-4 w-4 text-emerald-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-xl font-black text-slate-950 dark:text-zinc-50 text-emerald-650 dark:text-emerald-450">
+            <div className="text-xl font-black text-slate-950 dark:text-zinc-50 text-emerald-700 dark:text-emerald-500">
               {formatCurrency(invoiceStats.collected, currency)}
             </div>
             <p className="text-[9px] text-slate-400 dark:text-zinc-500 mt-1">Paid in full</p>
@@ -367,7 +365,7 @@ export function InvoiceManager({ projectId, workspaceId, clientId, initialInvoic
             <CreditCard className="h-4 w-4 text-blue-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-xl font-black text-slate-950 dark:text-zinc-50 text-blue-650 dark:text-blue-450">
+            <div className="text-xl font-black text-slate-950 dark:text-zinc-50 text-blue-700 dark:text-blue-500">
               {formatCurrency(invoiceStats.pending, currency)}
             </div>
             <p className="text-[9px] text-slate-400 dark:text-zinc-500 mt-1">Sent to client, awaiting payment</p>
@@ -380,7 +378,7 @@ export function InvoiceManager({ projectId, workspaceId, clientId, initialInvoic
             <FileText className="h-4 w-4 text-zinc-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-xl font-black text-slate-950 dark:text-zinc-50 text-zinc-650 dark:text-zinc-400">
+            <div className="text-xl font-black text-slate-950 dark:text-zinc-50 text-slate-600 dark:text-zinc-400">
               {formatCurrency(invoiceStats.drafts, currency)}
             </div>
             <p className="text-[9px] text-slate-400 dark:text-zinc-500 mt-1">Unsent invoices</p>
@@ -390,7 +388,7 @@ export function InvoiceManager({ projectId, workspaceId, clientId, initialInvoic
 
       {/* Recurring Invoice settings card */}
       <Card className="border-zinc-200/60 dark:border-zinc-800/80 bg-white dark:bg-slate-900 rounded-xl shadow-sm overflow-hidden">
-        <CardHeader className="border-b border-zinc-150 dark:border-zinc-800/50 pb-4">
+        <CardHeader className="border-b border-gray-100 dark:border-zinc-800/50 pb-4">
           <div className="flex items-center justify-between">
             <div>
               <CardTitle className="text-sm font-bold text-zinc-950 dark:text-zinc-50 flex items-center gap-2">
@@ -404,23 +402,23 @@ export function InvoiceManager({ projectId, workspaceId, clientId, initialInvoic
         </CardHeader>
         <CardContent className="pt-5 space-y-4">
           {invoices.length === 0 ? (
-            <div className="flex items-start gap-2.5 p-3.5 bg-amber-50 dark:bg-amber-950/20 text-amber-850 dark:text-amber-300 rounded-lg border border-amber-100 dark:border-amber-900/60 text-xs">
-              <AlertCircle className="h-4.5 w-4.5 shrink-0 mt-0.5 text-amber-600 dark:text-amber-450" />
+            <div className="flex items-start gap-2.5 p-3.5 bg-amber-50 dark:bg-amber-950/20 text-amber-900 dark:text-amber-300 rounded-lg border border-amber-100 dark:border-amber-900/60 text-xs">
+              <AlertCircle className="h-4.5 w-4.5 shrink-0 mt-0.5 text-amber-600 dark:text-amber-500" />
               <div className="space-y-1">
                 <p className="font-bold">Manual Invoice Required</p>
-                <p className="text-zinc-650 dark:text-slate-350">
+                <p className="text-slate-600 dark:text-slate-400">
                   Recurring billing requires at least one manual invoice for this client to act as a template. Please create an invoice first.
                 </p>
               </div>
             </div>
           ) : (
             <div className="space-y-4">
-              <div className="flex items-center justify-between p-3.5 bg-zinc-50/50/50 dark:bg-zinc-950/20/20 rounded-lg border border-zinc-150 dark:border-slate-900">
+              <div className="flex items-center justify-between p-3.5 bg-zinc-50/50 dark:bg-zinc-950/20 rounded-lg border border-gray-100 dark:border-slate-900">
                 <div className="space-y-0.5">
                   <label className="text-xs font-bold text-zinc-800 dark:text-zinc-200">
                     Enable Automatic Recurring Billing
                   </label>
-                  <p className="text-[10px] text-slate-450 dark:text-zinc-500">
+                  <p className="text-[10px] text-slate-500 dark:text-zinc-500">
                     If active, the system will process schedules automatically on the designated run dates.
                   </p>
                 </div>
@@ -434,7 +432,7 @@ export function InvoiceManager({ projectId, workspaceId, clientId, initialInvoic
               </div>
 
               {isRecurringActive && (
-                <div className="grid gap-4 sm:grid-cols-2 p-4 bg-zinc-50/50/30 dark:bg-zinc-950/20/10 rounded-lg border border-zinc-150/60 dark:border-slate-900/50">
+                <div className="grid gap-4 sm:grid-cols-2 p-4 bg-zinc-50/50 dark:bg-zinc-950/20 rounded-lg border border-gray-100/60 dark:border-slate-900/50">
                   <div className="space-y-1.5">
                     <label className="text-xs font-semibold text-zinc-700 dark:text-zinc-300">Billing Frequency</label>
                     <Select
@@ -445,7 +443,7 @@ export function InvoiceManager({ projectId, workspaceId, clientId, initialInvoic
                       <SelectTrigger className="bg-white dark:bg-slate-900 border-zinc-200/60 dark:border-zinc-800/80 h-9 text-xs">
                         <SelectValue placeholder="Select Frequency" />
                       </SelectTrigger>
-                      <SelectContent className="bg-white dark:bg-slate-955 border-slate-250 dark:border-zinc-800/80">
+                      <SelectContent className="bg-white dark:bg-slate-950 border-zinc-200 dark:border-zinc-800/80">
                         <SelectItem value="WEEKLY">Weekly</SelectItem>
                         <SelectItem value="MONTHLY">Monthly</SelectItem>
                         <SelectItem value="QUARTERLY">Quarterly</SelectItem>
@@ -495,16 +493,16 @@ export function InvoiceManager({ projectId, workspaceId, clientId, initialInvoic
       <Card className="border-zinc-200/60 dark:border-zinc-800/80 bg-white dark:bg-slate-900 rounded-xl shadow-sm overflow-hidden">
         <CardContent className="p-0">
           {invoices.length === 0 ? (
-            <div className="text-center py-12 text-slate-550 dark:text-zinc-400 space-y-2">
-              <DollarSign className="h-10 w-10 mx-auto text-slate-350 dark:text-zinc-700" />
+            <div className="text-center py-12 text-gray-500 dark:text-zinc-400 space-y-2">
+              <DollarSign className="h-10 w-10 mx-auto text-slate-400 dark:text-zinc-700" />
               <p className="text-sm font-semibold">No invoices generated yet</p>
-              <p className="text-xs text-slate-450">Click &ldquo;Create Invoice&rdquo; to start billing for project deliverables.</p>
+              <p className="text-xs text-slate-500">Click &ldquo;Create Invoice&rdquo; to start billing for project deliverables.</p>
             </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse">
                 <thead>
-                  <tr className="border-b border-zinc-150 dark:border-slate-805 bg-zinc-50/50/50 dark:bg-zinc-950/20/20 text-xs font-bold text-zinc-500 dark:text-zinc-400">
+                  <tr className="border-b border-gray-100 dark:border-gray-800 bg-zinc-50/50 dark:bg-zinc-950/20 text-xs font-bold text-zinc-500 dark:text-zinc-400">
                     <th className="py-3 px-4 font-bold">Invoice Number</th>
                     <th className="py-3 px-4 font-bold">Due Date</th>
                     <th className="py-3 px-4 font-bold">Status</th>
@@ -514,13 +512,13 @@ export function InvoiceManager({ projectId, workspaceId, clientId, initialInvoic
                     <th className="py-3 px-4 font-bold text-right">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100 dark:divide-slate-850 text-xs">
+                <tbody className="divide-y divide-slate-100 dark:divide-gray-800 text-xs">
                   {invoices.map((invoice) => (
-                    <tr key={invoice.id} className="hover:bg-zinc-50/50/40 dark:hover:bg-slate-950/10 transition-colors">
+                    <tr key={invoice.id} className="hover:bg-zinc-50/50 dark:hover:bg-slate-950/10 transition-colors">
                       <td className="py-3.5 px-4 font-bold text-zinc-950 dark:text-zinc-50">
                         {invoice.invoiceNumber}
                       </td>
-                      <td className="py-3.5 px-4 text-slate-600 dark:text-slate-455 font-medium">
+                      <td className="py-3.5 px-4 text-slate-600 dark:text-slate-500 font-medium">
                         {formatDate(invoice.dueDate)}
                       </td>
                       <td className="py-3.5 px-4">
@@ -528,10 +526,10 @@ export function InvoiceManager({ projectId, workspaceId, clientId, initialInvoic
                           {invoice.status}
                         </Badge>
                       </td>
-                      <td className="py-3.5 px-4 text-right text-zinc-650 dark:text-zinc-400">
+                      <td className="py-3.5 px-4 text-right text-slate-600 dark:text-zinc-400">
                         {formatCurrency(Number(invoice.subtotal), invoice.currency)}
                       </td>
-                      <td className="py-3.5 px-4 text-right text-zinc-650 dark:text-zinc-400">
+                      <td className="py-3.5 px-4 text-right text-slate-600 dark:text-zinc-400">
                         {formatCurrency(Number(invoice.taxAmount), invoice.currency)}
                       </td>
                       <td className="py-3.5 px-4 text-right font-bold text-zinc-950 dark:text-zinc-50">
@@ -544,7 +542,7 @@ export function InvoiceManager({ projectId, workspaceId, clientId, initialInvoic
                             <Button
                               variant="ghost"
                               size="icon"
-                              className="cursor-pointer h-7 w-7 text-blue-500 hover:text-blue-750 dark:hover:text-blue-400"
+                              className="cursor-pointer h-7 w-7 text-blue-500 hover:text-blue-900 dark:hover:text-blue-400"
                               onClick={() => handleSendInvoice(invoice.id)}
                               title="Send Invoice to client"
                               disabled={isLoading}
@@ -557,7 +555,7 @@ export function InvoiceManager({ projectId, workspaceId, clientId, initialInvoic
                             <Button
                               variant="ghost"
                               size="icon"
-                              className="cursor-pointer h-7 w-7 text-emerald-500 hover:text-emerald-750 dark:hover:text-emerald-400"
+                              className="cursor-pointer h-7 w-7 text-emerald-500 hover:text-emerald-800 dark:hover:text-emerald-400"
                               onClick={() => handleMarkAsPaid(invoice.id)}
                               title="Mark invoice as paid"
                               disabled={isLoading}
@@ -580,7 +578,7 @@ export function InvoiceManager({ projectId, workspaceId, clientId, initialInvoic
                             <Button
                               variant="ghost"
                               size="icon"
-                              className="cursor-pointer h-7 w-7 text-red-400 hover:text-red-650 dark:hover:text-red-400"
+                              className="cursor-pointer h-7 w-7 text-red-400 hover:text-red-700 dark:hover:text-red-400"
                               onClick={() => {
                                 setInvoiceToDelete(invoice);
                                 setIsDeleteOpen(true);
@@ -609,13 +607,13 @@ export function InvoiceManager({ projectId, workspaceId, clientId, initialInvoic
             <DialogTitle className="text-zinc-950 dark:text-zinc-100 flex items-center gap-2">
               <DollarSign className="h-5 w-5 text-primary" /> Create New Invoice
             </DialogTitle>
-            <DialogDescription className="text-slate-550 dark:text-zinc-400 text-xs">
+            <DialogDescription className="text-gray-500 dark:text-zinc-400 text-xs">
               Add billed line items, adjust currency rates, and configure tax rates.
             </DialogDescription>
           </DialogHeader>
 
           <form onSubmit={handleCreateInvoice} className="space-y-6">
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
               <div className="space-y-1.5">
                 <label className="text-xs font-semibold text-zinc-700 dark:text-zinc-300">Due Date</label>
                 <Input
@@ -632,7 +630,7 @@ export function InvoiceManager({ projectId, workspaceId, clientId, initialInvoic
                   <SelectTrigger className="bg-white dark:bg-slate-900 border-zinc-200/60 dark:border-zinc-800/80 h-9 text-xs">
                     <SelectValue placeholder="USD" />
                   </SelectTrigger>
-                  <SelectContent className="bg-white dark:bg-zinc-950/20 border-slate-250 dark:border-zinc-800/80">
+                  <SelectContent className="bg-white dark:bg-zinc-950/20 border-zinc-200 dark:border-zinc-800/80">
                     <SelectItem value="USD">USD ($)</SelectItem>
                     <SelectItem value="EUR">EUR (€)</SelectItem>
                     <SelectItem value="GBP">GBP (£)</SelectItem>
@@ -657,7 +655,7 @@ export function InvoiceManager({ projectId, workspaceId, clientId, initialInvoic
 
             {/* Line Items builder */}
             <div className="space-y-4">
-              <div className="flex items-center justify-between border-b border-zinc-150 dark:border-zinc-800/50 pb-2">
+              <div className="flex items-center justify-between border-b border-gray-100 dark:border-zinc-800/50 pb-2">
                 <h4 className="text-xs font-bold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider">Line Items</h4>
                 <Button
                   type="button"
@@ -670,7 +668,7 @@ export function InvoiceManager({ projectId, workspaceId, clientId, initialInvoic
               </div>
 
               {items.map((item, index) => (
-                <div key={index} className="flex gap-3 items-start p-3 bg-zinc-50/50/50 dark:bg-zinc-950/20/20 rounded-lg border border-zinc-150 dark:border-slate-900 relative pr-10">
+                <div key={index} className="flex gap-3 items-start p-3 bg-zinc-50/50 dark:bg-zinc-950/20 rounded-lg border border-gray-100 dark:border-slate-900 relative pr-10">
                   <div className="grid gap-3 grid-cols-12 flex-1">
                     <div className="col-span-6 space-y-1">
                       <Input
@@ -719,7 +717,7 @@ export function InvoiceManager({ projectId, workspaceId, clientId, initialInvoic
                     <button
                       type="button"
                       onClick={() => handleRemoveItem(index)}
-                      className="absolute right-2.5 top-3.5 text-red-400 hover:text-red-650 dark:hover:text-red-400"
+                      className="absolute right-2.5 top-3.5 text-red-400 hover:text-red-700 dark:hover:text-red-400"
                     >
                       <MinusCircle className="h-4.5 w-4.5" />
                     </button>
@@ -729,7 +727,7 @@ export function InvoiceManager({ projectId, workspaceId, clientId, initialInvoic
             </div>
 
             {/* Total Cost calculations panel */}
-            <div className="border-t border-zinc-150 dark:border-zinc-800/50 pt-4 flex justify-end">
+            <div className="border-t border-gray-100 dark:border-zinc-800/50 pt-4 flex justify-end">
               <div className="w-64 space-y-2 text-xs">
                 <div className="flex justify-between text-zinc-500">
                   <span>Subtotal:</span>
@@ -739,7 +737,7 @@ export function InvoiceManager({ projectId, workspaceId, clientId, initialInvoic
                   <span>Tax ({taxRate}%):</span>
                   <span className="font-semibold text-zinc-800 dark:text-zinc-300">{formatCurrency(taxAmount, currency)}</span>
                 </div>
-                <div className="flex justify-between border-t border-slate-150 dark:border-zinc-800/80 pt-2 text-sm font-bold">
+                <div className="flex justify-between border-t border-slate-200 dark:border-zinc-800/80 pt-2 text-sm font-bold">
                   <span className="text-zinc-950 dark:text-zinc-50">Grand Total:</span>
                   <span className="text-primary dark:text-indigo-400">{formatCurrency(totalAmount, currency)}</span>
                 </div>
@@ -772,7 +770,7 @@ export function InvoiceManager({ projectId, workspaceId, clientId, initialInvoic
         <DialogContent className="border-zinc-200/60 dark:border-zinc-800/80 bg-white dark:bg-zinc-950/20 sm:max-w-md">
           <DialogHeader>
             <DialogTitle className="text-zinc-950 dark:text-zinc-100">Delete Invoice</DialogTitle>
-            <DialogDescription className="text-slate-550 dark:text-zinc-400 text-xs">
+            <DialogDescription className="text-gray-500 dark:text-zinc-400 text-xs">
               Are you sure you want to delete invoice <strong className="text-zinc-800 dark:text-zinc-200">&ldquo;{invoiceToDelete?.invoiceNumber}&rdquo;</strong>? This action is permanent and cannot be undone.
             </DialogDescription>
           </DialogHeader>
@@ -784,7 +782,7 @@ export function InvoiceManager({ projectId, workspaceId, clientId, initialInvoic
                 setIsDeleteOpen(false);
                 setInvoiceToDelete(null);
               }}
-              className="cursor-pointer border-zinc-200/60 dark:border-zinc-800/80 text-slate-750 dark:text-slate-350"
+              className="cursor-pointer border-zinc-200/60 dark:border-zinc-800/80 text-gray-700 dark:text-slate-400"
             >
               Cancel
             </Button>
@@ -792,7 +790,7 @@ export function InvoiceManager({ projectId, workspaceId, clientId, initialInvoic
               variant="destructive"
               disabled={isLoading}
               onClick={handleDeleteInvoice}
-              className="cursor-pointer bg-red-650 hover:bg-red-700 text-white font-medium"
+              className="cursor-pointer bg-red-700 hover:bg-red-700 text-white font-medium"
             >
               {isLoading ? 'Deleting...' : 'Delete'}
             </Button>

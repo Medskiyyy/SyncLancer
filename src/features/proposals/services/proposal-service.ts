@@ -1,11 +1,11 @@
+import { AppError } from '@/lib/errors';
 import { ProposalRepository } from '../repositories/proposal-repository';
 import { WorkspaceService } from '@/features/workspace/services/workspace-service';
 import { NotificationService } from '@/features/notifications/services/notification-service';
 import { sendEmail } from '@/lib/email';
 import { CreateProposalInput, UpdateProposalInput } from '../schemas/proposal';
-import { Proposal, ProposalStatus, Project, ProjectStatus, Role } from '@prisma/client';
+import { ProposalStatus, ProjectStatus, Role } from '@prisma/client';
 import prisma from '@/lib/prisma';
-import { Decimal } from '@prisma/client/runtime/library';
 
 export class ProposalService {
   private proposalRepository: ProposalRepository;
@@ -219,11 +219,10 @@ export class ProposalService {
       }
 
       if (workspace.plan === 'FREE' && activeProjectsCount >= 3) {
-        const error = new Error(
-          'You have reached the maximum number of active projects allowed on the Free plan. Upgrade to Pro to approve this proposal.'
+        throw new AppError(
+          'You have reached the maximum number of active projects allowed on the Free plan. Upgrade to Pro to approve this proposal.',
+          'LIMIT_EXCEEDED'
         );
-        (error as any).code = 'LIMIT_EXCEEDED';
-        throw error;
       }
 
       // 5. Approve Proposal (Update status to APPROVED)

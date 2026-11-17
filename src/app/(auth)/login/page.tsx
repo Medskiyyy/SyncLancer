@@ -99,7 +99,7 @@ function LoginForm() {
                     <FormLabel>Password</FormLabel>
                     <Link
                       href="/forgot-password"
-                      className="text-xs text-primary hover:underline font-semibold"
+                      className="inline-flex min-h-6 items-center text-xs text-primary hover:underline font-semibold"
                     >
                       Forgot password?
                     </Link>
@@ -149,7 +149,7 @@ function LoginForm() {
       </CardContent>
       <CardFooter className="flex flex-wrap items-center justify-center gap-1 text-center text-sm text-muted-foreground border-t border-border/40 mt-4 pt-4">
         Don&apos;t have an account?{' '}
-        <Link href="/register" className="font-semibold text-primary hover:underline">
+        <Link href="/register" className="inline-flex min-h-6 items-center font-semibold text-primary hover:underline">
           Sign up
         </Link>
       </CardFooter>

@@ -7,7 +7,6 @@ import {
   ArrowRight,
   CheckCircle2,
   Clock,
-  FileText,
   Users,
   Download,
 } from 'lucide-react';

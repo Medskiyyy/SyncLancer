@@ -1,3 +1,4 @@
+import { serialize } from '@/lib/serialize';
 import { auth } from '@/auth';
 import { redirect, notFound } from 'next/navigation';
 import { WorkspaceService } from '@/features/workspace/services/workspace-service';
@@ -29,7 +30,7 @@ export default async function ClientDetailPage({ params }: PageProps) {
   try {
     // Validate workspace membership
     await workspaceService.validateWorkspaceAccess(workspace.id, session.user.id);
-  } catch (error) {
+  } catch {
     redirect('/');
   }
 
@@ -40,11 +41,11 @@ export default async function ClientDetailPage({ params }: PageProps) {
 
   const files = await clientService.getClientFiles(workspace.id, clientId, session.user.id);
 
-  // Cast client to the expected ExtendedClient structure
+
   return (
     <ClientProfile
-      client={client as any}
-      files={files}
+      client={serialize(client)}
+      files={serialize(files)}
       workspaceId={workspace.id}
       workspaceSlug={workspaceSlug}
     />

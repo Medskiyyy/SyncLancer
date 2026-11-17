@@ -1,3 +1,4 @@
+import { getErrorMessage } from '@/lib/errors';
 import { NextResponse } from 'next/server';
 import { auth } from '@/auth';
 import { ProposalService } from '@/features/proposals/services/proposal-service';
@@ -41,18 +42,21 @@ export async function GET(
 
     // Render React-PDF document to buffer
     const pdfElement = React.createElement(ProposalPdfDocument, { proposal });
-    const buffer = await renderToBuffer(pdfElement as any);
+    // renderToBuffer is typed against -pdf's own DocumentProps element, which
+    // a typed component element does not structurally match. Cast to the real
+    // parameter type rather than any, so a wrong argument is still caught.
+    const buffer = await renderToBuffer(pdfElement as unknown as Parameters<typeof renderToBuffer>[0]);
 
     return new NextResponse(new Uint8Array(buffer), {
       headers: {
         'Content-Type': 'application/pdf',
-        'Content-Disposition': `inline; filename="proposal-${(proposal as any).proposalNumber}.pdf"`,
+        'Content-Disposition': `inline; filename="proposal-${proposal.proposalNumber}.pdf"`,
       },
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Export proposal PDF error:', error);
     return NextResponse.json(
-      { success: false, error: { code: 'API_ERROR', message: error.message || 'An error occurred' } },
+      { success: false, error: { code: 'API_ERROR', message: getErrorMessage(error, 'An error occurred') } },
       { status: 500 }
     );
   }

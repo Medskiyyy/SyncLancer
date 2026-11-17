@@ -1,4 +1,5 @@
 import React from 'react';
+import type { Prisma } from '@prisma/client';
 import { Document, Page, Text, View, StyleSheet } from '@react-pdf/renderer';
 
 const styles = StyleSheet.create({
@@ -158,8 +159,13 @@ const styles = StyleSheet.create({
   },
 });
 
+/** Exactly what InvoiceRepository.findById() returns — kept in sync by the compiler. */
+export type InvoicePdfPayload = Prisma.InvoiceGetPayload<{
+  include: { items: true; client: true; project: true };
+}>;
+
 interface InvoicePdfProps {
-  invoice: any;
+  invoice: InvoicePdfPayload;
 }
 
 export function InvoicePdfDocument({ invoice }: InvoicePdfProps) {
@@ -171,8 +177,9 @@ export function InvoicePdfDocument({ invoice }: InvoicePdfProps) {
     });
   };
 
-  const formatCurrency = (amount: number | string) => {
-    const num = typeof amount === 'number' ? amount : parseFloat(amount);
+  // Prisma hands money columns over as Decimal; Number() covers all three forms.
+  const formatCurrency = (amount: number | string | Prisma.Decimal) => {
+    const num = Number(amount);
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
       currency: invoice.currency,
@@ -237,7 +244,7 @@ export function InvoicePdfDocument({ invoice }: InvoicePdfProps) {
             <Text style={[styles.colTotal, { fontWeight: 'bold' }]}>Amount</Text>
           </View>
 
-          {invoice.items?.map((item: any) => (
+          {invoice.items?.map((item) => (
             <View key={item.id} style={styles.tableRow}>
               <View style={styles.colDescription}>
                 <Text style={{ fontWeight: 'bold', fontSize: 9.5 }}>{item.name}</Text>

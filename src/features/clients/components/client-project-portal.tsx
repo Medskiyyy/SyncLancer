@@ -1,5 +1,6 @@
 'use client';
 
+import { getErrorMessage } from '@/lib/errors';
 import React, { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
@@ -12,11 +13,9 @@ import {
   Calendar, 
   Layers, 
   DollarSign, 
-  Clock, 
   CheckSquare, 
   AlertCircle,
   TrendingUp,
-  User,
   Receipt
 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -74,13 +73,6 @@ interface ClientProjectPortalProps {
   workspaceSlug: string;
 }
 
-const TAB_ICONS = {
-  overview: FolderOpen,
-  milestones: Layers,
-  files: FolderOpen,
-  invoices: FileText,
-};
-
 const STATUS_COLORS: Record<string, string> = {
   DRAFT: 'bg-zinc-100 text-zinc-800 dark:bg-zinc-800 dark:text-zinc-200 border-zinc-200',
   ACTIVE: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 border-emerald-200',
@@ -104,14 +96,14 @@ const TASK_PRIORITY_COLORS: Record<string, string> = {
 };
 
 const INVOICE_STATUS_COLORS: Record<string, string> = {
-  DRAFT: 'bg-zinc-105 text-zinc-800 dark:bg-zinc-800 dark:text-zinc-200 border-zinc-200',
-  SENT: 'bg-blue-100 text-blue-800 dark:bg-blue-955 dark:text-blue-300 border-blue-200',
-  PAID: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-955 dark:text-emerald-300 border-emerald-250',
-  OVERDUE: 'bg-rose-100 text-rose-800 dark:bg-rose-955 dark:text-rose-300 border-rose-200',
-  CANCELLED: 'bg-amber-100 text-amber-800 dark:bg-amber-955 dark:text-amber-300 border-amber-200',
+  DRAFT: 'bg-slate-100 text-zinc-800 dark:bg-zinc-800 dark:text-zinc-200 border-zinc-200',
+  SENT: 'bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300 border-blue-200',
+  PAID: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 border-emerald-200',
+  OVERDUE: 'bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300 border-rose-200',
+  CANCELLED: 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300 border-amber-200',
 };
 
-export function ClientProjectPortal({ project, workspaceSlug }: ClientProjectPortalProps) {
+export function ClientProjectPortal({ project }: ClientProjectPortalProps) {
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [activeTab, setActiveTab] = useState<'overview' | 'milestones' | 'files' | 'invoices'>('overview');
@@ -151,8 +143,8 @@ export function ClientProjectPortal({ project, workspaceSlug }: ClientProjectPor
       } else {
         toast.error(res.error || 'Failed to generate download link');
       }
-    } catch (e: any) {
-      toast.error(e.message || 'An error occurred');
+    } catch (e: unknown) {
+      toast.error(getErrorMessage(e, 'An error occurred'));
     }
   };
 
@@ -181,8 +173,8 @@ export function ClientProjectPortal({ project, workspaceSlug }: ClientProjectPor
       } else {
         toast.error(res.error?.message || 'Failed to upload file');
       }
-    } catch (err: any) {
-      toast.error(err.message || 'An error occurred');
+    } catch (err: unknown) {
+      toast.error(getErrorMessage(err, 'An error occurred'));
     } finally {
       setIsUploading(false);
     }
@@ -251,13 +243,13 @@ export function ClientProjectPortal({ project, workspaceSlug }: ClientProjectPor
           {/* Main Info */}
           <div className="md:col-span-2 space-y-6">
             <Card className="border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 rounded-xl shadow-sm">
-              <CardHeader className="border-b border-zinc-100 dark:border-zinc-850 pb-4">
+              <CardHeader className="border-b border-zinc-100 dark:border-gray-800 pb-4">
                 <CardTitle className="text-base font-bold text-zinc-900 dark:text-zinc-50 flex items-center gap-2">
                   <Layers className="h-5 w-5 text-indigo-500" /> Description & Scope
                 </CardTitle>
               </CardHeader>
               <CardContent className="pt-6">
-                <p className="text-sm text-zinc-650 dark:text-zinc-300 whitespace-pre-line leading-relaxed">
+                <p className="text-sm text-slate-600 dark:text-zinc-300 whitespace-pre-line leading-relaxed">
                   {project.description || 'No description provided for this project.'}
                 </p>
               </CardContent>
@@ -265,7 +257,7 @@ export function ClientProjectPortal({ project, workspaceSlug }: ClientProjectPor
 
             <div className="grid gap-6 sm:grid-cols-2">
               <Card className="border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 rounded-xl shadow-sm">
-                <CardHeader className="border-b border-zinc-100 dark:border-zinc-850 pb-4">
+                <CardHeader className="border-b border-zinc-100 dark:border-gray-800 pb-4">
                   <CardTitle className="text-base font-bold text-zinc-900 dark:text-zinc-50 flex items-center gap-2">
                     <DollarSign className="h-5 w-5 text-indigo-500" /> Budget Details
                   </CardTitle>
@@ -281,7 +273,7 @@ export function ClientProjectPortal({ project, workspaceSlug }: ClientProjectPor
               </Card>
 
               <Card className="border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 rounded-xl shadow-sm">
-                <CardHeader className="border-b border-zinc-100 dark:border-zinc-850 pb-4">
+                <CardHeader className="border-b border-zinc-100 dark:border-gray-800 pb-4">
                   <CardTitle className="text-base font-bold text-zinc-900 dark:text-zinc-50 flex items-center gap-2">
                     <Calendar className="h-5 w-5 text-indigo-500" /> Key Dates
                   </CardTitle>
@@ -289,13 +281,13 @@ export function ClientProjectPortal({ project, workspaceSlug }: ClientProjectPor
                 <CardContent className="pt-6 space-y-3">
                   <div>
                     <span className="text-xs text-zinc-400 dark:text-zinc-500">Start Date</span>
-                    <p className="text-sm font-bold text-zinc-850 dark:text-zinc-200">
+                    <p className="text-sm font-bold text-gray-800 dark:text-zinc-200">
                       {formatDate(project.startDate)}
                     </p>
                   </div>
                   <div>
                     <span className="text-xs text-zinc-400 dark:text-zinc-500">Deadline</span>
-                    <p className="text-sm font-bold text-zinc-850 dark:text-zinc-200">
+                    <p className="text-sm font-bold text-gray-800 dark:text-zinc-200">
                       {formatDate(project.deadline)}
                     </p>
                   </div>
@@ -307,7 +299,7 @@ export function ClientProjectPortal({ project, workspaceSlug }: ClientProjectPor
           {/* Project Health Side panel */}
           <div className="space-y-6">
             <Card className="border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 rounded-xl shadow-sm">
-              <CardHeader className="border-b border-zinc-100 dark:border-zinc-850 pb-4">
+              <CardHeader className="border-b border-zinc-100 dark:border-gray-800 pb-4">
                 <CardTitle className="text-base font-bold text-zinc-900 dark:text-zinc-50 flex items-center gap-2">
                   <TrendingUp className="h-5 w-5 text-indigo-500" /> Project Progress
                 </CardTitle>
@@ -344,7 +336,7 @@ export function ClientProjectPortal({ project, workspaceSlug }: ClientProjectPor
 
       {activeTab === 'milestones' && (
         <Card className="border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 rounded-xl shadow-sm">
-          <CardHeader className="border-b border-zinc-100 dark:border-zinc-850 pb-4">
+          <CardHeader className="border-b border-zinc-100 dark:border-gray-800 pb-4">
             <CardTitle className="text-base font-bold text-zinc-900 dark:text-zinc-50 flex items-center gap-2">
               <Layers className="h-5 w-5 text-indigo-500" /> Milestones Timeline
             </CardTitle>
@@ -354,12 +346,12 @@ export function ClientProjectPortal({ project, workspaceSlug }: ClientProjectPor
           </CardHeader>
           <CardContent className="pt-6">
             {project.milestones.length === 0 ? (
-              <div className="text-center py-8 text-zinc-550 dark:text-zinc-400 space-y-2">
+              <div className="text-center py-8 text-gray-500 dark:text-zinc-400 space-y-2">
                 <AlertCircle className="h-8 w-8 mx-auto text-zinc-400" />
                 <p className="text-sm font-semibold">No milestones set up for this project yet.</p>
               </div>
             ) : (
-              <div className="relative border-l border-zinc-250 dark:border-zinc-800 pl-6 space-y-8 py-2">
+              <div className="relative border-l border-zinc-200 dark:border-zinc-800 pl-6 space-y-8 py-2">
                 {project.milestones.map((milestone) => (
                   <div key={milestone.id} className="relative">
                     <span className="absolute -left-[31px] top-1 flex h-4.5 w-4.5 items-center justify-center rounded-full border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900">
@@ -372,7 +364,7 @@ export function ClientProjectPortal({ project, workspaceSlug }: ClientProjectPor
                         {milestone.description && (
                           <p className="text-xs text-zinc-500 dark:text-zinc-400">{milestone.description}</p>
                         )}
-                        <div className="flex items-center gap-2.5 text-[10px] text-zinc-400 dark:text-zinc-550 pt-1">
+                        <div className="flex items-center gap-2.5 text-[10px] text-zinc-400 dark:text-gray-500 pt-1">
                           <span className="flex items-center">
                             <Calendar className="mr-1 h-3 w-3" /> Due {formatDate(milestone.dueDate)}
                           </span>
@@ -387,10 +379,10 @@ export function ClientProjectPortal({ project, workspaceSlug }: ClientProjectPor
 
                     {/* Milestone tasks */}
                     {milestone.tasks && milestone.tasks.length > 0 && (
-                      <div className="mt-4 rounded-lg bg-zinc-50 dark:bg-zinc-950/40 p-3 space-y-2 border border-zinc-150 dark:border-zinc-900/60 max-w-xl">
+                      <div className="mt-4 rounded-lg bg-zinc-50 dark:bg-zinc-950/40 p-3 space-y-2 border border-gray-100 dark:border-zinc-900/60 max-w-xl">
                         {milestone.tasks.map((task) => (
                           <div key={task.id} className="flex items-center justify-between text-xs py-0.5">
-                            <span className="flex items-center gap-2 font-medium text-zinc-750 dark:text-zinc-300">
+                            <span className="flex items-center gap-2 font-medium text-gray-700 dark:text-zinc-300">
                               <CheckSquare className="h-3.5 w-3.5 text-indigo-500" />
                               {task.title}
                             </span>
@@ -424,7 +416,7 @@ export function ClientProjectPortal({ project, workspaceSlug }: ClientProjectPor
             className={`border-2 border-dashed rounded-xl p-8 text-center transition-all cursor-pointer flex flex-col items-center justify-center space-y-3 ${
               isDragOver 
                 ? 'border-indigo-500 bg-indigo-50/20 dark:bg-indigo-950/10' 
-                : 'border-zinc-250 hover:border-indigo-400 bg-white dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-indigo-500'
+                : 'border-zinc-200 hover:border-indigo-400 bg-white dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-indigo-500'
             }`}
             onClick={() => fileInputRef.current?.click()}
           >
@@ -444,9 +436,9 @@ export function ClientProjectPortal({ project, workspaceSlug }: ClientProjectPor
               </>
             ) : (
               <>
-                <UploadCloud className="h-10 w-10 text-zinc-400 dark:text-zinc-650" />
-                <p className="text-sm font-bold text-zinc-850 dark:text-zinc-200">
-                  Drag & drop a file here, or <span className="text-indigo-650 dark:text-indigo-400 hover:underline">browse files</span>
+                <UploadCloud className="h-10 w-10 text-zinc-400 dark:text-slate-600" />
+                <p className="text-sm font-bold text-gray-800 dark:text-zinc-200">
+                  Drag & drop a file here, or <span className="text-indigo-600 dark:text-indigo-400 hover:underline">browse files</span>
                 </p>
                 <p className="text-xs text-zinc-400 max-w-sm">
                   Upload project references, feedback, or assets up to 10MB.
@@ -457,14 +449,14 @@ export function ClientProjectPortal({ project, workspaceSlug }: ClientProjectPor
 
           {/* Files List Card */}
           <Card className="border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 rounded-xl shadow-sm overflow-hidden">
-            <CardHeader className="border-b border-zinc-100 dark:border-zinc-850 pb-4">
+            <CardHeader className="border-b border-zinc-100 dark:border-gray-800 pb-4">
               <CardTitle className="text-base font-bold text-zinc-900 dark:text-zinc-50 flex items-center gap-2">
                 <FolderOpen className="h-5 w-5 text-indigo-500" /> Project Files
               </CardTitle>
             </CardHeader>
             <CardContent className="p-0">
               {project.files.length === 0 ? (
-                <div className="text-center py-12 text-zinc-550 dark:text-zinc-400 space-y-2">
+                <div className="text-center py-12 text-gray-500 dark:text-zinc-400 space-y-2">
                   <FileText className="h-10 w-10 mx-auto text-zinc-300 dark:text-zinc-700" />
                   <p className="text-sm font-semibold">No files shared yet</p>
                   <p className="text-xs text-zinc-400">
@@ -475,7 +467,7 @@ export function ClientProjectPortal({ project, workspaceSlug }: ClientProjectPor
                 <div className="overflow-x-auto">
                   <table className="w-full text-left border-collapse">
                     <thead>
-                      <tr className="border-b border-zinc-100 dark:border-zinc-805 bg-zinc-50/50 dark:bg-zinc-950/20 text-xs font-bold text-zinc-500 dark:text-zinc-400">
+                      <tr className="border-b border-zinc-100 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-950/20 text-xs font-bold text-zinc-500 dark:text-zinc-400">
                         <th className="py-3 px-4 font-bold">File Name</th>
                         <th className="py-3 px-4 font-bold">Size</th>
                         <th className="py-3 px-4 font-bold">Uploaded By</th>
@@ -483,7 +475,7 @@ export function ClientProjectPortal({ project, workspaceSlug }: ClientProjectPor
                         <th className="py-3 px-4 font-bold text-right">Actions</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-zinc-100 dark:divide-zinc-850 text-xs">
+                    <tbody className="divide-y divide-zinc-100 dark:divide-gray-800 text-xs">
                       {project.files.map((file) => (
                         <tr key={file.id} className="hover:bg-zinc-50/40 dark:hover:bg-zinc-950/10 transition-colors">
                           <td className="py-3.5 px-4 font-medium text-zinc-800 dark:text-zinc-200">
@@ -495,7 +487,7 @@ export function ClientProjectPortal({ project, workspaceSlug }: ClientProjectPor
                           <td className="py-3.5 px-4 text-zinc-600 dark:text-zinc-400">
                             {formatBytes(file.fileSize)}
                           </td>
-                          <td className="py-3.5 px-4 text-zinc-650 dark:text-zinc-400">
+                          <td className="py-3.5 px-4 text-slate-600 dark:text-zinc-400">
                             {file.uploader?.fullName || 'Workspace member'}
                           </td>
                           <td className="py-3.5 px-4 text-zinc-600 dark:text-zinc-400">
@@ -505,7 +497,7 @@ export function ClientProjectPortal({ project, workspaceSlug }: ClientProjectPor
                             <Button
                               variant="ghost"
                               size="icon"
-                              className="h-7 w-7 text-zinc-450 hover:text-zinc-650 dark:hover:text-zinc-250"
+                              className="h-7 w-7 text-zinc-400 hover:text-slate-600 dark:hover:text-zinc-200"
                               onClick={() => handleDownload(file.id)}
                               title="Download file"
                             >
@@ -525,14 +517,14 @@ export function ClientProjectPortal({ project, workspaceSlug }: ClientProjectPor
 
       {activeTab === 'invoices' && (
         <Card className="border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 rounded-xl shadow-sm overflow-hidden">
-          <CardHeader className="border-b border-zinc-100 dark:border-zinc-850 pb-4">
+          <CardHeader className="border-b border-zinc-100 dark:border-gray-800 pb-4">
             <CardTitle className="text-base font-bold text-zinc-900 dark:text-zinc-50 flex items-center gap-2">
               <FileText className="h-5 w-5 text-indigo-500" /> Project Invoices
             </CardTitle>
           </CardHeader>
           <CardContent className="p-0">
             {project.invoices.length === 0 ? (
-              <div className="text-center py-12 text-zinc-550 dark:text-zinc-400 space-y-2">
+              <div className="text-center py-12 text-gray-500 dark:text-zinc-400 space-y-2">
                 <Receipt className="h-10 w-10 mx-auto text-zinc-300 dark:text-zinc-700" />
                 <p className="text-sm font-semibold">No invoices generated for this project</p>
               </div>
@@ -540,7 +532,7 @@ export function ClientProjectPortal({ project, workspaceSlug }: ClientProjectPor
               <div className="overflow-x-auto">
                 <table className="w-full text-left border-collapse">
                   <thead>
-                    <tr className="border-b border-zinc-100 dark:border-zinc-805 bg-zinc-50/50 dark:bg-zinc-950/20 text-xs font-bold text-zinc-500 dark:text-zinc-400">
+                    <tr className="border-b border-zinc-100 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-950/20 text-xs font-bold text-zinc-500 dark:text-zinc-400">
                       <th className="py-3 px-4 font-bold">Invoice Number</th>
                       <th className="py-3 px-4 font-bold">Due Date</th>
                       <th className="py-3 px-4 font-bold">Status</th>
@@ -548,13 +540,13 @@ export function ClientProjectPortal({ project, workspaceSlug }: ClientProjectPor
                       <th className="py-3 px-4 font-bold text-right">Actions</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-zinc-100 dark:divide-zinc-850 text-xs">
+                  <tbody className="divide-y divide-zinc-100 dark:divide-gray-800 text-xs">
                     {project.invoices.map((invoice) => (
                       <tr key={invoice.id} className="hover:bg-zinc-50/40 dark:hover:bg-zinc-950/10 transition-colors">
                         <td className="py-3.5 px-4 font-bold text-zinc-900 dark:text-zinc-50">
                           {invoice.invoiceNumber}
                         </td>
-                        <td className="py-3.5 px-4 text-zinc-650 dark:text-zinc-450 font-medium">
+                        <td className="py-3.5 px-4 text-slate-600 dark:text-zinc-400 font-medium">
                           {formatDate(invoice.dueDate)}
                         </td>
                         <td className="py-3.5 px-4">
@@ -574,7 +566,7 @@ export function ClientProjectPortal({ project, workspaceSlug }: ClientProjectPor
                             <Button
                               variant="ghost"
                               size="icon"
-                              className="h-7 w-7 text-zinc-450 hover:text-zinc-650 dark:hover:text-zinc-200"
+                              className="h-7 w-7 text-zinc-400 hover:text-slate-600 dark:hover:text-zinc-200"
                               title="Download PDF"
                             >
                               <Download className="h-3.5 w-3.5" />

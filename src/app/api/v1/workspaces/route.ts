@@ -1,3 +1,4 @@
+import { getErrorMessage } from '@/lib/errors';
 import { NextResponse } from 'next/server';
 import { auth } from '@/auth';
 import { WorkspaceService } from '@/features/workspace/services/workspace-service';
@@ -21,10 +22,10 @@ export async function GET() {
       success: true,
       data: workspaces,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Get workspaces API error:', error);
     return NextResponse.json(
-      { success: false, error: { code: 'API_ERROR', message: error.message || 'An error occurred' } },
+      { success: false, error: { code: 'API_ERROR', message: getErrorMessage(error, 'An error occurred') } },
       { status: 500 }
     );
   }
@@ -62,10 +63,10 @@ export async function POST(request: Request) {
       success: true,
       data: workspace,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Create workspace API error:', error);
     return NextResponse.json(
-      { success: false, error: { code: 'API_ERROR', message: error.message || 'An error occurred' } },
+      { success: false, error: { code: 'API_ERROR', message: getErrorMessage(error, 'An error occurred') } },
       { status: 500 }
     );
   }

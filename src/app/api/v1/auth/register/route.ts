@@ -1,3 +1,4 @@
+import { getErrorMessage } from '@/lib/errors';
 import { NextResponse } from 'next/server';
 import { AuthService } from '@/features/auth/services/auth-service';
 import { registerSchema } from '@/features/auth/schemas/auth';
@@ -30,14 +31,14 @@ export async function POST(request: Request) {
         userId: user.id,
       },
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Registration API error:', error);
     return NextResponse.json(
       {
         success: false,
         error: {
           code: 'REGISTRATION_FAILED',
-          message: error.message || 'Registration failed',
+          message: getErrorMessage(error, 'Registration failed'),
         },
       },
       { status: 400 }

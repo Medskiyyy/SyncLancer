@@ -3,7 +3,7 @@ import { redirect, notFound } from 'next/navigation';
 import Link from 'next/link';
 import prisma from '@/lib/prisma';
 import { WorkspaceService } from '@/features/workspace/services/workspace-service';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { 
@@ -38,7 +38,7 @@ export default async function ClientPortalDashboardPage({ params }: PageProps) {
   // Validate workspace membership
   try {
     await workspaceService.validateWorkspaceAccess(workspace.id, session.user.id);
-  } catch (error) {
+  } catch {
     redirect('/');
   }
 
@@ -55,7 +55,7 @@ export default async function ClientPortalDashboardPage({ params }: PageProps) {
       <div className="flex flex-col items-center justify-center py-16 text-center space-y-4">
         <AlertCircle className="h-12 w-12 text-red-500" />
         <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-50">Access Denied</h2>
-        <p className="text-sm text-zinc-550 dark:text-zinc-400 max-w-md">
+        <p className="text-sm text-gray-500 dark:text-zinc-400 max-w-md">
           Your user profile is not linked to any client accounts in this workspace. Please contact the workspace administrator to link your account.
         </p>
       </div>
@@ -129,7 +129,7 @@ export default async function ClientPortalDashboardPage({ params }: PageProps) {
   const STATUS_COLORS: Record<string, string> = {
     DRAFT: 'bg-zinc-100 text-zinc-800 dark:bg-zinc-800 dark:text-zinc-200 border-zinc-200',
     SENT: 'bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300 border-blue-200',
-    PAID: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 border-emerald-250',
+    PAID: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 border-emerald-200',
     OVERDUE: 'bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300 border-rose-200',
     CANCELLED: 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300 border-amber-200',
   };
@@ -149,7 +149,7 @@ export default async function ClientPortalDashboardPage({ params }: PageProps) {
 
       {/* KPI Cards Grid */}
       <div className="grid gap-4 sm:grid-cols-3">
-        <Card className="border-zinc-250 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-sm rounded-xl">
+        <Card className="border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-sm rounded-xl">
           <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
             <CardTitle className="text-xs font-semibold text-zinc-500">Active Projects</CardTitle>
             <FolderKanban className="h-4.5 w-4.5 text-indigo-500" />
@@ -162,20 +162,20 @@ export default async function ClientPortalDashboardPage({ params }: PageProps) {
           </CardContent>
         </Card>
 
-        <Card className="border-zinc-250 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-sm rounded-xl">
+        <Card className="border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-sm rounded-xl">
           <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
             <CardTitle className="text-xs font-semibold text-zinc-500">Outstanding Balance</CardTitle>
             <Receipt className="h-4.5 w-4.5 text-rose-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-black text-zinc-900 dark:text-zinc-50 text-rose-650 dark:text-rose-455">
+            <div className="text-2xl font-black text-zinc-900 dark:text-zinc-50 text-rose-700 dark:text-rose-500">
               {formatCurrency(outstandingBalance)}
             </div>
             <p className="text-[10px] text-zinc-400 mt-1">Awaiting your payment</p>
           </CardContent>
         </Card>
 
-        <Card className="border-zinc-250 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-sm rounded-xl">
+        <Card className="border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-sm rounded-xl">
           <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
             <CardTitle className="text-xs font-semibold text-zinc-500">Files Shared</CardTitle>
             <FolderOpen className="h-4.5 w-4.5 text-emerald-500" />
@@ -193,7 +193,7 @@ export default async function ClientPortalDashboardPage({ params }: PageProps) {
       <div className="grid gap-6 md:grid-cols-2">
         {/* Projects Section */}
         <Card className="border-zinc-200 dark:border-zinc-800 shadow-sm rounded-xl bg-white dark:bg-zinc-900 overflow-hidden">
-          <CardHeader className="border-b border-zinc-100 dark:border-zinc-850 pb-4">
+          <CardHeader className="border-b border-zinc-100 dark:border-gray-800 pb-4">
             <CardTitle className="text-sm font-bold text-zinc-900 dark:text-zinc-50 flex items-center gap-2">
               <Briefcase className="h-4.5 w-4.5 text-indigo-500" /> Projects
             </CardTitle>
@@ -204,14 +204,14 @@ export default async function ClientPortalDashboardPage({ params }: PageProps) {
                 No active projects assigned to your account.
               </div>
             ) : (
-              <div className="divide-y divide-zinc-100 dark:divide-zinc-850">
+              <div className="divide-y divide-zinc-100 dark:divide-gray-800">
                 {projects.map((project) => (
                   <div key={project.id} className="p-4 flex items-center justify-between hover:bg-zinc-50/40 dark:hover:bg-zinc-950/10 transition-colors">
                     <div className="space-y-1 pr-4 min-w-0">
                       <h3 className="text-xs font-bold text-zinc-900 dark:text-zinc-50 truncate">
                         {project.name}
                       </h3>
-                      <p className="text-[10px] text-zinc-450 truncate max-w-sm">
+                      <p className="text-[10px] text-zinc-400 truncate max-w-sm">
                         {project.description || 'No description provided.'}
                       </p>
                       <div className="flex items-center gap-2 pt-1 text-[10px] text-zinc-400">
@@ -249,7 +249,7 @@ export default async function ClientPortalDashboardPage({ params }: PageProps) {
 
         {/* Recent Invoices Section */}
         <Card className="border-zinc-200 dark:border-zinc-800 shadow-sm rounded-xl bg-white dark:bg-zinc-900 overflow-hidden">
-          <CardHeader className="border-b border-zinc-100 dark:border-zinc-850 pb-4 flex flex-row items-center justify-between space-y-0">
+          <CardHeader className="border-b border-zinc-100 dark:border-gray-800 pb-4 flex flex-row items-center justify-between space-y-0">
             <CardTitle className="text-sm font-bold text-zinc-900 dark:text-zinc-50 flex items-center gap-2">
               <Receipt className="h-4.5 w-4.5 text-rose-500" /> Recent Invoices
             </CardTitle>
@@ -263,7 +263,7 @@ export default async function ClientPortalDashboardPage({ params }: PageProps) {
                 No invoices issued for your account.
               </div>
             ) : (
-              <div className="divide-y divide-zinc-100 dark:divide-zinc-850">
+              <div className="divide-y divide-zinc-100 dark:divide-gray-800">
                 {invoices.slice(0, 5).map((invoice) => (
                   <div key={invoice.id} className="p-4 flex items-center justify-between hover:bg-zinc-50/40 dark:hover:bg-zinc-950/10 transition-colors">
                     <div className="space-y-0.5">
@@ -288,7 +288,7 @@ export default async function ClientPortalDashboardPage({ params }: PageProps) {
                         target="_blank"
                         rel="noreferrer"
                       >
-                        <Button variant="ghost" size="icon" className="h-7 w-7 text-zinc-400 hover:text-zinc-650 dark:hover:text-zinc-200">
+                        <Button variant="ghost" size="icon" className="h-7 w-7 text-zinc-400 hover:text-slate-600 dark:hover:text-zinc-200">
                           <Download className="h-3.5 w-3.5" />
                         </Button>
                       </a>
@@ -303,7 +303,7 @@ export default async function ClientPortalDashboardPage({ params }: PageProps) {
 
       {/* Shared Files Panel */}
       <Card className="border-zinc-200 dark:border-zinc-800 shadow-sm rounded-xl bg-white dark:bg-zinc-900 overflow-hidden">
-        <CardHeader className="border-b border-zinc-100 dark:border-zinc-850 pb-4 flex flex-row items-center justify-between space-y-0">
+        <CardHeader className="border-b border-zinc-100 dark:border-gray-800 pb-4 flex flex-row items-center justify-between space-y-0">
           <CardTitle className="text-sm font-bold text-zinc-900 dark:text-zinc-50 flex items-center gap-2">
             <FolderOpen className="h-4.5 w-4.5 text-emerald-500" /> Recent Files
           </CardTitle>
@@ -317,14 +317,14 @@ export default async function ClientPortalDashboardPage({ params }: PageProps) {
               No files shared for your projects.
             </div>
           ) : (
-            <div className="divide-y divide-zinc-100 dark:divide-zinc-850">
+            <div className="divide-y divide-zinc-100 dark:divide-gray-800">
               {files.map((file) => (
                 <div key={file.id} className="p-3.5 flex items-center justify-between hover:bg-zinc-50/40 dark:hover:bg-zinc-950/10 transition-colors text-xs">
                   <div className="flex items-center gap-2.5 min-w-0 pr-4">
                     <FolderOpen className="h-4 w-4 text-zinc-400 shrink-0" />
                     <div className="min-w-0">
                       <div className="font-bold text-zinc-900 dark:text-zinc-50 truncate max-w-md">{file.fileName}</div>
-                      <div className="text-[9px] text-zinc-450 mt-0.5">
+                      <div className="text-[9px] text-zinc-400 mt-0.5">
                         {file.fileType.toUpperCase()} &bull; {new Intl.NumberFormat('en', { notation: 'compact', style: 'unit', unit: 'byte' }).format(Number(file.fileSize))} &bull; Shared {new Date(file.createdAt).toLocaleDateString()}
                       </div>
                     </div>
@@ -334,7 +334,7 @@ export default async function ClientPortalDashboardPage({ params }: PageProps) {
                     target="_blank"
                     rel="noreferrer"
                   >
-                    <Button variant="ghost" size="icon" className="h-7 w-7 text-zinc-400 hover:text-zinc-650 dark:hover:text-zinc-200">
+                    <Button variant="ghost" size="icon" className="h-7 w-7 text-zinc-400 hover:text-slate-600 dark:hover:text-zinc-200">
                       <Download className="h-3.5 w-3.5" />
                     </Button>
                   </a>
