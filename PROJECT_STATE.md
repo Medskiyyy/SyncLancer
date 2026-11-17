@@ -1,10 +1,19 @@
 # Project State
 
 ## Current Phase
-- **Premium SaaS Redesign (Complete)**
+- **High-Contrast Ink & Signal Emerald Total Redesign (Complete)**
 
 ## Completed Tasks
-### Premium SaaS Redesign
+### High-Contrast Ink & Signal Emerald Redesign (2026-11-18)
+- [x] Replaced Slate/Blue design tokens with High-Contrast Ink (`#121212`) & Pure White (`#ffffff`) + Signal Emerald (`#059669` light / `#10b981` dark) `--brand` tokens and true graphite `.dark` surface (`#0d0d0c`) in `src/app/globals.css`
+- [x] Switched heading font from `Onest` to `Archivo` paired with `Plus Jakarta Sans` UI body and `JetBrains Mono` monetary/code `tabular-nums` in `src/app/layout.tsx`, wrapped with `ThemeProvider` (`next-themes`)
+- [x] Built geometric 2-bar `<BrandLogo />`, SSR-safe `<ThemeToggle />`, crisp Ink buttons, flat shadowless `<Card>`, and `rounded-[5px]` semantic `<Badge>` primitives
+- [x] Embedded 2 bespoke studio photographs (`landing-hero-studio.jpg`, `landing-portal-handoff.jpg`) and rebuilt all `src/components/landing/*` sections (asymmetric hero, 4-tab module showcase, 4-column workflow ledger, `#portal` showcase, harmonized dark/light CTA band)
+- [x] Redesigned split 12-column `AuthShell`, de-carded Auth/Onboarding/Offline routes, and unified workspace sidebar, switcher, command palette, notification center, and `<ThemeToggle />` topbar
+- [x] Unified Dashboard & Analytics into borderless operational headers + `divide-x` KPI ledger strips, Ink/Emerald Recharts palettes, monochrome Kanban columns, 4-bucket semantic status badges, ledger tables, time-tracker bar, project/proposal builders, and proposal/invoice PDF accents (`0` legacy shade matches across `src/`)
+- [x] Eliminated pre-existing ESLint warning (`form.watch` -> `useWatch` in `project-builder.tsx` + `useState` default date init) and verified `tsc --noEmit`, `eslint` (0 errors, 0 warnings), `vitest` (50/50), and `next build` (27/27 static + dynamic routes)
+
+### Premium SaaS Redesign (Superseded)
 - [x] Implemented global Slate/Blue SaaS design tokens, typography scale, and CSS layout utilities in `globals.css`
 - [x] Developed page transition layout provider (`page-transition-provider.tsx`) with Framer Motion
 - [x] Redesigned layout shell structure and topbar spacing in dashboard layout
@@ -183,10 +192,10 @@
 - [x] Seeded standard PNG icons (`icon-192.png`, `icon-512.png`) inside the public directory
 
 ## Current Phase
-- **Anti-Slop UI & Functional State-Sync Overhaul (Complete)**
+- **High-Contrast Ink & Signal Emerald Total Redesign (Complete — Committed Locally)**
 
 ## In Progress Tasks
-- None (Phases 1-4 completed and verified locally)
+- None (Phases 1-5 completed and verified locally on `main`)
 
 ## Next Tasks
 - **Phase 19: Testing**
@@ -194,4 +203,4 @@
   - [ ] Set up Playwright E2E tests (optional / awaiting production DB env)
 
 ## Known Issues
-- None (`npx tsc --noEmit`, `npm run lint` [0 errors, 1 pre-existing `form.watch` warning in `project-builder.tsx`], `npm test` [50/50], and `npm run build` [27/27 static pages + dynamic routes] all pass cleanly)
+- None (`npx tsc --noEmit`, `npm run lint` [0 errors, 0 warnings], `npm test` [4 suites, 50/50], and `npm run build` [27/27 static pages + dynamic routes] all pass cleanly)
