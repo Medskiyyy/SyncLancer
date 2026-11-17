@@ -117,86 +117,81 @@ export function NotificationCenter() {
 
   return (
     <div className="relative" ref={dropdownRef}>
-      {/* Bell Trigger */}
-      <Button 
-        variant="ghost" 
-        size="icon" 
-        className="relative hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+      <Button
+        variant="ghost"
+        size="icon"
+        className="relative h-8 w-8 text-muted-foreground hover:bg-secondary hover:text-foreground"
         onClick={handleToggle}
       >
-        <Bell className="h-4 w-4 text-slate-600 dark:text-zinc-400" />
+        <Bell className="h-4 w-4" strokeWidth={1.75} />
         {unreadCount > 0 && (
-          <span className="absolute top-1.5 right-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground shadow-sm ring-2 ring-background">
+          <span className="absolute top-1 right-1 flex h-4 w-4 items-center justify-center rounded-full bg-brand text-[10px] font-bold text-brand-foreground ring-2 ring-background">
             {unreadCount > 9 ? '9+' : unreadCount}
           </span>
         )}
       </Button>
 
-      {/* Dropdown Panel */}
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-80 sm:w-96 border border-border bg-popover text-popover-foreground rounded-xl shadow-xl z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
-          {/* Header */}
-          <div className="flex items-center justify-between px-4 py-3 border-b border-border bg-muted/40">
-            <span className="text-sm font-bold text-foreground">Notifications</span>
+        <div className="absolute right-0 z-50 mt-2 w-80 overflow-hidden rounded-lg border border-border bg-popover text-popover-foreground shadow-xl animate-in fade-in slide-in-from-top-2 duration-200 sm:w-96">
+          <div className="flex items-center justify-between border-b border-border bg-secondary/50 px-4 py-3">
+            <span className="font-heading text-sm font-bold text-foreground">Notifications</span>
             {unreadCount > 0 && (
-              <button 
+              <button
                 onClick={handleMarkAllAsRead}
-                className="text-xs font-semibold text-primary hover:underline cursor-pointer"
+                className="text-xs font-medium text-brand hover:underline cursor-pointer"
               >
                 Mark all as read
               </button>
             )}
           </div>
 
-          {/* List Area */}
-          <div className="max-h-80 overflow-y-auto divide-y divide-border">
+          <div className="max-h-80 divide-y divide-border overflow-y-auto">
             {loading ? (
               <div className="flex flex-col items-center justify-center py-10 text-muted-foreground">
-                <Loader2 className="h-6 w-6 animate-spin text-primary" />
-                <span className="text-xs mt-2">Loading notifications...</span>
+                <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+                <span className="mt-2 text-xs">Loading notifications...</span>
               </div>
             ) : notifications.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-12 text-muted-foreground px-4 text-center space-y-2">
-                <BellOff className="h-8 w-8 text-muted-foreground/50" />
-                <p className="text-sm font-semibold text-foreground">All caught up!</p>
-                <p className="text-xs text-muted-foreground max-w-xs">No notifications yet. We&rsquo;ll alert you when something happens.</p>
+              <div className="flex flex-col items-center justify-center space-y-2 px-4 py-12 text-center text-muted-foreground">
+                <BellOff className="h-7 w-7 text-muted-foreground/50" />
+                <p className="text-sm font-semibold text-foreground">All caught up</p>
+                <p className="max-w-xs text-xs text-muted-foreground">
+                  No notifications yet. Activity updates will appear here.
+                </p>
               </div>
             ) : (
               notifications.map((notif) => (
-                <div 
-                  key={notif.id} 
+                <div
+                  key={notif.id}
                   className={`flex items-start gap-3 p-4 transition-colors ${
-                    notif.isRead 
-                      ? 'bg-card hover:bg-muted/40' 
-                      : 'bg-primary/5 hover:bg-primary/10'
+                    notif.isRead
+                      ? 'bg-card hover:bg-secondary/40'
+                      : 'bg-secondary/60 hover:bg-secondary'
                   }`}
                 >
-                  {/* Status Indicator Dot */}
                   <div className="mt-1.5 flex h-2 w-2 shrink-0 rounded-full">
                     {!notif.isRead && (
-                      <span className="h-2 w-2 rounded-full bg-primary" />
+                      <span className="h-2 w-2 rounded-full bg-brand" />
                     )}
                   </div>
 
-                  {/* Body Content */}
-                  <div className="flex-1 min-w-0">
-                    <p className={`text-sm ${notif.isRead ? 'text-muted-foreground' : 'font-bold text-foreground'}`}>
+                  <div className="min-w-0 flex-1">
+                    <p className={`text-sm ${notif.isRead ? 'text-muted-foreground' : 'font-semibold text-foreground'}`}>
                       {notif.title}
                     </p>
-                    <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed break-words">
+                    <p className="mt-0.5 break-words text-xs leading-relaxed text-muted-foreground">
                       {notif.message}
                     </p>
-                    <span className="text-[11px] text-muted-foreground mt-1 block">
+                    <span className="mt-1 block text-[11px] text-muted-foreground">
                       {formatRelativeTime(notif.createdAt)}
                     </span>
                   </div>
 
-                  {/* Individual Actions */}
                   {!notif.isRead && (
-                    <button 
+                    <button
                       onClick={(e) => handleMarkAsRead(notif.id, e)}
                       title="Mark as read"
-                      className="mt-0.5 p-1 rounded-full text-muted-foreground hover:text-primary hover:bg-muted transition-all shrink-0 cursor-pointer"
+                      className="mt-0.5 shrink-0 rounded-md p-1 text-muted-foreground transition-colors hover:bg-background hover:text-brand cursor-pointer"
                     >
                       <Check className="h-3.5 w-3.5" />
                     </button>

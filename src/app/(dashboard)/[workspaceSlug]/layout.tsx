@@ -58,7 +58,7 @@ export default async function DashboardLayout({
   );
 
   return (
-    <div className="flex min-h-screen bg-background font-sans">
+    <div className="flex min-h-[100dvh] bg-background font-sans text-foreground">
       {isClient && (
         <ClientPortalRedirect
           workspaceSlug={workspaceSlug}

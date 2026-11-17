@@ -22,6 +22,8 @@ import {
 } from 'lucide-react';
 import { WorkspaceSwitcher } from './workspace-switcher';
 import { CommandPalette } from './command-palette';
+import { BrandLogo } from '@/components/brand-logo';
+import { ThemeToggle } from '@/components/theme-toggle';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import { createTimeEntryAction } from '@/features/time-tracking/actions/time-entry-actions';
@@ -66,7 +68,7 @@ export function SidebarNav({
 
   React.useEffect(() => {
     const timerStorageKey = `@synclancer/active-timer-${currentWorkspace.id}`;
-    
+
     const checkTimer = () => {
       const stored = localStorage.getItem(timerStorageKey);
       if (stored) {
@@ -85,7 +87,6 @@ export function SidebarNav({
 
     checkTimer();
 
-    // Sync from local storage change events or regular 1s interval
     const interval = setInterval(checkTimer, 1000);
     window.addEventListener('storage', checkTimer);
 
@@ -140,7 +141,6 @@ export function SidebarNav({
       .join(':');
   };
 
-  // Close mobile menu on route change
   React.useEffect(() => {
     const timer = setTimeout(() => {
       setIsMobileMenuOpen(false);
@@ -148,7 +148,6 @@ export function SidebarNav({
     return () => clearTimeout(timer);
   }, [pathname]);
 
-  // Listen for Ctrl+K globally
   React.useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'k' && (e.metaKey || e.ctrlKey)) {
@@ -203,8 +202,8 @@ export function SidebarNav({
   const renderNavLinks = () => {
     if (isClient) {
       return (
-        <div className="space-y-1.5 px-3 py-4">
-          <div className="px-3 mb-2 text-[10px] font-semibold tracking-wider text-zinc-400 dark:text-gray-500 uppercase">
+        <div className="space-y-1 px-3 py-4">
+          <div className="px-3 mb-1.5 text-[11px] font-medium text-muted-foreground">
             Client Portal
           </div>
           {clientNavItems.map((item) => {
@@ -215,20 +214,28 @@ export function SidebarNav({
                 key={item.name}
                 href={item.href}
                 className={cn(
-                  "relative flex h-10 items-center gap-3 rounded-md px-3 text-sm font-medium transition-colors duration-150 cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                  'relative flex h-9 items-center gap-2.5 rounded-md px-3 text-sm font-medium transition-colors duration-150 cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-ring',
                   active
-                    ? "text-primary font-semibold"
-                    : "text-zinc-600 hover:bg-zinc-100/70 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-900/50 dark:hover:text-zinc-100"
+                    ? 'text-foreground font-semibold'
+                    : 'text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground'
                 )}
               >
                 {active && (
                   <motion.div
                     layoutId="sidebar-indicator"
-                    className="absolute inset-0 rounded-md bg-sidebar-accent border-l-[3px] border-sidebar-primary"
-                    transition={{ type: "spring", stiffness: 380, damping: 30 }}
-                  />
+                    className="absolute inset-0 rounded-md bg-sidebar-accent"
+                    transition={{ type: 'spring', stiffness: 380, damping: 30 }}
+                  >
+                    <span className="absolute left-0 top-1.5 bottom-1.5 w-0.5 rounded-full bg-brand" />
+                  </motion.div>
                 )}
-                <Icon className={cn("h-5 w-5 shrink-0 transition-transform duration-200 relative z-10", active ? "text-primary" : "text-zinc-400 dark:text-zinc-500")} />
+                <Icon
+                  className={cn(
+                    'relative z-10 h-4 w-4 shrink-0',
+                    active ? 'text-brand' : 'text-muted-foreground'
+                  )}
+                  strokeWidth={1.75}
+                />
                 <span className="relative z-10">{item.name}</span>
               </Link>
             );
@@ -241,10 +248,10 @@ export function SidebarNav({
       <div className="space-y-5 px-3 py-4">
         {adminGroups.map((group) => (
           <div key={group.title} className="space-y-1">
-            <div className="px-3 mb-2 text-[10px] font-semibold tracking-wider text-zinc-400 dark:text-gray-500 uppercase">
+            <div className="px-3 mb-1.5 text-[11px] font-medium text-muted-foreground">
               {group.title}
             </div>
-            <div className="space-y-1">
+            <div className="space-y-0.5">
               {group.items.map((item) => {
                 const Icon = item.icon;
                 const active = isLinkActive(item.href);
@@ -253,20 +260,28 @@ export function SidebarNav({
                     key={item.name}
                     href={item.href}
                     className={cn(
-                      "relative flex h-10 items-center gap-3 rounded-md px-3 text-sm font-medium transition-colors duration-150 cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                      'relative flex h-9 items-center gap-2.5 rounded-md px-3 text-sm font-medium transition-colors duration-150 cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-ring',
                       active
-                        ? "text-primary font-semibold"
-                        : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+                        ? 'text-foreground font-semibold'
+                        : 'text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground'
                     )}
                   >
                     {active && (
                       <motion.div
                         layoutId="sidebar-indicator"
-                        className="absolute inset-0 rounded-md bg-sidebar-accent border-l-[3px] border-sidebar-primary"
-                        transition={{ type: "spring", stiffness: 380, damping: 30 }}
-                      />
+                        className="absolute inset-0 rounded-md bg-sidebar-accent"
+                        transition={{ type: 'spring', stiffness: 380, damping: 30 }}
+                      >
+                        <span className="absolute left-0 top-1.5 bottom-1.5 w-0.5 rounded-full bg-brand" />
+                      </motion.div>
                     )}
-                    <Icon className={cn("h-5 w-5 shrink-0 relative z-10", active ? "text-primary" : "text-muted-foreground")} />
+                    <Icon
+                      className={cn(
+                        'relative z-10 h-4 w-4 shrink-0',
+                        active ? 'text-brand' : 'text-muted-foreground'
+                      )}
+                      strokeWidth={1.75}
+                    />
                     <span className="relative z-10">{item.name}</span>
                   </Link>
                 );
@@ -280,11 +295,11 @@ export function SidebarNav({
 
   const renderSidebarContent = () => (
     <div className="flex h-full flex-col bg-transparent">
-      {/* Switcher Section - Workspace Card height exactly 72px */}
-      <div className="border-b border-zinc-200/60 dark:border-zinc-800/60 h-[72px] flex items-center px-4">
+      <div className="flex h-[72px] items-center border-b border-sidebar-border px-4">
         {isClient ? (
-          <div className="flex h-11 items-center px-2">
-            <span className="text-xs font-black tracking-wider uppercase text-primary">
+          <div className="flex items-center gap-2.5 px-1">
+            <BrandLogo showWordmark={false} />
+            <span className="font-heading text-sm font-bold text-foreground">
               Client Portal
             </span>
           </div>
@@ -293,20 +308,18 @@ export function SidebarNav({
         )}
       </div>
 
-      {/* Nav items */}
-      <nav className="flex-1 overflow-y-auto pt-2">{renderNavLinks()}</nav>
+      <nav className="flex-1 overflow-y-auto pt-1">{renderNavLinks()}</nav>
 
-      {/* User profile & Logout */}
-      <div className="border-t border-zinc-200/60 dark:border-zinc-800/60 p-4">
-        <div className="flex items-center gap-3 px-2 py-2 mb-3">
-          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary border border-primary/20 text-xs font-bold font-heading">
-            {userName ? userName.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase() : 'U'}
+      <div className="border-t border-sidebar-border p-4">
+        <div className="mb-3 flex items-center gap-3 px-2 py-1.5">
+          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[6px] bg-foreground text-xs font-bold font-heading text-background">
+            {userName ? userName.split(' ').map((n) => n[0]).join('').slice(0, 2).toUpperCase() : 'U'}
           </div>
           <div className="flex flex-col overflow-hidden text-xs">
-            <span className="font-semibold truncate text-zinc-900 dark:text-zinc-50">
+            <span className="truncate font-semibold text-foreground">
               {userName || 'User'}
             </span>
-            <span className="text-[10px] text-zinc-400 truncate dark:text-zinc-500">
+            <span className="truncate text-[11px] text-muted-foreground">
               {userEmail}
             </span>
           </div>
@@ -318,25 +331,21 @@ export function SidebarNav({
 
   return (
     <>
-      {/* Desktop Sidebar (Permanent) - Floating Glass panel */}
-      <aside className="fixed left-0 top-0 bottom-0 z-20 hidden w-60 border-r border-sidebar-border bg-sidebar shadow-sm md:flex md:flex-col">
+      <aside className="fixed left-0 top-0 bottom-0 z-20 hidden w-60 border-r border-sidebar-border bg-sidebar shadow-none md:flex md:flex-col">
         {renderSidebarContent()}
       </aside>
 
-      {/* Mobile Drawer (Collapsible/Drawer Overlay) */}
       {isMobileMenuOpen && (
-        <div className="fixed inset-0 z-40 md:hidden flex">
-          {/* Backdrop */}
+        <div className="fixed inset-0 z-40 flex md:hidden">
           <div
-            className="fixed inset-0 bg-black/30 transition-opacity"
+            className="fixed inset-0 bg-black/40 transition-opacity"
             onClick={() => setIsMobileMenuOpen(false)}
           />
 
-          {/* Drawer panel */}
           <div className="relative flex w-[260px] max-w-xs flex-col border-r border-sidebar-border bg-sidebar animate-in slide-in-from-left duration-200">
             <button
               onClick={() => setIsMobileMenuOpen(false)}
-              className="absolute top-4 right-4 z-50 rounded-lg p-1.5 text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-900 cursor-pointer outline-none"
+              className="absolute top-4 right-4 z-50 rounded-md p-1.5 text-muted-foreground hover:bg-secondary hover:text-foreground cursor-pointer outline-none"
             >
               <X className="h-5 w-5" />
             </button>
@@ -345,80 +354,67 @@ export function SidebarNav({
         </div>
       )}
 
-      {/* Main Content Area Wrapper.
-          min-w-0 is required: as a flex child its default min-width:auto lets it
-          grow past the viewport whenever a page holds wide content (kanban board,
-          data tables), which also stops inner overflow-x-auto scrollers from ever
-          engaging. */}
-      <div className="flex min-w-0 flex-1 flex-col md:pl-60 min-h-screen">
-        {/* Top Header - exactly 64px height (h-16) */}
-        <header className="sticky top-0 z-10 flex h-16 border-b border-border bg-card px-4 md:px-6 items-center justify-between w-full">
+      <div className="flex min-w-0 flex-1 flex-col md:pl-60 min-h-[100dvh]">
+        <header className="sticky top-0 z-10 flex h-14 w-full items-center justify-between border-b border-border bg-background/95 px-4 backdrop-blur-sm md:px-6">
           <div className="flex min-w-0 flex-1 items-center justify-between gap-2">
-            {/* Left section: Hamburger (mobile) + Page Title */}
             <div className="flex min-w-0 items-center gap-2 sm:gap-3">
               <button
                 onClick={() => setIsMobileMenuOpen(true)}
-                className="shrink-0 rounded-md p-1.5 text-muted-foreground hover:bg-muted md:hidden cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                className="shrink-0 rounded-md p-1.5 text-muted-foreground hover:bg-secondary hover:text-foreground md:hidden cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-ring"
               >
                 <Menu className="h-5 w-5" />
               </button>
 
-              <div className="flex min-w-0 items-center gap-1.5 text-sm font-semibold">
-                {/* The "SyncLancer /" prefix is dropped on narrow screens so the
-                    workspace name keeps room instead of pushing the header wide. */}
-                <span className="hidden text-muted-foreground font-normal sm:inline">SyncLancer</span>
-                <span className="hidden text-zinc-300 dark:text-zinc-700 sm:inline">/</span>
-                <span className="truncate font-bold text-zinc-900 dark:text-zinc-50 md:max-w-none">
+              <div className="flex min-w-0 items-center gap-1.5 text-sm">
+                <span className="hidden text-muted-foreground sm:inline">SyncLancer</span>
+                <span className="hidden text-border sm:inline">/</span>
+                <span className="truncate font-heading font-semibold text-foreground md:max-w-none">
                   {isClient ? 'Client Portal' : currentWorkspace.name}
                 </span>
               </div>
             </div>
 
-            {/* Right section: Global search (320px), Notification Center, User Avatar */}
-            <div className="flex shrink-0 items-center gap-2 sm:gap-4">
-              {/* Desktop header search bar trigger - exactly 320px width */}
-              <div className="relative hidden md:block w-[320px]">
-                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+            <div className="flex shrink-0 items-center gap-2 sm:gap-3">
+              <div className="relative hidden md:block w-[240px] lg:w-[280px]">
+                <Search className="absolute left-2.5 top-2 h-4 w-4 text-muted-foreground" />
                 <button
                   onClick={() => setIsSearchOpen(true)}
-                  className="flex h-9 w-full items-center justify-between rounded-md border border-border bg-muted/50 pl-8 pr-3 text-left text-xs text-muted-foreground transition-colors hover:bg-muted cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-ring font-medium"
+                  className="flex h-8 w-full items-center justify-between rounded-md border border-border bg-secondary/60 pl-8 pr-2.5 text-left text-xs font-medium text-muted-foreground transition-colors hover:bg-secondary cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 >
                   <span>Search workspace...</span>
-                  <kbd className="pointer-events-none font-mono text-[9px] text-zinc-400">Ctrl K</kbd>
+                  <kbd className="pointer-events-none font-mono text-[11px] text-muted-foreground">Ctrl K</kbd>
                 </button>
               </div>
 
-              {/* Quick Actions Search button for mobile */}
               <button
                 onClick={() => setIsSearchOpen(true)}
-                className="rounded-lg p-1.5 text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-800 cursor-pointer outline-none md:hidden"
+                className="rounded-md p-1.5 text-muted-foreground hover:bg-secondary hover:text-foreground cursor-pointer outline-none md:hidden"
               >
                 <Search className="h-4 w-4" />
               </button>
 
-              {/* Notification Center */}
+              <ThemeToggle />
+
               {notificationCenter}
 
               {!isClient && (
                 <Link
                   href={`/${workspaceSlug}/settings`}
                   title="Workspace settings"
-                  className="flex h-8 w-8 items-center justify-center rounded-md border border-border bg-muted/50 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                  className="flex h-8 w-8 items-center justify-center rounded-md border border-border bg-background text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
                 >
-                  <Settings className="h-4 w-4" />
+                  <Settings className="h-4 w-4" strokeWidth={1.75} />
                 </Link>
               )}
             </div>
           </div>
         </header>
 
-        {/* Page Content - 16px padding on mobile, 24px from md up, max 1440px width */}
-        <main className="flex-1 p-4 md:p-6 max-w-[1440px] w-full mx-auto min-w-0">
+        <main className="mx-auto w-full max-w-[1440px] min-w-0 flex-1 p-4 md:p-6">
           {children}
         </main>
       </div>
 
-      {/* Command Palette search dialog */}
       <CommandPalette
         isOpen={isSearchOpen}
         onClose={() => setIsSearchOpen(false)}
@@ -426,22 +422,21 @@ export function SidebarNav({
         isClient={isClient}
       />
 
-      {/* Floating Active Timer Panel */}
       {activeTimer && (
-        <div className="fixed bottom-4 right-4 left-4 z-50 flex items-center gap-4 rounded-lg border border-primary/30 bg-slate-950 text-white p-4 shadow-lg animate-in slide-in-from-bottom duration-200 sm:left-auto sm:bottom-6 sm:right-6 sm:max-w-sm">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary/10 border border-primary/20 shrink-0">
-            <span className="h-3.5 w-3.5 rounded-full bg-primary" />
+        <div className="fixed bottom-4 right-4 left-4 z-50 flex items-center gap-3.5 rounded-lg border border-border bg-card p-3.5 text-foreground shadow-lg animate-in slide-in-from-bottom duration-200 sm:left-auto sm:bottom-6 sm:right-6 sm:max-w-sm">
+          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-secondary border border-border">
+            <span className="h-2.5 w-2.5 rounded-full bg-brand" />
           </div>
-          <div className="flex flex-col min-w-0">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-primary">Active Timer</span>
-            <span className="text-xs font-semibold truncate text-zinc-100">{activeTimer.projectName}</span>
-            <span className="text-[10px] text-slate-400 truncate mt-0.5">{activeTimer.notes || 'No description'}</span>
+          <div className="flex min-w-0 flex-1 flex-col">
+            <span className="text-[11px] font-medium text-brand">Active timer</span>
+            <span className="truncate text-xs font-semibold text-foreground">{activeTimer.projectName}</span>
+            <span className="mt-0.5 truncate text-[11px] text-muted-foreground">{activeTimer.notes || 'No description'}</span>
           </div>
-          <div className="flex items-center gap-3 pl-2 border-l border-zinc-800">
-            <span className="text-sm font-mono font-bold tracking-tight text-white">{formatTime(elapsed)}</span>
+          <div className="flex items-center gap-3 border-l border-border pl-3">
+            <span className="font-mono text-sm font-bold tabular-nums tracking-tight text-foreground">{formatTime(elapsed)}</span>
             <button
               onClick={handleStopFloatingTimer}
-              className="flex h-8 w-8 items-center justify-center rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 cursor-pointer transition-colors"
+              className="flex h-8 w-8 items-center justify-center rounded-md border border-destructive/20 bg-destructive/10 text-destructive transition-colors hover:bg-destructive/20 cursor-pointer"
               title="Stop Timer"
             >
               <Square className="h-3.5 w-3.5 fill-current" />

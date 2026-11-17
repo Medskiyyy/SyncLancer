@@ -9,7 +9,6 @@ import { createWorkspaceSchema, CreateWorkspaceInput } from '@/features/workspac
 import { createWorkspaceAction } from '@/features/workspace/actions/workspace-actions';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { AuthShell } from '@/components/auth/auth-shell';
 
@@ -36,7 +35,6 @@ export default function OnboardingPage() {
         return;
       }
 
-      // Redirect to the newly created workspace dashboard
       router.push(`/${result.data.slug}`);
     } catch (err: unknown) {
       setError(getErrorMessage(err, 'An unexpected error occurred'));
@@ -47,60 +45,61 @@ export default function OnboardingPage() {
 
   return (
     <AuthShell>
-      <Card className="w-full max-w-md border-border bg-card shadow-sm">
-        <CardHeader className="space-y-1 text-center">
-          <CardTitle className="text-2xl font-bold tracking-tight font-heading">Create your workspace</CardTitle>
-          <CardDescription>
-            Let&apos;s set up a workspace for your freelancing business to track projects, clients, and invoices
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-              {error && (
-                <div className="rounded-md bg-destructive/15 p-3 text-sm text-destructive">
-                  {error}
-                </div>
+      <div className="space-y-6">
+        <div>
+          <h1 className="font-heading text-2xl font-bold tracking-tight text-foreground">
+            Create your workspace
+          </h1>
+          <p className="mt-1.5 text-sm text-muted-foreground">
+            Set up an isolated workspace to manage your clients, projects, and invoices.
+          </p>
+        </div>
+
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            {error && (
+              <div className="rounded-md border border-destructive/20 bg-destructive/10 p-3 text-sm text-destructive">
+                {error}
+              </div>
+            )}
+
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Workspace name</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Aksara Studio" disabled={isLoading} className="h-10" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
               )}
+            />
 
-              <FormField
-                control={form.control}
-                name="name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Workspace Name</FormLabel>
-                    <FormControl>
-                      <Input placeholder="My Freelance Business" disabled={isLoading} {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+            <FormField
+              control={form.control}
+              name="slug"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Workspace URL slug (optional)</FormLabel>
+                  <FormControl>
+                    <div className="flex items-center gap-2">
+                      <span className="font-mono text-xs text-muted-foreground">synclancer.com/</span>
+                      <Input placeholder="aksara-studio" disabled={isLoading} className="h-10" {...field} />
+                    </div>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-              <FormField
-                control={form.control}
-                name="slug"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Workspace URL Slug (Optional)</FormLabel>
-                    <FormControl>
-                      <div className="flex items-center">
-                        <span className="mr-2 text-sm text-muted-foreground">synclancer.com/</span>
-                        <Input placeholder="my-business" disabled={isLoading} {...field} />
-                      </div>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? 'Creating workspace...' : 'Create Workspace'}
-              </Button>
-            </form>
-          </Form>
-        </CardContent>
-      </Card>
+            <Button type="submit" className="mt-2 h-10 w-full" disabled={isLoading}>
+              {isLoading ? 'Creating workspace...' : 'Create Workspace'}
+            </Button>
+          </form>
+        </Form>
+      </div>
     </AuthShell>
   );
 }
