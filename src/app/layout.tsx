@@ -1,19 +1,20 @@
 import type { Metadata } from "next";
-import { Plus_Jakarta_Sans, Onest, JetBrains_Mono } from "next/font/google";
+import { Archivo, Plus_Jakarta_Sans, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "sonner";
 import { PwaRegister } from "@/components/pwa-register";
 import { MotionProvider } from "@/app/providers/motion-provider";
+import { ThemeProvider } from "@/app/providers/theme-provider";
+
+const archivo = Archivo({
+  subsets: ["latin"],
+  variable: "--font-archivo",
+  display: "swap",
+});
 
 const plusJakartaSans = Plus_Jakarta_Sans({
   subsets: ["latin"],
   variable: "--font-jakarta",
-  display: "swap",
-});
-
-const onest = Onest({
-  subsets: ["latin"],
-  variable: "--font-onest",
   display: "swap",
 });
 
@@ -36,12 +37,15 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`h-full antialiased ${plusJakartaSans.variable} ${onest.variable} ${jetbrainsMono.variable}`}
+      suppressHydrationWarning
+      className={`h-full antialiased ${archivo.variable} ${plusJakartaSans.variable} ${jetbrainsMono.variable}`}
     >
       <body className="min-h-full flex flex-col">
-        <PwaRegister />
-        <MotionProvider>{children}</MotionProvider>
-        <Toaster position="top-right" richColors />
+        <ThemeProvider>
+          <PwaRegister />
+          <MotionProvider>{children}</MotionProvider>
+          <Toaster position="top-right" richColors />
+        </ThemeProvider>
       </body>
     </html>
   );
