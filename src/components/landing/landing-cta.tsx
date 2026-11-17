@@ -2,10 +2,8 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { motion, useInView } from 'framer-motion';
-import { ArrowRight, LogIn } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { Language, translations } from './translations';
-import { easeOutQuart } from '@/components/ui/motion';
 
 interface LandingCTAProps {
   lang: Language;
@@ -13,48 +11,37 @@ interface LandingCTAProps {
 
 export const LandingCTA: React.FC<LandingCTAProps> = ({ lang }) => {
   const t = translations[lang].cta;
-  const ref = React.useRef<HTMLDivElement>(null);
-  const isInView = useInView(ref, { once: true, margin: '-100px' });
 
   return (
-    <section className="py-24 md:py-32 bg-slate-50 overflow-hidden text-slate-900">
+    <section className="bg-white py-20 md:py-24">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <motion.div
-          ref={ref}
-          initial={{ opacity: 0 }}
-          animate={isInView ? { opacity: 1 } : { opacity: 0 }}
-          transition={{ duration: 0.6, ease: easeOutQuart }}
-          className="relative rounded-2xl bg-blue-600 p-8 sm:p-12 md:p-16 overflow-hidden"
-        >
-          {/* Background accent */}
-          <div className="absolute top-0 right-0 w-96 h-96 bg-blue-500 rounded-full blur-3xl opacity-50 pointer-events-none -translate-y-1/2 translate-x-1/3" />
-
-          <div className="relative z-10 max-w-3xl mx-auto text-center">
-            <h2 className="text-3xl font-semibold sm:text-4xl md:text-5xl font-heading leading-snug text-white">
+        <div className="flex flex-col justify-between gap-8 rounded-xl border border-slate-800 bg-slate-950 px-6 py-12 text-white sm:px-10 md:flex-row md:items-center md:py-14">
+          <div className="max-w-xl">
+            <h2 className="font-heading text-2xl font-semibold tracking-tight text-white sm:text-3xl">
               {t.title}
             </h2>
-
-            <p className="mt-5 text-lg text-blue-100 leading-relaxed max-w-2xl mx-auto">
+            <p className="mt-3 text-sm leading-relaxed text-slate-300 sm:text-base">
               {t.subtitle}
             </p>
-
-            <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-3">
-              <Link href="/register" className="w-full sm:w-auto">
-                <div className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 text-base font-medium text-blue-600 hover:bg-blue-50 transition-colors cursor-pointer">
-                  <span>{t.buttonRegister}</span>
-                  <ArrowRight className="h-4 w-4" />
-                </div>
-              </Link>
-
-              <Link href="/login" className="w-full sm:w-auto">
-                <div className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-lg border border-white/30 bg-white/10 backdrop-blur-sm px-6 py-3 text-base font-medium text-white hover:bg-white/20 transition-colors cursor-pointer">
-                  <LogIn className="h-4 w-4" />
-                  <span>{t.buttonLogin}</span>
-                </div>
-              </Link>
-            </div>
           </div>
-        </motion.div>
+
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center shrink-0">
+            <Link
+              href="/register"
+              className="inline-flex h-11 items-center justify-center gap-2 rounded-md bg-blue-600 px-5 text-sm font-medium text-white transition-colors hover:bg-blue-700 whitespace-nowrap"
+            >
+              <span>{t.buttonRegister}</span>
+              <ArrowRight className="h-4 w-4" strokeWidth={1.75} />
+            </Link>
+
+            <Link
+              href="/login"
+              className="inline-flex h-11 items-center justify-center rounded-md border border-slate-700 bg-slate-900 px-5 text-sm font-medium text-slate-100 transition-colors hover:bg-slate-800 whitespace-nowrap"
+            >
+              {t.buttonLogin}
+            </Link>
+          </div>
+        </div>
       </div>
     </section>
   );

@@ -1,181 +1,72 @@
 'use client';
 
 import React from 'react';
-import { motion, useInView } from 'framer-motion';
-import {
-  Users,
-  FileText,
-  LayoutGrid,
-  Clock,
-  Receipt,
-  ShieldCheck,
-  HardDrive,
-} from 'lucide-react';
+import { BarChart3, Building2, FolderOpen, Receipt } from 'lucide-react';
+import { FadeIn } from '@/components/ui/motion';
 import { Language, translations } from './translations';
-import { easeOutQuart } from '@/components/ui/motion';
 
 interface LandingFeaturesProps {
   lang: Language;
 }
 
-interface FeatureCardProps {
-  icon: React.ReactNode;
-  tag: string;
-  title: string;
-  desc: string;
-  className?: string;
-  index: number;
-}
-
-const FeatureCard = ({ icon, tag, title, desc, className = '', index }: FeatureCardProps) => {
-  const ref = React.useRef<HTMLDivElement>(null);
-  const isInView = useInView(ref, { once: true, margin: '-80px' });
-
-  return (
-    <motion.div
-      ref={ref}
-      initial={{ opacity: 0, y: 20, scale: 0.98 }}
-      animate={isInView ? { opacity: 1, y: 0, scale: 1 } : { opacity: 0, y: 20, scale: 0.98 }}
-      transition={{
-        duration: 0.5,
-        delay: index * 0.1,
-        ease: easeOutQuart,
-      }}
-      className={`group rounded-xl border border-slate-200 bg-white p-6 hover:border-slate-300 hover:shadow-lg hover:shadow-slate-200/50 transition-all ${className}`}
-    >
-      <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-50 border border-blue-100 text-blue-600">
-        {icon}
-      </div>
-
-      <span className="mt-5 inline-block text-[11px] font-semibold tracking-wider text-blue-600 uppercase">
-        {tag}
-      </span>
-
-      <h3 className="mt-2 text-lg font-semibold text-slate-900">
-        {title}
-      </h3>
-
-      <p className="mt-3 text-base leading-relaxed text-slate-500">
-        {desc}
-      </p>
-    </motion.div>
-  );
-};
+const SECONDARY_ICONS = [Receipt, FolderOpen, Building2, BarChart3];
 
 export const LandingFeatures: React.FC<LandingFeaturesProps> = ({ lang }) => {
   const t = translations[lang].features;
 
-  const features = [
-    {
-      icon: <Users className="h-5 w-5" />,
-      tag: t.crm.tag,
-      title: t.crm.title,
-      desc: t.crm.desc,
-    },
-    {
-      icon: <FileText className="h-5 w-5" />,
-      tag: t.proposals.tag,
-      title: t.proposals.title,
-      desc: t.proposals.desc,
-    },
-    {
-      icon: <LayoutGrid className="h-5 w-5" />,
-      tag: t.kanban.tag,
-      title: t.kanban.title,
-      desc: t.kanban.desc,
-    },
-    {
-      icon: <Clock className="h-5 w-5" />,
-      tag: t.timeTracking.tag,
-      title: t.timeTracking.title,
-      desc: t.timeTracking.desc,
-    },
-    {
-      icon: <Receipt className="h-5 w-5" />,
-      tag: t.invoicing.tag,
-      title: t.invoicing.title,
-      desc: t.invoicing.desc,
-    },
-    {
-      icon: <ShieldCheck className="h-5 w-5" />,
-      tag: t.clientPortal.tag,
-      title: t.clientPortal.title,
-      desc: t.clientPortal.desc,
-    },
-    {
-      icon: <HardDrive className="h-5 w-5" />,
-      tag: t.storage.tag,
-      title: t.storage.title,
-      desc: t.storage.desc,
-    },
-  ];
-
   return (
-    <section id="features" className="py-24 md:py-32 bg-slate-50 text-slate-900">
+    <section id="features" className="bg-slate-50 py-20 md:py-24 text-slate-900">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        {/* Section Header */}
-        <div className="text-center max-w-3xl mx-auto">
-          <h2 className="text-3xl font-semibold tracking-tight text-slate-900 sm:text-4xl font-heading leading-snug">
+        <FadeIn direction="up" duration={0.4} className="max-w-2xl">
+          <h2 className="font-heading text-2xl font-semibold tracking-tight text-slate-950 sm:text-3xl">
             {t.title}
           </h2>
-          <p className="mt-5 text-lg text-slate-500 leading-relaxed">
+          <p className="mt-3 text-base leading-relaxed text-slate-600">
             {t.subtitle}
           </p>
-        </div>
+        </FadeIn>
 
-        {/* Asymmetric Bento Grid */}
-        <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-5">
-          <FeatureCard
-            icon={features[0].icon}
-            tag={features[0].tag}
-            title={features[0].title}
-            desc={features[0].desc}
-            className="md:col-span-2"
-            index={0}
-          />
-          <FeatureCard
-            icon={features[1].icon}
-            tag={features[1].tag}
-            title={features[1].title}
-            desc={features[1].desc}
-            index={1}
-          />
-          <FeatureCard
-            icon={features[2].icon}
-            tag={features[2].tag}
-            title={features[2].title}
-            desc={features[2].desc}
-            index={2}
-          />
-          <FeatureCard
-            icon={features[3].icon}
-            tag={features[3].tag}
-            title={features[3].title}
-            desc={features[3].desc}
-            index={3}
-          />
-          <FeatureCard
-            icon={features[4].icon}
-            tag={features[4].tag}
-            title={features[4].title}
-            desc={features[4].desc}
-            index={4}
-          />
-          <FeatureCard
-            icon={features[5].icon}
-            tag={features[5].tag}
-            title={features[5].title}
-            desc={features[5].desc}
-            index={5}
-          />
-          <FeatureCard
-            icon={features[6].icon}
-            tag={features[6].tag}
-            title={features[6].title}
-            desc={features[6].desc}
-            className="md:col-span-2"
-            index={6}
-          />
+        <div className="mt-12 overflow-hidden rounded-lg border border-slate-200 bg-white">
+          <div className="grid grid-cols-1 divide-y divide-slate-200 lg:grid-cols-2 lg:divide-x lg:divide-y-0">
+            {t.primary.map((item) => (
+              <div key={item.title} className="flex flex-col justify-between p-6 sm:p-8">
+                <div>
+                  <h3 className="font-heading text-lg font-semibold text-slate-950">
+                    {item.title}
+                  </h3>
+                  <p className="mt-2.5 text-sm leading-relaxed text-slate-600">
+                    {item.desc}
+                  </p>
+                </div>
+
+                <div className="mt-6 divide-y divide-slate-200 border-t border-slate-200">
+                  {item.metrics.map((m) => (
+                    <div key={m.label} className="flex flex-col gap-1 py-2.5 sm:flex-row sm:items-center sm:justify-between">
+                      <span className="text-xs font-medium text-slate-500">{m.label}</span>
+                      <span className="font-mono text-xs text-slate-900">{m.value}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="grid grid-cols-1 divide-y divide-slate-200 border-t border-slate-200 bg-slate-50/50 sm:grid-cols-2 sm:divide-x lg:grid-cols-4 lg:divide-y-0">
+            {t.secondary.map((item, idx) => {
+              const Icon = SECONDARY_ICONS[idx] || Receipt;
+              return (
+                <div key={item.title} className="p-6">
+                  <Icon className="h-4 w-4 text-blue-600" strokeWidth={1.75} />
+                  <h3 className="mt-4 font-heading text-base font-semibold text-slate-950">
+                    {item.title}
+                  </h3>
+                  <p className="mt-2 text-sm leading-relaxed text-slate-600">
+                    {item.desc}
+                  </p>
+                </div>
+              );
+            })}
+          </div>
         </div>
       </div>
     </section>
