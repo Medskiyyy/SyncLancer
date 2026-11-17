@@ -1,71 +1,155 @@
 'use client';
 
-import React from 'react';
-import { BarChart3, Building2, FolderOpen, Receipt } from 'lucide-react';
-import { FadeIn } from '@/components/ui/motion';
+import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { ArrowUpRight, Layers, ShieldCheck } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import { Language, translations } from './translations';
 
 interface LandingFeaturesProps {
   lang: Language;
 }
 
-const SECONDARY_ICONS = [Receipt, FolderOpen, Building2, BarChart3];
+type ModuleTab = 'crm' | 'proposals' | 'delivery' | 'billing';
 
 export const LandingFeatures: React.FC<LandingFeaturesProps> = ({ lang }) => {
   const t = translations[lang].features;
+  const [activeTab, setActiveTab] = useState<ModuleTab>('crm');
+  const activePanel = t.panels[activeTab];
 
   return (
-    <section id="features" className="bg-slate-50 py-20 md:py-24 text-slate-900">
+    <section id="features" className="bg-background py-20 md:py-24 text-foreground">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <FadeIn direction="up" duration={0.4} className="max-w-2xl">
-          <h2 className="font-heading text-2xl font-semibold tracking-tight text-slate-950 sm:text-3xl">
+        <div className="max-w-2xl">
+          <h2 className="font-heading text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
             {t.title}
           </h2>
-          <p className="mt-3 text-base leading-relaxed text-slate-600">
+          <p className="mt-3 text-base leading-relaxed text-muted-foreground">
             {t.subtitle}
           </p>
-        </FadeIn>
+        </div>
 
-        <div className="mt-12 overflow-hidden rounded-lg border border-slate-200 bg-white">
-          <div className="grid grid-cols-1 divide-y divide-slate-200 lg:grid-cols-2 lg:divide-x lg:divide-y-0">
-            {t.primary.map((item) => (
-              <div key={item.title} className="flex flex-col justify-between p-6 sm:p-8">
-                <div>
-                  <h3 className="font-heading text-lg font-semibold text-slate-950">
-                    {item.title}
-                  </h3>
-                  <p className="mt-2.5 text-sm leading-relaxed text-slate-600">
-                    {item.desc}
-                  </p>
-                </div>
+        <div className="mt-10 flex flex-wrap items-center gap-1 border-b border-border">
+          {t.tabs.map((tab) => {
+            const isActive = activeTab === tab.id;
+            return (
+              <button
+                key={tab.id}
+                type="button"
+                onClick={() => setActiveTab(tab.id as ModuleTab)}
+                className={cn(
+                  'relative px-4 py-3 text-sm font-medium transition-colors cursor-pointer whitespace-nowrap',
+                  isActive
+                    ? 'text-foreground'
+                    : 'text-muted-foreground hover:text-foreground'
+                )}
+              >
+                {tab.label}
+                {isActive && (
+                  <motion.div
+                    layoutId="landingFeatureTabUnderline"
+                    className="absolute right-0 bottom-0 left-0 h-0.5 bg-brand"
+                    transition={{ type: 'spring', stiffness: 360, damping: 32 }}
+                  />
+                )}
+              </button>
+            );
+          })}
+        </div>
 
-                <div className="mt-6 divide-y divide-slate-200 border-t border-slate-200">
-                  {item.metrics.map((m) => (
-                    <div key={m.label} className="flex flex-col gap-1 py-2.5 sm:flex-row sm:items-center sm:justify-between">
-                      <span className="text-xs font-medium text-slate-500">{m.label}</span>
-                      <span className="font-mono text-xs text-slate-900">{m.value}</span>
+        <div className="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-12">
+          <div className="lg:col-span-7">
+            <div className="flex h-full flex-col justify-between rounded-lg border border-border bg-card p-6 sm:p-8">
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={`${lang}-${activeTab}`}
+                  initial={{ opacity: 0, y: 6 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -6 }}
+                  transition={{ duration: 0.16 }}
+                  className="space-y-6"
+                >
+                  <div className="flex flex-wrap items-start justify-between gap-3">
+                    <div className="max-w-lg">
+                      <h3 className="font-heading text-xl font-bold text-foreground">
+                        {activePanel.heading}
+                      </h3>
+                      <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                        {activePanel.summary}
+                      </p>
                     </div>
-                  ))}
-                </div>
-              </div>
-            ))}
+                    <span className="rounded-[5px] border border-border bg-secondary px-2.5 py-1 font-mono text-[11px] font-medium text-foreground">
+                      {activePanel.tag}
+                    </span>
+                  </div>
+
+                  <div className="divide-y divide-border rounded-md border border-border bg-background">
+                    {activePanel.rows.map((row) => (
+                      <div
+                        key={row.title}
+                        className="flex flex-col gap-2 px-4 py-3.5 sm:flex-row sm:items-center sm:justify-between"
+                      >
+                        <div className="min-w-0">
+                          <div className="truncate text-sm font-medium text-foreground">
+                            {row.title}
+                          </div>
+                          <div className="mt-0.5 truncate text-xs text-muted-foreground">
+                            {row.subtitle}
+                          </div>
+                        </div>
+
+                        <div className="flex items-center justify-between gap-3 sm:justify-end">
+                          <span className="font-mono text-xs font-semibold tabular-nums text-foreground whitespace-nowrap">
+                            {row.metric}
+                          </span>
+                          <span
+                            className={cn(
+                              'rounded-[5px] border px-2 py-0.5 text-[11px] font-medium whitespace-nowrap',
+                              row.positive
+                                ? 'border-emerald-500/20 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400'
+                                : 'border-border bg-secondary text-foreground'
+                            )}
+                          >
+                            {row.status}
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </motion.div>
+              </AnimatePresence>
+            </div>
           </div>
 
-          <div className="grid grid-cols-1 divide-y divide-slate-200 border-t border-slate-200 bg-slate-50/50 sm:grid-cols-2 sm:divide-x lg:grid-cols-4 lg:divide-y-0">
-            {t.secondary.map((item, idx) => {
-              const Icon = SECONDARY_ICONS[idx] || Receipt;
-              return (
-                <div key={item.title} className="p-6">
-                  <Icon className="h-4 w-4 text-blue-600" strokeWidth={1.75} />
-                  <h3 className="mt-4 font-heading text-base font-semibold text-slate-950">
-                    {item.title}
-                  </h3>
-                  <p className="mt-2 text-sm leading-relaxed text-slate-600">
-                    {item.desc}
-                  </p>
-                </div>
-              );
-            })}
+          <div className="flex flex-col gap-6 lg:col-span-5">
+            <div className="flex flex-1 flex-col justify-between rounded-lg bg-foreground p-6 text-background sm:p-7">
+              <div className="flex items-center justify-between">
+                <Layers className="h-5 w-5 text-brand" strokeWidth={1.75} />
+                <ArrowUpRight className="h-4 w-4 opacity-60" strokeWidth={1.75} />
+              </div>
+              <div className="mt-6">
+                <h3 className="font-heading text-lg font-bold">
+                  {t.highlights.topTitle}
+                </h3>
+                <p className="mt-2 text-sm leading-relaxed opacity-80">
+                  {t.highlights.topBody}
+                </p>
+              </div>
+            </div>
+
+            <div className="flex flex-1 flex-col justify-between rounded-lg border border-border bg-secondary p-6 text-foreground sm:p-7">
+              <div>
+                <ShieldCheck className="h-5 w-5 text-brand" strokeWidth={1.75} />
+              </div>
+              <div className="mt-6">
+                <h3 className="font-heading text-lg font-bold">
+                  {t.highlights.bottomTitle}
+                </h3>
+                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                  {t.highlights.bottomBody}
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       </div>

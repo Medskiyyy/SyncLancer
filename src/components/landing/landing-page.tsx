@@ -14,7 +14,7 @@ export const LandingPage: React.FC = () => {
   const [lang, setLang] = useState<Language>('id');
 
   return (
-    <div className="min-h-screen bg-white font-sans text-slate-900 selection:bg-blue-500/20 selection:text-blue-900">
+    <div className="min-h-[100dvh] bg-background font-sans text-foreground selection:bg-emerald-500/20 selection:text-foreground">
       <LandingNavbar lang={lang} onLanguageChange={setLang} />
       <main>
         <LandingHero lang={lang} />

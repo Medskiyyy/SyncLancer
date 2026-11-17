@@ -10,172 +10,137 @@ export const translations = {
       register: 'Mulai Gratis',
     },
     hero: {
-      title: 'Kelola klien, proyek, dan tagihan freelance di satu tempat.',
+      title: 'Satu buku kerja untuk klien, proyek, dan tagihan.',
       description:
-        'Satukan prospek CRM, proposal PDF, papan tugas, catatan jam kerja, invoice, dan portal klien tanpa berpindah aplikasi.',
+        'Kelola prospek, proposal PDF, milestone tugas, jam kerja billable, dan invoice dalam satu ruang kerja bersih.',
       startFree: 'Mulai Gratis',
       loginLink: 'Masuk',
-      modulesStrip: ['CRM Pipeline', 'Proposal PDF', 'Task Kanban', 'Time Log', 'Invoice', 'Client Portal'],
-      tabs: {
-        crm: 'Pipeline CRM',
-        proposals: 'Proposal',
-        kanban: 'Kanban & Jam',
-        billing: 'Tagihan',
-      },
-      workspaceName: 'Aksara Studio',
-      workspacePlan: 'Pro Workspace',
-    },
-    mockup: {
-      crmView: {
-        title: 'Pipeline Prospek Aktif',
-        countLabel: '3 prospek berjalan',
-        rows: [
-          { client: 'Nusantara Retail', scope: 'Portal Order B2B', value: 'Rp 38.500.000', stage: 'Proposal Sent' },
-          { client: 'Surya Logistics', scope: 'Dashboard Armada', value: 'Rp 24.000.000', stage: 'Negotiation' },
-          { client: 'Bumi Arsitektur', scope: 'Web Company Profile', value: 'Rp 14.500.000', stage: 'Won' },
-        ],
-      },
-      proposalView: {
-        number: 'PROP-2026-014',
-        client: 'Nusantara Retail',
-        status: 'Approved',
-        services: [
-          { name: 'Desain UI Sistem Order & Checkout', price: 'Rp 16.000.000' },
-          { name: 'Pengembangan Next.js & Integrasi API', price: 'Rp 19.000.000' },
-        ],
-        taxLabel: 'PPN 10%',
-        taxValue: 'Rp 3.500.000',
-        totalLabel: 'Total Estimasi',
-        totalValue: 'Rp 38.500.000',
-      },
-      kanbanView: {
-        title: 'Sprint Aktif: Portal Order B2B',
-        timerProject: 'Portal Order B2B',
-        timerDuration: '03:42:15',
-        timerBillable: 'Rp 925.000',
-        columns: [
-          { label: 'Backlog', task: 'Skema peran admin cabang' },
-          { label: 'In Progress', task: 'Integrasi upload bukti bayar' },
-          { label: 'Review', task: 'Halaman riwayat pesanan' },
-        ],
-      },
-      billingView: {
-        title: 'Buku Tagihan & Jadwal Berulang',
-        rows: [
-          { number: 'INV-2026-028', client: 'Nusantara Retail', due: '24 Nov 2026', amount: 'Rp 19.250.000', status: 'Sent' },
-          { number: 'INV-2026-027', client: 'Bumi Arsitektur', due: '10 Nov 2026', amount: 'Rp 14.500.000', status: 'Paid' },
-        ],
-      },
+      captionLeft: 'SyncLancer Workspace',
+      captionRight: 'CRM · Proposal · Milestone · Invoice · Portal',
+      imageAlt: 'Meja studio kerja minimalis dengan buku kontrak, laptop matte hitam, dan daun emerald',
     },
     features: {
-      title: 'Semua modul inti yang benar-benar dipakai saat menangani klien.',
-      subtitle: 'Dirancang mengikuti urutan kerja freelancer dari kontak pertama hingga invoice lunas.',
-      primary: [
-        {
-          title: 'CRM Pipeline & Proposal PDF',
-          desc: 'Catat prospek per tahap, ubah jadi akun klien saat deal, lalu susun estimasi pajak dan ekspor proposal PDF. Proposal yang disetujui langsung membuat proyek baru.',
-          metrics: [
-            { label: 'Tahap Pipeline', value: 'Lead -> Contacted -> Sent -> Won' },
-            { label: 'Otomatisasi', value: 'Approve proposal membuat proyek aktif' },
+      title: 'Enam modul operasional yang terhubung ke satu data klien.',
+      subtitle:
+        'Pindah dari penawaran awal ke invoice lunas tanpa menyalin ulang data antar aplikasi.',
+      tabs: [
+        { id: 'crm', label: 'Pipeline CRM' },
+        { id: 'proposals', label: 'Proposal PDF' },
+        { id: 'delivery', label: 'Milestone & Jam' },
+        { id: 'billing', label: 'Invoice & Berkas' },
+      ],
+      panels: {
+        crm: {
+          heading: 'Pipeline prospek dan konversi klien',
+          summary:
+            'Pindahkan prospek antar kolom status, catat estimasi nilai proyek, lalu ubah menjadi profil klien aktif dalam satu klik.',
+          tag: 'Lead -> Klien Aktif',
+          rows: [
+            { title: 'Nusantara Retail', subtitle: 'Portal Order B2B', metric: 'Rp 38.500.000', status: 'Proposal Sent', positive: false },
+            { title: 'Surya Logistics', subtitle: 'Dashboard Armada', metric: 'Rp 24.000.000', status: 'Negotiation', positive: false },
+            { title: 'Bumi Arsitektur', subtitle: 'Company Profile Web', metric: 'Rp 14.500.000', status: 'Won', positive: true },
           ],
         },
-        {
-          title: 'Milestone, Kanban & Catatan Jam Kerja',
-          desc: 'Pecah target proyek menjadi milestone dan kartu tugas. Jalankan timer langsung dari workspace, lalu konversi log jam billable ke tagihan proyek.',
-          metrics: [
-            { label: 'Pelacakan Waktu', value: '1 timer aktif per workspace + log manual' },
-            { label: 'Progres Proyek', value: 'Terhitung otomatis dari status milestone' },
+        proposals: {
+          heading: 'Penyusun proposal dan persetujuan proyek',
+          summary:
+            'Rinci item layanan, hitung pajak otomatis, dan unduh PDF siap kirim. Saat disetujui, proyek baru langsung terbentuk.',
+          tag: 'PROP-2026-014',
+          rows: [
+            { title: 'Arsitektur UI Sistem Order & Checkout', subtitle: 'Tahap 1 Desain', metric: 'Rp 16.000.000', status: 'Included', positive: false },
+            { title: 'Pengembangan Next.js & Integrasi API', subtitle: 'Tahap 2 Implementasi', metric: 'Rp 19.000.000', status: 'Included', positive: false },
+            { title: 'Total Estimasi (termasuk PPN 10%)', subtitle: 'Nusantara Retail', metric: 'Rp 38.500.000', status: 'Approved', positive: true },
           ],
         },
-      ],
-      secondary: [
-        {
-          title: 'Invoice PDF & Jadwal Berulang',
-          desc: 'Buat nomor tagihan berurutan, kirim lewat email, catat pembayaran, dan aktifkan penagihan retainer otomatis.',
+        delivery: {
+          heading: 'Milestone proyek, Kanban tugas, dan time tracker',
+          summary:
+            'Pantau progres proyek otomatis dari status milestone, jalankan satu timer aktif per workspace, atau catat jam kerja manual.',
+          tag: 'Progres 72%',
+          rows: [
+            { title: 'Skema peran admin cabang', subtitle: 'Backlog · Estimasi 6j', metric: 'Milestone 1', status: 'Done', positive: true },
+            { title: 'Integrasi upload bukti pembayaran', subtitle: 'In Progress · Timer aktif', metric: '03:42:15', status: 'Billable', positive: true },
+            { title: 'Ekspor laporan pesanan bulanan', subtitle: 'Review · Tenggat 28 Nov', metric: 'Milestone 2', status: 'In Review', positive: false },
+          ],
         },
-        {
-          title: 'Penyimpanan Berkas Terkontrol',
-          desc: 'Kelompokkan kontrak, aset desain, dan dokumen deliverable per proyek dengan batas kuota paket yang jelas.',
+        billing: {
+          heading: 'Invoice PDF, jadwal berulang, dan kuota berkas',
+          summary:
+            'Terbitkan nomor tagihan berurutan, jadwalkan invoice retainer bulanan, dan kelola dokumen deliverable dalam satu folder proyek.',
+          tag: 'Kuota Paket Terkontrol',
+          rows: [
+            { title: 'INV-2026-028', subtitle: 'Nusantara Retail · Termin 1', metric: 'Rp 19.250.000', status: 'Sent', positive: false },
+            { title: 'INV-2026-027', subtitle: 'Bumi Arsitektur · Lunas', metric: 'Rp 14.500.000', status: 'Paid', positive: true },
+            { title: 'Panduan-API-v2.pdf', subtitle: 'Berkas Deliverable · 2.4 MB', metric: 'Shared', status: 'Portal Ready', positive: true },
+          ],
         },
-        {
-          title: 'Multi-Workspace & Batas Paket',
-          desc: 'Pisahkan bisnis studio atau freelance pribadi dalam workspace berbeda dengan kontrol peran owner dan klien.',
-        },
-        {
-          title: 'Analitik Pendapatan & Beban Kerja',
-          desc: 'Pantau pendapatan bulanan 12 bulan terakhir, tagihan tertunda, dan distribusi status proyek secara langsung.',
-        },
-      ],
+      },
+      highlights: {
+        topTitle: 'Data mengalir tanpa input ulang',
+        topBody:
+          'Profil klien dari CRM otomatis mengisi halaman proposal, menginisialisasi proyek saat disetujui, dan tersambung ke buku tagihan.',
+        bottomTitle: 'Multi-workspace terisolasi',
+        bottomBody:
+          'Pisahkan proyek pribadi dan studio dalam workspace berbeda dengan batasan paket proyek aktif, klien, serta kuota penyimpanan.',
+      },
     },
     workflow: {
-      title: 'Tiga langkah dari prospek ke pembayaran.',
-      subtitle: 'Setiap modul terhubung ke data yang sama sehingga tidak perlu input ulang.',
+      title: 'Urutan kerja yang jelas dari kontak pertama hingga lunas.',
+      subtitle: 'Empat tahap utama operasional freelancer tanpa spreadsheet terpisah.',
       steps: [
         {
-          index: '01',
-          title: 'Catat Prospek & Kirim Proposal',
-          desc: 'Masukkan kontak baru di papan CRM, konversi jadi klien, dan kirim penawaran PDF dengan rincian harga.',
-          io: 'Input: Brief klien -> Output: Proposal PDF & proyek aktif',
+          verb: 'Catat Prospek',
+          desc: 'Kelola prospek di papan CRM, simpan detail kontak, lalu konversi ke profil klien aktif saat deal.',
+          result: 'Daftar klien rapi sejak hari pertama.',
         },
         {
-          index: '02',
-          title: 'Eksekusi Tugas & Rekam Jam',
-          desc: 'Atur milestone proyek, geser kartu tugas di Kanban, dan catat jam kerja real-time maupun entri manual.',
-          io: 'Input: Daftar milestone -> Output: Progres & log jam billable',
+          verb: 'Susun Proposal',
+          desc: 'Buat penawaran bertarif, hitung subtotal dan pajak, ekspor PDF, dan pantau persetujuan.',
+          result: 'Proyek langsung terbuat saat disetujui.',
         },
         {
-          index: '03',
-          title: 'Terbitkan Invoice & Buka Portal',
-          desc: 'Kirim tagihan PDF atau jadwalkan invoice berulang sambil memberi klien akses pantau progres dan berkas.',
-          io: 'Input: Deliverable & tagihan -> Output: Pembayaran tercatat',
+          verb: 'Pantau Eksekusi',
+          desc: 'Pecah target menjadi milestone, geser kartu tugas di Kanban, dan catat jam kerja billable.',
+          result: 'Persentase selesai selalu terukur.',
+        },
+        {
+          verb: 'Terbitkan Invoice',
+          desc: 'Buat tagihan sekali jalan atau berulang, kirim PDF, dan bagikan progres melalui portal klien.',
+          result: 'Pembayaran dan deliverable tercatat utuh.',
         },
       ],
     },
     portal: {
-      title: 'Portal Klien tanpa perlu akun freelancer.',
+      title: 'Portal Klien khusus tanpa keramaian dashboard admin.',
       subtitle:
-        'Undang perwakilan klien untuk memantau perkembangan proyek, mengunduh aset, dan memeriksa tagihan dalam tampilan khusus.',
+        'Undang perwakilan klien untuk memeriksa perkembangan milestone, mengunduh deliverable, dan mengecek status tagihan.',
+      imageAlt: 'Dossier serah terima klien dengan pita pembatas emerald dan lembaran spesifikasi proyek',
       items: [
         {
           label: 'Progres & Milestone Read-Only',
-          detail: 'Klien melihat persentase selesai, tenggat waktu, dan daftar tugas tiap tahap.',
+          detail: 'Klien melihat persentase selesai, tenggat waktu, dan status tugas per tahap tanpa mengubah papan internal.',
         },
         {
           label: 'Pertukaran Berkas Terpusat',
-          detail: 'Unduh deliverable final atau unggah dokumen referensi langsung ke proyek terkait.',
+          detail: 'Unduh hasil akhir atau unggah dokumen referensi yang langsung tertaut ke proyek terkait.',
         },
         {
           label: 'Riwayat Tagihan & Unduh PDF',
-          detail: 'Semua invoice berstatus sent, paid, atau overdue tersedia beserta PDF siap cetak.',
+          detail: 'Semua invoice berstatus sent, paid, maupun overdue tersedia lengkap beserta berkas PDF.',
         },
       ],
-      preview: {
-        clientName: 'Nusantara Retail',
-        projectName: 'Portal Order B2B',
-        progress: 72,
-        milestones: [
-          { title: 'Arsitektur & Wireframe', status: 'Completed' },
-          { title: 'Integrasi Katalog & Checkout', status: 'In Progress' },
-          { title: 'Uji Muat & Serah Terima', status: 'Not Started' },
-        ],
-        invoiceNumber: 'INV-2026-028',
-        invoiceAmount: 'Rp 19.250.000',
-        invoiceStatus: 'Sent',
-        fileName: 'Panduan-API-v2.pdf',
-        fileMeta: '2.4 MB',
-      },
     },
     cta: {
-      title: 'Mulai rapikan operasional klien dan tagihan Anda hari ini.',
-      subtitle: 'Buat workspace gratis untuk mengelola hingga 3 proyek aktif dan 5 klien tanpa kartu kredit.',
+      title: 'Rapikan alur klien, proyek, dan tagihan Anda hari ini.',
+      subtitle: 'Mulai workspace gratis untuk hingga 3 proyek aktif dan 5 klien tanpa kartu kredit.',
       buttonRegister: 'Mulai Gratis',
       buttonLogin: 'Masuk',
     },
     footer: {
-      tagline: 'Workspace operasional proyek, klien, dan penagihan untuk freelancer.',
+      tagline: 'Ruang kerja operasional klien, proyek, dan penagihan untuk freelancer.',
       navigation: 'Navigasi',
       account: 'Akun',
-      rights: 'SyncLancer.',
+      rights: 'SyncLancer. Seluruh hak cipta dilindungi.',
     },
   },
   en: {
@@ -187,172 +152,137 @@ export const translations = {
       register: 'Start Free',
     },
     hero: {
-      title: 'Run your client pipeline, project delivery, and billing in one place.',
+      title: 'One operational ledger for clients, delivery, and billing.',
       description:
-        'Bring CRM leads, PDF proposals, task boards, time tracking, invoices, and client portals into one focused workspace.',
+        'Manage your lead pipeline, PDF proposals, project milestones, billable hours, and client invoices in one calm workspace.',
       startFree: 'Start Free',
       loginLink: 'Sign In',
-      modulesStrip: ['CRM Pipeline', 'PDF Proposals', 'Task Kanban', 'Time Log', 'Invoices', 'Client Portal'],
-      tabs: {
-        crm: 'CRM Pipeline',
-        proposals: 'Proposals',
-        kanban: 'Kanban & Time',
-        billing: 'Billing',
-      },
-      workspaceName: 'Aksara Studio',
-      workspacePlan: 'Pro Workspace',
-    },
-    mockup: {
-      crmView: {
-        title: 'Active Lead Pipeline',
-        countLabel: '3 active deals',
-        rows: [
-          { client: 'Nusantara Retail', scope: 'B2B Order Portal', value: '$3,850', stage: 'Proposal Sent' },
-          { client: 'Surya Logistics', scope: 'Fleet Operations Dashboard', value: '$2,400', stage: 'Negotiation' },
-          { client: 'Bumi Architecture', scope: 'Studio Showcase Site', value: '$1,450', stage: 'Won' },
-        ],
-      },
-      proposalView: {
-        number: 'PROP-2026-014',
-        client: 'Nusantara Retail',
-        status: 'Approved',
-        services: [
-          { name: 'Order Flow & Checkout UI Architecture', price: '$1,600' },
-          { name: 'Next.js Frontend & API Integration', price: '$1,900' },
-        ],
-        taxLabel: 'Tax 10%',
-        taxValue: '$350',
-        totalLabel: 'Proposal Total',
-        totalValue: '$3,850',
-      },
-      kanbanView: {
-        title: 'Active Sprint: B2B Order Portal',
-        timerProject: 'B2B Order Portal',
-        timerDuration: '03:42:15',
-        timerBillable: '$240.50',
-        columns: [
-          { label: 'Backlog', task: 'Branch manager role matrix' },
-          { label: 'In Progress', task: 'Payment proof upload flow' },
-          { label: 'Review', task: 'Order history export view' },
-        ],
-      },
-      billingView: {
-        title: 'Invoice Ledger & Recurring Billing',
-        rows: [
-          { number: 'INV-2026-028', client: 'Nusantara Retail', due: 'Nov 24, 2026', amount: '$1,925', status: 'Sent' },
-          { number: 'INV-2026-027', client: 'Bumi Architecture', due: 'Nov 10, 2026', amount: '$1,450', status: 'Paid' },
-        ],
-      },
+      captionLeft: 'SyncLancer Workspace',
+      captionRight: 'CRM · Proposals · Milestones · Invoices · Portal',
+      imageAlt: 'Minimalist daylight studio desk with a closed matte black laptop, architectural scope sheets, and an emerald botanical leaf',
     },
     features: {
-      title: 'Every core module you actually use across client engagements.',
-      subtitle: 'Structured around how independent engineers and studios take work from initial lead to paid invoice.',
-      primary: [
-        {
-          title: 'CRM Pipeline & PDF Proposals',
-          desc: 'Track prospects by stage, convert won deals into client profiles, and build itemized PDF proposals. Approving a proposal spawns the active project.',
-          metrics: [
-            { label: 'Pipeline Stages', value: 'Lead -> Contacted -> Sent -> Won' },
-            { label: 'Handoff', value: 'Approval creates the project record' },
+      title: 'Six core modules connected to the same client record.',
+      subtitle:
+        'Move engagements from initial inquiry to paid invoice without retyping details across disconnected apps.',
+      tabs: [
+        { id: 'crm', label: 'CRM Pipeline' },
+        { id: 'proposals', label: 'PDF Proposals' },
+        { id: 'delivery', label: 'Milestones & Time' },
+        { id: 'billing', label: 'Invoices & Files' },
+      ],
+      panels: {
+        crm: {
+          heading: 'Lead tracking and one-click client conversion',
+          summary:
+            'Move prospects across Kanban columns, record deal estimates, and convert won deals directly into active client profiles.',
+          tag: 'Lead -> Active Client',
+          rows: [
+            { title: 'Nusantara Retail', subtitle: 'B2B Order Portal', metric: '$3,850', status: 'Proposal Sent', positive: false },
+            { title: 'Surya Logistics', subtitle: 'Fleet Operations Dashboard', metric: '$2,400', status: 'Negotiation', positive: false },
+            { title: 'Bumi Architecture', subtitle: 'Studio Showcase Site', metric: '$1,450', status: 'Won', positive: true },
           ],
         },
-        {
-          title: 'Milestones, Kanban & Time Tracking',
-          desc: 'Break projects into dated milestones and draggable tasks. Run a persistent workspace timer or log manual hours ready for billing.',
-          metrics: [
-            { label: 'Timer Scope', value: '1 active timer per workspace + manual logs' },
-            { label: 'Completion', value: 'Calculated from milestone status' },
+        proposals: {
+          heading: 'Itemized scope builder and project auto-spawn',
+          summary:
+            'Build line-item quotes with automatic tax totals and export print-ready PDFs. Approving a proposal spawns the project.',
+          tag: 'PROP-2026-014',
+          rows: [
+            { title: 'Order Flow & Checkout UI Architecture', subtitle: 'Phase 1 Design', metric: '$1,600', status: 'Included', positive: false },
+            { title: 'Next.js Frontend & API Integration', subtitle: 'Phase 2 Build', metric: '$1,900', status: 'Included', positive: false },
+            { title: 'Proposal Total (incl. 10% Tax)', subtitle: 'Nusantara Retail', metric: '$3,850', status: 'Approved', positive: true },
           ],
         },
-      ],
-      secondary: [
-        {
-          title: 'PDF Invoices & Recurring Billing',
-          desc: 'Issue sequential invoices, email clients directly, mark payments, and automate monthly retainers.',
+        delivery: {
+          heading: 'Project milestones, task Kanban, and time logs',
+          summary:
+            'Calculate completion from milestone status, run one persistent timer per workspace, or log manual billable entries.',
+          tag: '72% Complete',
+          rows: [
+            { title: 'Branch manager role matrix', subtitle: 'Backlog · Est. 6h', metric: 'Milestone 1', status: 'Done', positive: true },
+            { title: 'Payment proof upload flow', subtitle: 'In Progress · Active timer', metric: '03:42:15', status: 'Billable', positive: true },
+            { title: 'Monthly order export view', subtitle: 'Review · Due Nov 28', metric: 'Milestone 2', status: 'In Review', positive: false },
+          ],
         },
-        {
-          title: 'Scoped Cloud File Storage',
-          desc: 'Organize contracts, design files, and deliverables per project with explicit plan quota checks.',
+        billing: {
+          heading: 'Sequential PDF invoices, recurring billing, and files',
+          summary:
+            'Issue numbered invoices, automate monthly retainers, and organize project deliverables with explicit workspace quota checks.',
+          tag: 'Quota Tracked',
+          rows: [
+            { title: 'INV-2026-028', subtitle: 'Nusantara Retail · Deposit', metric: '$1,925', status: 'Sent', positive: false },
+            { title: 'INV-2026-027', subtitle: 'Bumi Architecture · Settled', metric: '$1,450', status: 'Paid', positive: true },
+            { title: 'API-Handoff-Spec-v2.pdf', subtitle: 'Deliverable Asset · 2.4 MB', metric: 'Shared', status: 'Portal Ready', positive: true },
+          ],
         },
-        {
-          title: 'Multi-Workspace & Role Access',
-          desc: 'Separate client accounts or retainers into isolated workspaces with owner and client permissions.',
-        },
-        {
-          title: 'Revenue & Workload Analytics',
-          desc: 'Track 12-month rolling revenue, pending balances, logged hours, and project status distribution.',
-        },
-      ],
+      },
+      highlights: {
+        topTitle: 'Single source of client truth',
+        topBody:
+          'Client records created in CRM populate proposals, spawn active project scopes on approval, and stay linked to every invoice.',
+        bottomTitle: 'Isolated multi-workspace control',
+        bottomBody:
+          'Separate independent retainers or studio arms with strict owner and client roles plus built-in plan limits.',
+      },
     },
     workflow: {
-      title: 'Three steps from prospect to paid invoice.',
-      subtitle: 'Each stage shares the same workspace records so nothing gets retyped across tools.',
+      title: 'A clear sequence from inquiry to settled invoice.',
+      subtitle: 'Four operational stages built on one shared workspace schema.',
       steps: [
         {
-          index: '01',
-          title: 'Capture Leads & Send Proposals',
-          desc: 'Log prospects in the CRM board, convert them to clients, and export clean PDF scopes with tax totals.',
-          io: 'Input: Client brief -> Output: PDF proposal & project',
+          verb: 'Capture Leads',
+          desc: 'Track prospects on your CRM board, store contact notes, and convert won opportunities into clients.',
+          result: 'Clean client records from day one.',
         },
         {
-          index: '02',
-          title: 'Deliver Milestones & Log Hours',
-          desc: 'Schedule milestones, move tasks across Kanban columns, and track billable hours in real time.',
-          io: 'Input: Task breakdown -> Output: Verified progress & time log',
+          verb: 'Send Proposals',
+          desc: 'Draft itemized scopes, compute tax automatically, export PDFs, and track client approval.',
+          result: 'Approval spawns the active project.',
         },
         {
-          index: '03',
-          title: 'Issue Invoices & Share Portal',
-          desc: 'Send sequential PDF invoices or recurring schedules while clients track updates from their portal.',
-          io: 'Input: Deliverables & hours -> Output: Recorded payment',
+          verb: 'Track Delivery',
+          desc: 'Organize milestones, move tasks across Kanban lanes, and record billable hours accurately.',
+          result: 'Progress stays grounded in real tasks.',
+        },
+        {
+          verb: 'Issue Invoices',
+          desc: 'Send sequential PDF invoices or monthly retainers while clients review updates in their portal.',
+          result: 'Payments and deliverables stay aligned.',
         },
       ],
     },
     portal: {
-      title: 'A dedicated Client Portal without admin noise.',
+      title: 'A focused Client Portal without internal workspace clutter.',
       subtitle:
-        'Invite client stakeholders to check milestone completion, exchange files, and download PDF invoices from one clean view.',
+        'Invite client stakeholders to track milestone progress, exchange project files, and download PDF invoices.',
+      imageAlt: 'Architectural stone table with charcoal deliverable dossier, emerald bookmark ribbon, and geometric layout sheets',
       items: [
         {
-          label: 'Read-Only Milestone Timeline',
-          detail: 'Clients inspect project completion percentages, target dates, and task progress.',
+          label: 'Read-Only Milestone Progress',
+          detail: 'Clients inspect completion percentages, target dates, and task delivery without touching internal boards.',
         },
         {
-          label: 'Direct File Exchange',
-          detail: 'Download approved deliverables or upload reference assets scoped to each project.',
+          label: 'Scoped File Exchange',
+          detail: 'Download signed-off deliverables or upload reference assets scoped directly to each project.',
         },
         {
           label: 'Invoice Ledger & PDF Access',
-          detail: 'Every sent, paid, or overdue invoice is listed with instant PDF download.',
+          detail: 'Every sent, paid, or overdue invoice is available in one chronological list with PDF download.',
         },
       ],
-      preview: {
-        clientName: 'Nusantara Retail',
-        projectName: 'B2B Order Portal',
-        progress: 72,
-        milestones: [
-          { title: 'Architecture & Wireframes', status: 'Completed' },
-          { title: 'Catalog & Checkout Integration', status: 'In Progress' },
-          { title: 'Load Testing & Handoff', status: 'Not Started' },
-        ],
-        invoiceNumber: 'INV-2026-028',
-        invoiceAmount: '$1,925',
-        invoiceStatus: 'Sent',
-        fileName: 'API-Handoff-Spec-v2.pdf',
-        fileMeta: '2.4 MB',
-      },
     },
     cta: {
-      title: 'Keep client delivery and invoicing in one organized workspace.',
+      title: 'Bring clients, project delivery, and invoicing into one workspace.',
       subtitle: 'Create a free workspace for up to 3 active projects and 5 clients with no credit card required.',
       buttonRegister: 'Start Free',
       buttonLogin: 'Sign In',
     },
     footer: {
-      tagline: 'Client, project, and billing operations workspace for freelancers.',
+      tagline: 'Operational workspace for freelance client pipelines, delivery, and billing.',
       navigation: 'Navigation',
       account: 'Account',
-      rights: 'SyncLancer.',
+      rights: 'SyncLancer. All rights reserved.',
     },
   },
-};
+} as const;
